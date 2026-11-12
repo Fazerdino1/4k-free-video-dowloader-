@@ -1,0 +1,26 @@
+{
+  "name": "4k free video dowloader",
+  "short_name": "4k dowloader",
+  "description": "Téléchargeur vidéo 4K/8K, playlists, sous-titres et audio MP3 open source en Rust pour Windows et Linux.",
+  "start_url": "/4k-free-video-dowloader-/",
+  "display": "standalone",
+  "background_color": "#f7f9f8",
+  "theme_color": "#7bc81d",
+  "icons": [
+    {
+      "src": "assets/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

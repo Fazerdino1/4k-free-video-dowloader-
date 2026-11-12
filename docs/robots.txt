@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fazerdino1.github.io/4k-free-video-dowloader-/sitemap.xml

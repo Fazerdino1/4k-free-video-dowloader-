@@ -1,6 +1,6 @@
 # 4k free video dowloader (`vidgrab` & `vidgrab-cli`)
 
-Dépôt officiel : [Fazerdino1/4k-free-video-dowloader-](https://github.com/Fazerdino1/4k-free-video-dowloader-) • Licence : **[GPL-3.0-or-later](LICENSE)**
+Site officiel : **[fazerdino1.github.io/4k-free-video-dowloader-](https://fazerdino1.github.io/4k-free-video-dowloader-/)** • Dépôt : [Fazerdino1/4k-free-video-dowloader-](https://github.com/Fazerdino1/4k-free-video-dowloader-) • Licence : **[GPL-3.0-or-later](LICENSE)**
 
 Application **open source**, écrite **100 % en Rust** (Tauri 2 + WebView2 / WebKitGTK + CLI headless), propulsée par **yt-dlp** et **ffmpeg**, compatible avec **Windows 10/11 (x64)** et l'ensemble des distributions Linux **Desktop, Serveur, ARM, Gaming, Cybersécurité et Conteneurs**.
 

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compatibilité Linux &amp; CLI Headless — 4k free video dowloader</title>
+  <meta name="description" content="Guide d'installation de 4k free video dowloader et vidgrab-cli sur Ubuntu, Debian, Linux Mint, Fedora, Arch, CachyOS, Manjaro, Gentoo, Alpine, Docker, Wayland et X11.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#7bc81d">
+  <link rel="canonical" href="https://fazerdino1.github.io/4k-free-video-dowloader-/guide-linux.html">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Aller au contenu principal</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="site-brand" href="./">
+        <img src="assets/icon-128.png" alt="" width="34" height="34">
+        <span>4k free video dowloader</span>
+        <span class="brand-pill">v0.2.0 Open Source</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Navigation principale">
+        <button
+          class="menu-button"
+          type="button"
+          popovertarget="site-menu"
+          popovertargetaction="toggle"
+          aria-controls="site-menu"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <span>Menu</span>
+        </button>
+
+        <ul id="site-menu" class="site-menu">
+          <li><a href="./">Présentation</a></li>
+          <li><a href="./#fonctionnalites">Fonctionnalités</a></li>
+          <li><a href="./#telechargement">Téléchargement</a></li>
+          <li><a href="guide-linux.html" aria-current="page">Linux &amp; CLI</a></li>
+          <li><a href="./#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <a class="nav-github" href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">Code source GitHub</a>
+        <a class="nav-cta" href="./#telechargement">Téléchargement gratuit</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="container" style="padding-block: 3.5rem 5rem;">
+    <div class="section-heading" style="margin-block-end: 2.5rem;">
+      <h1>Compatibilité universelle Linux &amp; CLI Headless</h1>
+      <p>Un même moteur Rust pour postes de travail Wayland/X11, serveurs SSH, consoles gaming et conteneurs Alpine <code>musl</code>.</p>
+    </div>
+
+    <div class="cards-2col">
+      <article class="feature-card">
+        <h3>Poste de travail &amp; grand public</h3>
+        <p>Support natif d'<strong>Ubuntu (24.04 / 26.04 LTS)</strong>, Kubuntu, Xubuntu, Lubuntu, <strong>Linux Mint 22.3 &amp; LMDE</strong>, <strong>Fedora 44</strong> (y compris Silverblue/Kinoite), <strong>Pop!_OS COSMIC</strong>, <strong>Zorin OS</strong> et <strong>Elementary OS</strong> via paquets <code>.deb</code>, <code>.rpm</code>, AppImage et Flatpak.</p>
+      </article>
+
+      <article class="feature-card">
+        <h3>Serveurs, Cloud &amp; Conteneurs</h3>
+        <p>Le binaire <code>vidgrab-cli</code> ne dépend d'aucune bibliothèque graphique GTK/WebKitGTK et fonctionne sur <strong>Debian 13</strong>, <strong>Ubuntu Server</strong>, <strong>RHEL</strong>, <strong>AlmaLinux</strong>, <strong>Rocky Linux</strong>, <strong>openSUSE Leap / Tumbleweed</strong> et <strong>Alpine Linux</strong> (musl / Docker non-root).</p>
+      </article>
+
+      <article class="feature-card">
+        <h3>Rolling Release, Gaming &amp; Sécurité</h3>
+        <p>Recettes et détection système prêtes pour <strong>Arch Linux</strong> (PKGBUILD AUR), <strong>CachyOS</strong>, <strong>EndeavourOS</strong>, <strong>Manjaro</strong>, <strong>Gentoo</strong> (ebuild v0.2.0), <strong>Bazzite</strong>, <strong>SteamOS</strong>, <strong>Nobara</strong>, <strong>Garuda</strong>, <strong>Kali Linux</strong>, <strong>Parrot OS</strong>, <strong>Tails</strong> (proxy Tor auto) et <strong>Qubes OS</strong>.</p>
+      </article>
+
+      <article class="feature-card">
+        <h3>Commandes rapides CLI &amp; Docker</h3>
+        <div class="cli-terminal" style="margin-block-start: 0.5rem;">vidgrab-cli diag
+vidgrab-cli download "URL" --quality 2160p --format mkv
+docker build -f packaging/docker/Dockerfile -t vidgrab-cli:latest .
+docker run --rm -v "$PWD/downloads:/downloads" vidgrab-cli:latest diag</div>
+      </article>
+    </div>
+
+    <div style="text-align: center; margin-block-start: 2rem;">
+      <a class="btn-hero" href="./#telechargement">Revenir aux téléchargements v0.2.0</a>
+    </div>
+  </main>
+
+  <footer class="site-footer" style="padding-block-end: 3rem;">
+    <div class="container footer-bottom" style="border-block-start: 0; padding-block-start: 0;">
+      <span>© 2026 Fazerdino1 — <strong>4k free video dowloader</strong> (GNU GPL-3.0-or-later).</span>
+      <a href="./">Retour à l'accueil</a>
+    </div>
+  </footer>
+</body>
+</html>
