@@ -1080,6 +1080,14 @@ const CLIENT_JS: &str = r##"
                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
+        function safeImgSrc(u) {
+            const raw = String(u || '').trim();
+            if (/^https?:\/\//i.test(raw) || /^data:image\/(png|jpe?g|webp|gif);/i.test(raw)) {
+                return raw;
+            }
+            return '';
+        }
+
         function normalizeUrl(u) {
             return (u || '').trim().replace(/\/+$/, '').toLowerCase();
         }
@@ -1817,7 +1825,7 @@ const CLIENT_JS: &str = r##"
                     const vurl = (e.url && e.url.startsWith('http')) ? e.url : (e.webpage_url || (e.id ? 'https://www.youtube.com/watch?v=' + e.id : ''));
                     const dur = formatDurationShort(e.duration);
                     const title = e.title || vurl || ('Vidéo ' + (i + 1));
-                    const thumb = e.thumbnail || '';
+                    const thumb = safeImgSrc(e.thumbnail);
                     return `<article class="yt-card">
                         <div class="yt-thumb-wrap">
                             ${thumb ? `<img src="${esc(thumb)}" alt="" referrerpolicy="no-referrer" />` : `<span class="thumb-ph" aria-hidden="true">${ICO.film}</span>`}
@@ -2504,13 +2512,15 @@ const CLIENT_JS: &str = r##"
         function renderCardJs(item) {
             const req = item.request, prog = item.progress;
             const cat = req.media_type === 'audio_only' ? 'audio' : (req.media_type === 'subtitles_only' ? 'subtitles' : 'video');
-            const thumb = req.thumbnail
-                ? `<img src="${esc(req.thumbnail)}" alt="" referrerpolicy="no-referrer" /><span class="thumb-play-overlay">${ICO.play}</span>`
+            const thumbSrc = safeImgSrc(req.thumbnail);
+            const thumb = thumbSrc
+                ? `<img src="${esc(thumbSrc)}" alt="" referrerpolicy="no-referrer" /><span class="thumb-play-overlay">${ICO.play}</span>`
                 : `<span class="thumb-ph">${cat === 'audio' ? ICO.music : (cat === 'subtitles' ? ICO.captions : ICO.film)}</span>`;
             const pct = (prog.status === 'completed' ? 100 : (prog.percent || 0)).toFixed(1);
             const barCls = prog.status === 'failed' ? 'bar-error' : (prog.status === 'paused' ? 'bar-paused' : (prog.status === 'completed' ? 'bar-done' : ''));
-            return `<article class="download-card" role="listitem" data-id="${req.id}" data-status="${prog.status}" data-category="${cat}" tabindex="0">
-                <div class="thumb-box" data-action="${prog.status === 'completed' ? 'play' : 'open'}" data-id="${req.id}" title="${prog.status === 'completed' ? 'Lire' : 'Ouvrir le dossier'}">${thumb}</div>
+            const safeId = esc(req.id);
+            return `<article class="download-card" role="listitem" data-id="${safeId}" data-status="${esc(prog.status)}" data-category="${cat}" tabindex="0">
+                <div class="thumb-box" data-action="${prog.status === 'completed' ? 'play' : 'open'}" data-id="${safeId}" title="${prog.status === 'completed' ? 'Lire' : 'Ouvrir le dossier'}">${thumb}</div>
                 <div class="item-meta">
                     <div class="item-title" title="${esc(req.title)}">${esc(req.title)}</div>
                     <div class="item-sub js-sub">${subLine(item)}</div>
@@ -2518,7 +2528,7 @@ const CLIENT_JS: &str = r##"
                         <div class="progress-fill ${barCls}" style="width: ${pct}%"></div>
                     </div>
                 </div>
-                <div class="item-actions">${actionButtons(req.id, prog.status)}</div>
+                <div class="item-actions">${actionButtons(safeId, prog.status)}</div>
             </article>`;
         }
 

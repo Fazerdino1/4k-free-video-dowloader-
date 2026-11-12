@@ -1,5 +1,7 @@
 # Rust build cache & local runtime/test artifacts
 /target/
+/dist/
+/release-assets/
 /Videos/
 *.mp4
 *.mkv
@@ -12,5 +14,13 @@
 *.log
 .DS_Store
 
-# AppImage exceeds GitHub's 100 MiB Git blob limit (110.76 MiB) — hosted in GitHub Releases v0.1.0
+# Release binaries & packages (distributed via GitHub Releases, never tracked in Git)
+/vidgrab
+/vidgrab-cli
 *.AppImage
+*.deb
+*.rpm
+*.exe
+*.dll
+*.zip
+SHA256SUMS.txt

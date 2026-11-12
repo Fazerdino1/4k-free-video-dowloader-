@@ -189,7 +189,11 @@ fi
 if [ "$CLI_ONLY" = "1" ]; then
   run_cmd cargo install --path "$ROOT_DIR/crates/vidgrab-cli" --locked
 else
-  run_cmd cargo build --release --offline -p vidgrab-tauri -p vidgrab-cli
+  CARGO_FLAGS="--locked"
+  if [ -d "$ROOT_DIR/vendor" ] || [ -f "$ROOT_DIR/.cargo/config.toml" ]; then
+    CARGO_FLAGS="--offline --locked"
+  fi
+  run_cmd cargo build --release $CARGO_FLAGS -p vidgrab-tauri -p vidgrab-cli
   run_cmd mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications" "$HOME/.local/share/icons/hicolor/128x128/apps"
   run_cmd install -Dm755 "$ROOT_DIR/target/release/vidgrab" "$HOME/.local/bin/vidgrab"
   run_cmd install -Dm755 "$ROOT_DIR/target/release/vidgrab-cli" "$HOME/.local/bin/vidgrab-cli"

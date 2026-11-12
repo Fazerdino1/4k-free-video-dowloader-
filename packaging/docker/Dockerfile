@@ -1,7 +1,7 @@
 # Multi-stage immutable container image for headless Linux servers & containers (Alpine musl)
 # Build from repository root:
 #   docker build -f packaging/docker/Dockerfile -t vidgrab-cli:latest .
-FROM rust:1.83-alpine3.21 AS builder
+FROM rust:1-alpine3.21 AS builder
 
 RUN apk add --no-cache musl-dev openssl-dev sqlite-dev pkgconfig
 

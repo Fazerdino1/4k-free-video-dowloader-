@@ -6,8 +6,8 @@
 use crate::error::CoreResult;
 use std::fs::{self, OpenOptions};
 use std::io::Write;
-use std::os::unix::fs::OpenOptionsExt;
-use std::os::unix::fs::PermissionsExt;
+#[cfg(unix)]
+use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::Path;
 use vidgrab_shared::CookieEntry;
 
@@ -47,17 +47,19 @@ pub fn write_netscape_cookies_file(path: &Path, cookies: &[CookieEntry]) -> Core
     }
     let content = format_netscape_cookies(cookies);
 
-    let mut file = OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(true)
-        .mode(0o600)
-        .open(path)?;
+    let mut opts = OpenOptions::new();
+    opts.create(true).write(true).truncate(true);
+    #[cfg(unix)]
+    opts.mode(0o600);
+    let mut file = opts.open(path)?;
 
-    // Explicitly enforce 0600 even if the file already existed with broader permissions
-    let mut perms = file.metadata()?.permissions();
-    perms.set_mode(0o600);
-    file.set_permissions(perms)?;
+    // Explicitly enforce 0600 on Unix even if the file already existed with broader permissions
+    #[cfg(unix)]
+    {
+        let mut perms = file.metadata()?.permissions();
+        perms.set_mode(0o600);
+        file.set_permissions(perms)?;
+    }
 
     file.write_all(content.as_bytes())?;
     file.sync_all()?;

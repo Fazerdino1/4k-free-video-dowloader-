@@ -1,18 +1,21 @@
 # 4k free video dowloader (`vidgrab` & `vidgrab-cli`)
 
-Repository: `# 4k-free-video-dowloader-`
+Dépôt officiel : [Fazerdino1/4k-free-video-dowloader-](https://github.com/Fazerdino1/4k-free-video-dowloader-) • Licence : **[GPL-3.0-or-later](LICENSE)**
 
-Application **open source**, écrite **100 % en Rust** (Tauri 2 + WebKitGTK + CLI headless), propulsée par **yt-dlp** et **ffmpeg**, compatible avec l'ensemble des distributions Linux **Desktop, Serveur, ARM, Gaming, Cybersécurité et Conteneurs**.
+Application **open source**, écrite **100 % en Rust** (Tauri 2 + WebView2 / WebKitGTK + CLI headless), propulsée par **yt-dlp** et **ffmpeg**, compatible avec **Windows 10/11 (x64)** et l'ensemble des distributions Linux **Desktop, Serveur, ARM, Gaming, Cybersécurité et Conteneurs**.
 
-## Téléchargements précompilés (`v0.1.0`)
+## Téléchargements précompilés (`v0.2.0`)
 
-Tous les binaires et paquets précompilés sont disponibles dans la [Release GitHub `v0.1.0`](https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.1.0) (et `.rpm` / `.deb` / `vidgrab` / `vidgrab-cli` directement à la racine du dépôt) :
+Tous les binaires et paquets précompilés sont distribués exclusivement via la [**Release GitHub `v0.2.0`**](https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.2.0) (accompagnés du fichier `SHA256SUMS.txt` ; le dépôt Git ne contient que les sources) :
 
-| Format | Usage cible | Fichier |
+| Plateforme / Format | Usage cible | Fichier |
 |---|---|---|
-| **AppImage** (universel Linux) | Toute distribution Linux (`chmod +x`) | `4k free video dowloader_0.1.0_amd64.AppImage` *(via Releases `v0.1.0`)* |
-| **RPM** | Fedora, Nobara, RHEL, AlmaLinux, Rocky, openSUSE | `4k free video dowloader-0.1.0-1.x86_64.rpm` |
-| **DEB** | Ubuntu, Linux Mint, Debian, Pop!_OS, Kali, Parrot, Zorin | `4k free video dowloader_0.1.0_amd64.deb` |
+| **Windows GUI (x64)** | Application Desktop Windows 10/11 *(placer `WebView2Loader.dll` dans le même dossier)* | `4k free video dowloader.exe` + `WebView2Loader.dll` |
+| **Windows Archive complète** | Archive portable prête à l'emploi (`4k free video dowloader.exe` + `vidgrab-cli.exe` + `WebView2Loader.dll` + `LICENSE`) | `4k free video dowloader_0.2.0_windows_x64.zip` |
+| **Windows CLI (x64)** | Ligne de commande headless Windows | `vidgrab-cli.exe` |
+| **AppImage** (universel Linux) | Toute distribution Linux (`chmod +x`) | `4k free video dowloader_0.2.0_amd64.AppImage` |
+| **RPM** | Fedora, Nobara, RHEL, AlmaLinux, Rocky, openSUSE | `4k free video dowloader-0.2.0-1.x86_64.rpm` |
+| **DEB** | Ubuntu, Linux Mint, Debian, Pop!_OS, Kali, Parrot, Zorin | `4k free video dowloader_0.2.0_amd64.deb` |
 | **GUI Linux (x86_64)** | Exécutable Desktop Rust/WebKitGTK | `vidgrab` |
 | **CLI Headless (x86_64)** | Serveurs, Raspberry Pi / SSH / conteneurs sans GTK | `vidgrab-cli` |
 
@@ -108,10 +111,19 @@ cargo clippy --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-### Construction des paquets `.deb` et `.rpm` (Tauri)
+### Construction des paquets `.deb`, `.rpm` et `.AppImage` (Tauri)
 
 ```bash
-cargo tauri build --bundles deb,rpm
+cargo tauri build --bundles deb,rpm,appimage
+```
+
+### Cross-compilation Windows x64 (depuis Linux avec MinGW-w64)
+
+```bash
+CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=x86_64-w64-mingw32-gcc \
+CC_x86_64_pc_windows_gnu=x86_64-w64-mingw32-gcc \
+AR_x86_64_pc_windows_gnu=x86_64-w64-mingw32-ar \
+cargo build --release --locked --target x86_64-pc-windows-gnu --workspace
 ```
 
 ### Image Docker serveur headless (Alpine `musl`, non-root)
@@ -120,3 +132,9 @@ cargo tauri build --bundles deb,rpm
 docker build -f packaging/docker/Dockerfile -t vidgrab-cli:latest .
 docker run --rm -v "$PWD/downloads:/downloads" vidgrab-cli:latest diag
 ```
+
+## Sécurité & Licence
+
+- **Licence** : GNU General Public License v3.0 or later ([`LICENSE`](LICENSE)).
+- **Durcissement WebView** : politique CSP restrictive dans [`src-tauri/tauri.conf.json`](src-tauri/tauri.conf.json), permissions Tauri limitées à la fenêtre principale dans [`src-tauri/capabilities/default.json`](src-tauri/capabilities/default.json), et filtrage des URLs d'images/miniatures dans l'interface.
+- **CI/CD GitHub Actions** : [`ci.yml`](.github/workflows/ci.yml) (`rustfmt`, `clippy` Linux & Windows GNU, tests d'intégration, compilation croisée) et [`release.yml`](.github/workflows/release.yml) pour la publication automatisée sur tags `v*`.

@@ -1,11 +1,11 @@
-# Maintainer: VidGrab Contributors
+# Maintainer: Fazerdino1 <187407683+Fazerdino1@users.noreply.github.com>
 pkgname=vidgrab
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=0
 pkgdesc="Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) in Rust"
-url="https://github.com/vidgrab/4kfreedowloader"
+url="https://github.com/Fazerdino1/4k-free-video-dowloader-"
 arch="x86_64 aarch64 armv7"
-license="MIT OR Apache-2.0"
+license="GPL-3.0-or-later"
 depends="ca-certificates ffmpeg yt-dlp python3"
 makedepends="cargo sqlite-dev openssl-dev"
 subpackages="$pkgname-cli"

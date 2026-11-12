@@ -27,4 +27,6 @@ dirs.workspace = true
 url.workspace = true
 tauri = { version = "2.0", features = ["tray-icon"] }
 tauri-plugin-dialog = "2.0"
+
+[target.'cfg(target_os = "linux")'.dependencies]
 webkit2gtk = { version = "2.0", features = ["v2_20"] }

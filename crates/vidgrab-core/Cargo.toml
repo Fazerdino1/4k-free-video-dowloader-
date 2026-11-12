@@ -20,10 +20,16 @@ hex.workspace = true
 base64 = "0.22"
 regex.workspace = true
 reqwest.workspace = true
-nix.workspace = true
 dirs.workspace = true
 which.workspace = true
 futures-util.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+nix.workspace = true
+
+[target.'cfg(target_os = "windows")'.dependencies]
+libsqlite3-sys = { version = "0.30", features = ["bundled"] }
+windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem"] }
 
 [dev-dependencies]
 tempfile.workspace = true

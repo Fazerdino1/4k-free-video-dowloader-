@@ -8,7 +8,11 @@ ARCH="${ARCH:-$(uname -m)}"
 APPDIR="$ROOT_DIR/target/AppDir"
 
 cd "$ROOT_DIR"
-cargo build --release --offline -p vidgrab-tauri -p vidgrab-cli
+CARGO_FLAGS="--locked"
+if [ -d "$ROOT_DIR/vendor" ] || [ -f "$ROOT_DIR/.cargo/config.toml" ]; then
+  CARGO_FLAGS="--offline --locked"
+fi
+cargo build --release $CARGO_FLAGS -p vidgrab-tauri -p vidgrab-cli
 
 rm -rf "$APPDIR"
 mkdir -p \

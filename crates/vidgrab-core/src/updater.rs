@@ -8,6 +8,7 @@ use crate::error::{CoreError, CoreResult};
 use futures_util::StreamExt;
 use sha2::{Digest, Sha256};
 use std::fs;
+#[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::process::Stdio;
@@ -63,22 +64,24 @@ pub fn write_executable_binary(dest_path: &Path, bytes: &[u8]) -> CoreResult<()>
     }
     let tmp_path = dest_path.with_extension("tmp");
     fs::write(&tmp_path, bytes)?;
-    let mut perms = fs::metadata(&tmp_path)?.permissions();
-    perms.set_mode(0o755);
-    fs::set_permissions(&tmp_path, perms)?;
+    #[cfg(unix)]
+    {
+        let mut perms = fs::metadata(&tmp_path)?.permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&tmp_path, perms)?;
+    }
     fs::rename(&tmp_path, dest_path)?;
     Ok(())
 }
 
 /// Checks whether a candidate `yt-dlp` executable is runnable and returns its version string.
 async fn probe_yt_dlp_version(bin: &Path) -> Option<String> {
-    let output = Command::new(bin)
-        .arg("--version")
+    let mut cmd = Command::new(bin);
+    cmd.arg("--version")
         .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .output()
-        .await
-        .ok()?;
+        .stderr(Stdio::null());
+    crate::configure_background_command(&mut cmd);
+    let output = cmd.output().await.ok()?;
     if output.status.success() {
         let ver = String::from_utf8_lossy(&output.stdout).trim().to_string();
         if !ver.is_empty() {
@@ -118,13 +121,10 @@ pub async fn ensure_or_update_yt_dlp(paths: &AppPaths, force_download: bool) -> 
     // and fall back to a fresh verified download.
     if target_path.exists() && force_download {
         info!("Updating existing yt-dlp binary via yt-dlp -U");
-        if let Ok(output) = Command::new(&target_path)
-            .arg("-U")
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .output()
-            .await
-        {
+        let mut cmd = Command::new(&target_path);
+        cmd.arg("-U").stdout(Stdio::piped()).stderr(Stdio::piped());
+        crate::configure_background_command(&mut cmd);
+        if let Ok(output) = cmd.output().await {
             if output.status.success() {
                 let msg = String::from_utf8_lossy(&output.stdout).trim().to_string();
                 return Ok(msg);
@@ -133,7 +133,8 @@ pub async fn ensure_or_update_yt_dlp(paths: &AppPaths, force_download: bool) -> 
     }
 
     let arch = std::env::consts::ARCH;
-    let candidates = crate::platform::preferred_ytdlp_asset_names(
+    let candidates = crate::platform::preferred_ytdlp_asset_names_for_os(
+        std::env::consts::OS,
         arch,
         crate::platform::detect_libc(),
         is_nixos,
@@ -209,16 +210,18 @@ pub async fn ensure_or_update_yt_dlp(paths: &AppPaths, force_download: bool) -> 
         });
     }
 
-    let mut perms = fs::metadata(&tmp_path)?.permissions();
-    perms.set_mode(0o755);
-    fs::set_permissions(&tmp_path, perms)?;
+    #[cfg(unix)]
+    {
+        let mut perms = fs::metadata(&tmp_path)?.permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&tmp_path, perms)?;
+    }
     tokio::fs::rename(&tmp_path, &target_path).await?;
 
-    let ver_output = Command::new(&target_path)
-        .arg("--version")
-        .stdout(Stdio::piped())
-        .output()
-        .await?;
+    let mut ver_cmd = Command::new(&target_path);
+    ver_cmd.arg("--version").stdout(Stdio::piped());
+    crate::configure_background_command(&mut ver_cmd);
+    let ver_output = ver_cmd.output().await?;
     let ver = String::from_utf8_lossy(&ver_output.stdout)
         .trim()
         .to_string();

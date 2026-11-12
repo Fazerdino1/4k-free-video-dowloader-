@@ -107,12 +107,16 @@ impl AppPaths {
         })
     }
 
-    /// Returns the path to the managed `yt-dlp` binary inside `~/.local/share/vidgrab/bin/yt-dlp`.
+    /// Returns the path to the managed `yt-dlp` binary inside the local `bin` directory.
     pub fn managed_yt_dlp_path(&self) -> PathBuf {
-        self.bin_dir.join("yt-dlp")
+        if cfg!(target_os = "windows") {
+            self.bin_dir.join("yt-dlp.exe")
+        } else {
+            self.bin_dir.join("yt-dlp")
+        }
     }
 
-    /// Resolves the effective `yt-dlp` binary path based on user settings, sandbox, and libc compatibility.
+    /// Resolves the effective `yt-dlp` binary path based on user settings, portable sidecar, sandbox, and libc compatibility.
     pub fn effective_yt_dlp(&self, settings: &Settings) -> PathBuf {
         if let Some(custom) = &settings.custom_yt_dlp_path {
             if !custom.as_os_str().is_empty() {
@@ -124,30 +128,45 @@ impl AppPaths {
                 return sys;
             }
         }
-        for env_bin in [
-            "/app/bin/yt-dlp".to_string(),
-            std::env::var("SNAP")
-                .map(|s| format!("{s}/bin/yt-dlp"))
-                .unwrap_or_default(),
-            std::env::var("SNAP")
-                .map(|s| format!("{s}/usr/bin/yt-dlp"))
-                .unwrap_or_default(),
-            std::env::var("APPDIR")
-                .map(|s| format!("{s}/usr/bin/yt-dlp"))
-                .unwrap_or_default(),
-        ] {
-            if !env_bin.is_empty() {
-                let candidate = PathBuf::from(&env_bin);
-                if candidate.exists() {
-                    return candidate;
+        if let Ok(exe) = std::env::current_exe() {
+            if let Some(exe_dir) = exe.parent() {
+                let sidecar = exe_dir.join(if cfg!(target_os = "windows") {
+                    "yt-dlp.exe"
+                } else {
+                    "yt-dlp"
+                });
+                if sidecar.is_file() {
+                    return sidecar;
                 }
             }
         }
-        let musl_or_nixos =
-            crate::platform::detect_libc() == "musl" || Path::new("/etc/NIXOS").exists();
-        if musl_or_nixos {
-            if let Ok(sys) = which::which("yt-dlp") {
-                return sys;
+        #[cfg(not(target_os = "windows"))]
+        {
+            for env_bin in [
+                "/app/bin/yt-dlp".to_string(),
+                std::env::var("SNAP")
+                    .map(|s| format!("{s}/bin/yt-dlp"))
+                    .unwrap_or_default(),
+                std::env::var("SNAP")
+                    .map(|s| format!("{s}/usr/bin/yt-dlp"))
+                    .unwrap_or_default(),
+                std::env::var("APPDIR")
+                    .map(|s| format!("{s}/usr/bin/yt-dlp"))
+                    .unwrap_or_default(),
+            ] {
+                if !env_bin.is_empty() {
+                    let candidate = PathBuf::from(&env_bin);
+                    if candidate.exists() {
+                        return candidate;
+                    }
+                }
+            }
+            let musl_or_nixos =
+                crate::platform::detect_libc() == "musl" || Path::new("/etc/NIXOS").exists();
+            if musl_or_nixos {
+                if let Ok(sys) = which::which("yt-dlp") {
+                    return sys;
+                }
             }
         }
         let managed = self.managed_yt_dlp_path();
@@ -157,13 +176,33 @@ impl AppPaths {
         which::which("yt-dlp").unwrap_or(managed)
     }
 
-    /// Resolves the effective `ffmpeg` binary path across native, Flatpak, Snap, AppImage,
-    /// NixOS, GNU Guix, and RPMFusion (`ffmpeg-free`) installations.
+    /// Resolves the effective `ffmpeg` binary path across native, Windows portable/WinGet/Scoop/Choco,
+    /// Flatpak, Snap, AppImage, NixOS, GNU Guix, and RPMFusion (`ffmpeg-free`) installations.
     pub fn effective_ffmpeg(&self, settings: &Settings) -> CoreResult<PathBuf> {
         if let Some(custom) = &settings.custom_ffmpeg_path {
             if custom.exists() {
                 return Ok(custom.clone());
             }
+        }
+        if let Ok(exe) = std::env::current_exe() {
+            if let Some(exe_dir) = exe.parent() {
+                let sidecar = exe_dir.join(if cfg!(target_os = "windows") {
+                    "ffmpeg.exe"
+                } else {
+                    "ffmpeg"
+                });
+                if sidecar.is_file() {
+                    return Ok(sidecar);
+                }
+            }
+        }
+        let managed_ffmpeg = self.bin_dir.join(if cfg!(target_os = "windows") {
+            "ffmpeg.exe"
+        } else {
+            "ffmpeg"
+        });
+        if managed_ffmpeg.is_file() {
+            return Ok(managed_ffmpeg);
         }
         if let Ok(found) = which::which("ffmpeg") {
             return Ok(found);
@@ -171,25 +210,41 @@ impl AppPaths {
         if let Ok(found_free) = which::which("ffmpeg-free") {
             return Ok(found_free);
         }
-        let mut candidates = vec![
-            PathBuf::from("/app/bin/ffmpeg"),
-            PathBuf::from("/run/current-system/sw/bin/ffmpeg"),
-            PathBuf::from("/usr/local/bin/ffmpeg"),
-            PathBuf::from("/usr/bin/ffmpeg"),
-            PathBuf::from("/usr/bin/ffmpeg-free"),
-        ];
-        if let Some(snap) = std::env::var_os("SNAP") {
-            let p = PathBuf::from(snap);
-            candidates.push(p.join("usr/bin/ffmpeg"));
-            candidates.push(p.join("bin/ffmpeg"));
+        let mut candidates = Vec::new();
+        #[cfg(target_os = "windows")]
+        {
+            if let Some(local_app) = dirs::data_local_dir() {
+                candidates.push(local_app.join("Microsoft/WinGet/Links/ffmpeg.exe"));
+            }
+            if let Some(home) = dirs::home_dir() {
+                candidates.push(home.join("scoop/shims/ffmpeg.exe"));
+            }
+            candidates.push(PathBuf::from(r"C:\ProgramData\chocolatey\bin\ffmpeg.exe"));
+            candidates.push(PathBuf::from(r"C:\ffmpeg\bin\ffmpeg.exe"));
+            candidates.push(PathBuf::from(r"C:\Program Files\ffmpeg\bin\ffmpeg.exe"));
         }
-        if let Some(appdir) = std::env::var_os("APPDIR") {
-            candidates.push(PathBuf::from(appdir).join("usr/bin/ffmpeg"));
-        }
-        if let Some(home) = dirs::home_dir() {
-            candidates.push(home.join(".nix-profile/bin/ffmpeg"));
-            candidates.push(home.join(".guix-profile/bin/ffmpeg"));
-            candidates.push(home.join(".local/bin/ffmpeg"));
+        #[cfg(not(target_os = "windows"))]
+        {
+            candidates.extend([
+                PathBuf::from("/app/bin/ffmpeg"),
+                PathBuf::from("/run/current-system/sw/bin/ffmpeg"),
+                PathBuf::from("/usr/local/bin/ffmpeg"),
+                PathBuf::from("/usr/bin/ffmpeg"),
+                PathBuf::from("/usr/bin/ffmpeg-free"),
+            ]);
+            if let Some(snap) = std::env::var_os("SNAP") {
+                let p = PathBuf::from(snap);
+                candidates.push(p.join("usr/bin/ffmpeg"));
+                candidates.push(p.join("bin/ffmpeg"));
+            }
+            if let Some(appdir) = std::env::var_os("APPDIR") {
+                candidates.push(PathBuf::from(appdir).join("usr/bin/ffmpeg"));
+            }
+            if let Some(home) = dirs::home_dir() {
+                candidates.push(home.join(".nix-profile/bin/ffmpeg"));
+                candidates.push(home.join(".guix-profile/bin/ffmpeg"));
+                candidates.push(home.join(".local/bin/ffmpeg"));
+            }
         }
         candidates
             .into_iter()

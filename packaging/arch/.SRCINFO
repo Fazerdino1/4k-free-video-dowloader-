@@ -1,13 +1,12 @@
 pkgbase = vidgrab
 	pkgdesc = Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) written in Rust
-	pkgver = 0.1.0
+	pkgver = 0.2.0
 	pkgrel = 1
-	url = https://github.com/vidgrab/4kfreedowloader
+	url = https://github.com/Fazerdino1/4k-free-video-dowloader-
 	arch = x86_64
 	arch = aarch64
 	arch = armv7h
-	license = MIT
-	license = Apache-2.0
+	license = GPL-3.0-or-later
 	makedepends = cargo
 	makedepends = pkgconf
 	makedepends = webkit2gtk-4.1

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 PRGNAM=vidgrab
-VERSION=${VERSION:-0.1.0}
+VERSION=${VERSION:-0.2.0}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_SBo}
 
@@ -32,7 +32,11 @@ rm -rf "$PKG"
 mkdir -p "$TMP" "$PKG" "$OUTPUT"
 
 cd "$ROOT_DIR"
-cargo build --release --offline -p vidgrab-tauri -p vidgrab-cli
+if [ -d vendor ] || [ -f .cargo/config.toml ]; then
+  cargo build --release --offline -p vidgrab-tauri -p vidgrab-cli
+else
+  cargo build --release --locked -p vidgrab-tauri -p vidgrab-cli
+fi
 
 install -Dm755 target/release/vidgrab "$PKG/usr/bin/vidgrab"
 install -Dm755 target/release/vidgrab-cli "$PKG/usr/bin/vidgrab-cli"

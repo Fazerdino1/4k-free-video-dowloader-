@@ -68,10 +68,16 @@ pub fn render_download_card(item: &DownloadItem, i18n: &I18nCatalog) -> String {
         .unwrap_or_default();
 
     let thumb_html = match &item.request.thumbnail {
-        Some(url) if !url.is_empty() => format!(
-            r#"<img src="{}" alt="Thumbnail" loading="lazy" /><span class="thumb-play-overlay">▶</span>"#,
-            html_escape(url)
-        ),
+        Some(url)
+            if url.starts_with("https://")
+                || url.starts_with("http://")
+                || url.starts_with("data:image/") =>
+        {
+            format!(
+                r#"<img src="{}" alt="Thumbnail" loading="lazy" referrerpolicy="no-referrer" /><span class="thumb-play-overlay">▶</span>"#,
+                html_escape(url)
+            )
+        }
         _ => String::from(r#"<span class="thumb-play-overlay">▶</span>"#),
     };
 

@@ -9,11 +9,11 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "GPL-3.0-or-later"
-authors = ["4k free dowloader Contributors"]
-repository = "https://github.com/vidgrab/vidgrab"
+authors = ["Fazerdino1"]
+repository = "https://github.com/Fazerdino1/4k-free-video-dowloader-"
 
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }

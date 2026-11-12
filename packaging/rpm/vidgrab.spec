@@ -1,9 +1,9 @@
 Name:           vidgrab
-Version:        0.1.0
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) in Rust
-License:        MIT OR Apache-2.0
-URL:            https://github.com/vidgrab/4kfreedowloader
+License:        GPL-3.0-or-later
+URL:            https://github.com/Fazerdino1/4k-free-video-dowloader-
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cargo
@@ -51,11 +51,16 @@ servers and minimal containers.
 %autosetup
 
 %build
-cargo build --release --offline -p vidgrab-tauri -p vidgrab-cli
+if [ -d vendor ] || [ -f .cargo/config.toml ]; then
+  cargo build --release --offline -p vidgrab-tauri -p vidgrab-cli
+else
+  cargo build --release --locked -p vidgrab-tauri -p vidgrab-cli
+fi
 
 %install
 install -Dm755 target/release/vidgrab %{buildroot}%{_bindir}/vidgrab
 install -Dm755 target/release/vidgrab-cli %{buildroot}%{_bindir}/vidgrab-cli
+install -Dm644 LICENSE %{buildroot}%{_licensedir}/%{name}/LICENSE
 install -Dm644 packaging/vidgrab.desktop %{buildroot}%{_datadir}/applications/vidgrab.desktop
 install -Dm644 packaging/metainfo/io.github.vidgrab.VidGrab.metainfo.xml %{buildroot}%{_datadir}/metainfo/io.github.vidgrab.VidGrab.metainfo.xml
 install -Dm644 src-tauri/icons/128x128.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/vidgrab.png
@@ -63,14 +68,16 @@ install -Dm644 src-tauri/icons/32x32.png %{buildroot}%{_datadir}/icons/hicolor/3
 install -Dm644 src-tauri/icons/icon.png %{buildroot}%{_datadir}/icons/hicolor/512x512/apps/vidgrab.png
 
 %files
+%license LICENSE
 %{_bindir}/vidgrab
 %{_datadir}/applications/vidgrab.desktop
 %{_datadir}/metainfo/io.github.vidgrab.VidGrab.metainfo.xml
 %{_datadir}/icons/hicolor/*/apps/vidgrab.png
 
 %files cli
+%license LICENSE
 %{_bindir}/vidgrab-cli
 
 %changelog
-* Thu Nov 12 2026 VidGrab Contributors - 0.1.0-1
-- Universal RPM spec supporting Fedora, RHEL, AlmaLinux, Rocky, Nobara, Bazzite, and openSUSE
+* Thu Nov 12 2026 Fazerdino1 <187407683+Fazerdino1@users.noreply.github.com> - 0.2.0-1
+- Harmonize GPL-3.0-or-later license, harden Tauri WebView CSP, and support Windows .exe

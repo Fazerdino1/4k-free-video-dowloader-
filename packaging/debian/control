@@ -1,7 +1,8 @@
 Source: vidgrab
 Section: video
 Priority: optional
-Maintainer: VidGrab Contributors <maintainers@example.org>
+Maintainer: Fazerdino1 <187407683+Fazerdino1@users.noreply.github.com>
+Homepage: https://github.com/Fazerdino1/4k-free-video-dowloader-
 Build-Depends: debhelper-compat (= 13), cargo, rustc, pkg-config, libwebkit2gtk-4.1-dev, libssl-dev, libsqlite3-dev, librsvg2-dev, libayatana-appindicator3-dev | libappindicator3-dev
 Standards-Version: 4.6.2
 

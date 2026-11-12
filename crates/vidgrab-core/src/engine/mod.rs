@@ -6,7 +6,9 @@ pub mod parser;
 
 use crate::config::AppPaths;
 use crate::error::{CoreError, CoreResult};
+#[cfg(unix)]
 use nix::sys::signal::{kill, Signal};
+#[cfg(unix)]
 use nix::unistd::Pid;
 use std::collections::HashMap;
 use std::path::Path;
@@ -72,11 +74,12 @@ pub async fn analyze_url(
     let cmd_args = args::build_analyze_args(url, flat_playlist, settings);
     debug!("Running yt-dlp analyze: {:?} {:?}", yt_dlp, cmd_args);
 
-    let fut = Command::new(&yt_dlp)
-        .args(&cmd_args)
+    let mut cmd = Command::new(&yt_dlp);
+    cmd.args(&cmd_args)
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output();
+        .stderr(Stdio::piped());
+    crate::configure_background_command(&mut cmd);
+    let fut = cmd.output();
 
     let output = tokio::time::timeout(ANALYZE_TIMEOUT, fut)
         .await
@@ -114,12 +117,12 @@ pub async fn list_extractors(paths: &AppPaths, settings: &Settings) -> CoreResul
         ));
     }
 
-    let output = Command::new(&yt_dlp)
-        .arg("--list-extractors")
+    let mut cmd = Command::new(&yt_dlp);
+    cmd.arg("--list-extractors")
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output()
-        .await?;
+        .stderr(Stdio::piped());
+    crate::configure_background_command(&mut cmd);
+    let output = cmd.output().await?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
@@ -136,14 +139,46 @@ pub async fn list_extractors(paths: &AppPaths, settings: &Settings) -> CoreResul
     Ok(list)
 }
 
-/// Sends `SIGTERM` to the `yt-dlp` process group (including any child `ffmpeg`)
-/// to cleanly pause it while preserving `.part` files.
+/// Cleanly stops the `yt-dlp` process tree (including any child `ffmpeg`)
+/// to pause or cancel a download while preserving `.part` files.
 pub fn terminate_process(pid: u32) -> CoreResult<()> {
-    let pgid = Pid::from_raw(-(pid as i32));
-    let direct = Pid::from_raw(pid as i32);
-    kill(pgid, Signal::SIGTERM)
-        .or_else(|_| kill(direct, Signal::SIGTERM))
-        .map_err(|e| CoreError::YtDlpFailed(format!("Failed to send SIGTERM to PID {pid}: {e}")))
+    #[cfg(unix)]
+    {
+        let pgid = Pid::from_raw(-(pid as i32));
+        let direct = Pid::from_raw(pid as i32);
+        kill(pgid, Signal::SIGTERM)
+            .or_else(|_| kill(direct, Signal::SIGTERM))
+            .map_err(|e| {
+                CoreError::YtDlpFailed(format!("Failed to send SIGTERM to PID {pid}: {e}"))
+            })
+    }
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        let status = std::process::Command::new("taskkill")
+            .args(["/PID", &pid.to_string(), "/T", "/F"])
+            .creation_flags(CREATE_NO_WINDOW)
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status()
+            .map_err(|e| {
+                CoreError::YtDlpFailed(format!("Failed to run taskkill for PID {pid}: {e}"))
+            })?;
+        if status.success() {
+            Ok(())
+        } else {
+            Err(CoreError::YtDlpFailed(format!(
+                "taskkill exited with status {} for PID {pid}",
+                status
+            )))
+        }
+    }
+    #[cfg(not(any(unix, target_os = "windows")))]
+    {
+        let _ = pid;
+        Ok(())
+    }
 }
 
 /// Removes `.part` and `.ytdl` temporary files in `output_dir` matching the download title or ID.
@@ -213,6 +248,7 @@ where
     cmd.args(&cmd_args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+    crate::configure_background_command(&mut cmd);
     #[cfg(unix)]
     cmd.process_group(0);
     let mut child = cmd.spawn()?;

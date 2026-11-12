@@ -22,7 +22,7 @@ pub fn print_usage(program_name: &str, to_stderr: bool) {
     let text = format!(
         "\
 4k free video dowloader (vidgrab) v{APP_VERSION}
-Moteur Open Source yt-dlp + ffmpeg pour Linux (Desktop & Serveur Headless)
+Moteur Open Source yt-dlp + ffmpeg pour Linux & Windows (Desktop & Serveur Headless)
 
 USAGE :
   {program_name}                         Lance l'interface graphique (Desktop)
@@ -110,7 +110,7 @@ fn cmd_diag(args: &[String]) -> i32 {
         }
     }
 
-    println!("=== 4k free video dowloader — Diagnostic Linux ===");
+    println!("=== 4k free video dowloader — Diagnostic Système ===");
     println!(
         "Distribution : {} (id={}, like={})",
         info.distro_name,

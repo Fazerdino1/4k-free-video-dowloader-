@@ -31,8 +31,10 @@ use vidgrab_core::queue::DownloadQueue;
 use vidgrab_core::smart_mode::build_smart_download_request;
 use vidgrab_core::subscriptions::SubscriptionManager;
 use vidgrab_core::updater::ensure_or_update_yt_dlp;
+#[cfg(target_os = "linux")]
+use vidgrab_shared::CookieBrowser;
 use vidgrab_shared::{
-    AiAudioOperation, CookieBrowser, CookieEntry, DownloadItem, DownloadProgress, DownloadRequest,
+    AiAudioOperation, CookieEntry, DownloadItem, DownloadProgress, DownloadRequest,
     LinuxPlatformInfo, MediaToolAction, PostDownloadAction, Settings, Subscription, VideoInfo,
 };
 
@@ -282,41 +284,65 @@ async fn cmd_open_path(path: PathBuf) -> CmdResult<()> {
     open::that(&target).map_err(|e| format!("Impossible d'ouvrir {} : {e}", target.display()))
 }
 
-/// Reads the system clipboard (Wayland `wl-paste`, then X11 `xclip` / `xsel`).
+/// Reads the system clipboard (PowerShell on Windows, `wl-paste`/`xclip`/`xsel` on Linux).
 #[tauri::command]
 async fn cmd_read_clipboard() -> CmdResult<String> {
-    let candidates: [(&str, &[&str]); 3] = [
-        ("wl-paste", &["--no-newline"]),
-        ("xclip", &["-selection", "clipboard", "-o"]),
-        ("xsel", &["--clipboard", "--output"]),
-    ];
-    for (bin, args) in candidates {
-        if let Ok(out) = tokio::process::Command::new(bin).args(args).output().await {
+    #[cfg(target_os = "windows")]
+    {
+        let mut cmd = tokio::process::Command::new("powershell.exe");
+        cmd.args([
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; Get-Clipboard -Raw",
+        ]);
+        vidgrab_core::configure_background_command(&mut cmd);
+        if let Ok(out) = cmd.output().await {
             if out.status.success() {
                 return Ok(String::from_utf8_lossy(&out.stdout).trim().to_string());
             }
         }
+        Err("Presse-papiers Windows inaccessible".to_string())
     }
-    Err(
-        "Presse-papiers inaccessible (installez wl-clipboard ou xclip via apt/dnf/pacman/zypper/apk)"
-            .to_string(),
-    )
+    #[cfg(not(target_os = "windows"))]
+    {
+        let candidates: [(&str, &[&str]); 3] = [
+            ("wl-paste", &["--no-newline"]),
+            ("xclip", &["-selection", "clipboard", "-o"]),
+            ("xsel", &["--clipboard", "--output"]),
+        ];
+        for (bin, args) in candidates {
+            if let Ok(out) = tokio::process::Command::new(bin).args(args).output().await {
+                if out.status.success() {
+                    return Ok(String::from_utf8_lossy(&out.stdout).trim().to_string());
+                }
+            }
+        }
+        Err(
+            "Presse-papiers inaccessible (installez wl-clipboard ou xclip via apt/dnf/pacman/zypper/apk)"
+                .to_string(),
+        )
+    }
 }
 
-/// Writes text to the system clipboard (Wayland `wl-copy`, then X11 `xclip`).
+/// Writes text to the system clipboard (PowerShell on Windows, `wl-copy`/`xclip` on Linux).
 #[tauri::command]
 async fn cmd_write_clipboard(text: String) -> CmdResult<()> {
     use tokio::io::AsyncWriteExt;
-    let candidates: [(&str, &[&str]); 2] = [
-        ("wl-copy", &[]),
-        ("xclip", &["-selection", "clipboard", "-i"]),
-    ];
-    for (bin, args) in candidates {
-        if let Ok(mut child) = tokio::process::Command::new(bin)
-            .args(args)
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-        {
+    #[cfg(target_os = "windows")]
+    {
+        let mut cmd = tokio::process::Command::new("powershell.exe");
+        cmd.args([
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            "[Console]::InputEncoding=[System.Text.Encoding]::UTF8; $v=[Console]::In.ReadToEnd(); Set-Clipboard -Value $v",
+        ])
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null());
+        vidgrab_core::configure_background_command(&mut cmd);
+        if let Ok(mut child) = cmd.spawn() {
             if let Some(mut stdin) = child.stdin.take() {
                 let _ = stdin.write_all(text.as_bytes()).await;
             }
@@ -326,8 +352,32 @@ async fn cmd_write_clipboard(text: String) -> CmdResult<()> {
                 }
             }
         }
+        Err("Impossible de copier dans le presse-papiers Windows".to_string())
     }
-    Err("Impossible de copier dans le presse-papiers".to_string())
+    #[cfg(not(target_os = "windows"))]
+    {
+        let candidates: [(&str, &[&str]); 2] = [
+            ("wl-copy", &[]),
+            ("xclip", &["-selection", "clipboard", "-i"]),
+        ];
+        for (bin, args) in candidates {
+            if let Ok(mut child) = tokio::process::Command::new(bin)
+                .args(args)
+                .stdin(std::process::Stdio::piped())
+                .spawn()
+            {
+                if let Some(mut stdin) = child.stdin.take() {
+                    let _ = stdin.write_all(text.as_bytes()).await;
+                }
+                if let Ok(st) = child.wait().await {
+                    if st.success() {
+                        return Ok(());
+                    }
+                }
+            }
+        }
+        Err("Impossible de copier dans le presse-papiers".to_string())
+    }
 }
 
 #[tauri::command]
@@ -634,10 +684,10 @@ async fn cmd_open_builtin_browser(
             let handle = app_for_nav.clone();
             let main_handle = handle.clone();
             let _ = main_handle.run_on_main_thread(move || {
-                let st = handle.state::<AppState>();
                 #[cfg(target_os = "linux")]
                 if let Some(bw) = handle.get_webview_window("browser") {
                     if !target_url.is_empty() {
+                        let st = handle.state::<AppState>();
                         export_webkit_cookies_for_url(
                             &bw,
                             target_url.clone(),
@@ -859,47 +909,88 @@ async fn cmd_get_platform_info(state: State<'_, AppState>) -> CmdResult<LinuxPla
     Ok(platform::detect_platform_info(&state.paths, &settings))
 }
 
-/// Triggers system shutdown across `systemd`, `elogind`, `OpenRC`, `runit`, or `sysvinit` when configured.
+/// Triggers system shutdown across Windows (`shutdown /s /t 5`) and Linux (`systemd`, `elogind`, `OpenRC`, `runit`, `sysvinit`).
 #[tauri::command]
 async fn cmd_shutdown_system() -> CmdResult<()> {
-    let candidates: [(&str, &[&str]); 4] = [
-        ("systemctl", &["poweroff"]),
-        ("loginctl", &["poweroff"]),
-        ("poweroff", &[]),
-        ("shutdown", &["-h", "now"]),
-    ];
-    for (bin, args) in candidates {
-        if let Ok(status) = tokio::process::Command::new(bin).args(args).status().await {
+    #[cfg(target_os = "windows")]
+    {
+        let mut cmd = tokio::process::Command::new("shutdown");
+        cmd.args(["/s", "/t", "5"]);
+        vidgrab_core::configure_background_command(&mut cmd);
+        if let Ok(status) = cmd.status().await {
             if status.success() {
                 return Ok(());
             }
         }
+        Err("Extinction Windows impossible (shutdown /s)".to_string())
     }
-    Err(
-        "Extinction système impossible (systemctl/loginctl/poweroff indisponibles ou droits insuffisants)"
-            .to_string(),
-    )
+    #[cfg(not(target_os = "windows"))]
+    {
+        let candidates: [(&str, &[&str]); 4] = [
+            ("systemctl", &["poweroff"]),
+            ("loginctl", &["poweroff"]),
+            ("poweroff", &[]),
+            ("shutdown", &["-h", "now"]),
+        ];
+        for (bin, args) in candidates {
+            if let Ok(status) = tokio::process::Command::new(bin).args(args).status().await {
+                if status.success() {
+                    return Ok(());
+                }
+            }
+        }
+        Err(
+            "Extinction système impossible (systemctl/loginctl/poweroff indisponibles ou droits insuffisants)"
+                .to_string(),
+        )
+    }
 }
 
-/// Writes or removes `~/.config/autostart/vidgrab.desktop` for KDE Plasma / XDG session autostart.
+/// Configures OS login autostart (Windows Registry Run key or Linux XDG `.desktop`).
 fn configure_autostart_desktop_entry(enabled: bool) -> std::io::Result<()> {
-    let Some(cfg_dir) = dirs::config_dir() else {
-        return Ok(());
-    };
-    let autostart_dir = cfg_dir.join("autostart");
-    fs::create_dir_all(&autostart_dir)?;
-    let desktop_file = autostart_dir.join("vidgrab.desktop");
-    if enabled {
-        let exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("/usr/bin/vidgrab"));
-        let content = format!(
-            "[Desktop Entry]\nType=Application\nName=4k free video dowloader\nExec={}\nIcon=4k-free-video-dowloader\nStartupWMClass=vidgrab\nTerminal=false\nCategories=AudioVideo;Video;\n",
-            exe.display()
-        );
-        fs::write(desktop_file, content)?;
-    } else if desktop_file.exists() {
-        let _ = fs::remove_file(desktop_file);
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        let run_key = r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run";
+        let value_name = "4k free video dowloader";
+        if enabled {
+            let exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("vidgrab.exe"));
+            let quoted = format!("\"{}\"", exe.display());
+            let _ = std::process::Command::new("reg.exe")
+                .args([
+                    "add", run_key, "/v", value_name, "/t", "REG_SZ", "/d", &quoted, "/f",
+                ])
+                .creation_flags(CREATE_NO_WINDOW)
+                .status()?;
+        } else {
+            let _ = std::process::Command::new("reg.exe")
+                .args(["delete", run_key, "/v", value_name, "/f"])
+                .creation_flags(CREATE_NO_WINDOW)
+                .status();
+        }
+        Ok(())
     }
-    Ok(())
+    #[cfg(not(target_os = "windows"))]
+    {
+        let Some(cfg_dir) = dirs::config_dir() else {
+            return Ok(());
+        };
+        let autostart_dir = cfg_dir.join("autostart");
+        fs::create_dir_all(&autostart_dir)?;
+        let desktop_file = autostart_dir.join("vidgrab.desktop");
+        if enabled {
+            let exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("/usr/bin/vidgrab"));
+            let content = format!(
+                "[Desktop Entry]\nType=Application\nName=4k free video dowloader\nExec={}\nIcon=4k-free-video-dowloader\nStartupWMClass=vidgrab\nTerminal=false\nCategories=AudioVideo;Video;\n",
+                exe.display()
+            );
+            fs::write(desktop_file, content)?;
+        } else if desktop_file.exists() {
+            let _ = fs::remove_file(desktop_file);
+        }
+        Ok(())
+    }
 }
 
 /// Returns the embedded high-resolution green cloud application icon (`128x128` PNG).
@@ -907,7 +998,7 @@ fn embedded_app_icon() -> tauri::image::Image<'static> {
     tauri::include_image!("./icons/128x128.png")
 }
 
-/// Sends a native desktop notification on Linux via `notify-send` when enabled in settings.
+/// Sends a native desktop notification (via `notify-send` on Linux or PowerShell balloon on Windows) when enabled in settings.
 fn send_desktop_notification_if_enabled(settings: &RwLock<Settings>, summary: &str, body: &str) {
     let enabled = settings
         .read()
@@ -916,6 +1007,7 @@ fn send_desktop_notification_if_enabled(settings: &RwLock<Settings>, summary: &s
     if !enabled {
         return;
     }
+    #[cfg(target_os = "linux")]
     let _ = std::process::Command::new("notify-send")
         .args([
             "--app-name=4k free video dowloader",
@@ -924,6 +1016,29 @@ fn send_desktop_notification_if_enabled(settings: &RwLock<Settings>, summary: &s
             body,
         ])
         .spawn();
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        let title_esc = summary.replace('\'', "''");
+        let body_esc = body.replace('\'', "''");
+        let ps_script = format!(
+            "Add-Type -AssemblyName System.Windows.Forms; $n=New-Object System.Windows.Forms.NotifyIcon; $n.Icon=[System.Drawing.SystemIcons]::Information; $n.Visible=$true; $n.ShowBalloonTip(5000,'{title_esc}','{body_esc}',[System.Windows.Forms.ToolTipIcon]::Info); Start-Sleep -Seconds 6; $n.Dispose()"
+        );
+        let _ = std::process::Command::new("powershell.exe")
+            .args([
+                "-NoProfile",
+                "-NonInteractive",
+                "-WindowStyle",
+                "Hidden",
+                "-Command",
+                &ps_script,
+            ])
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn();
+    }
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+    let _ = (summary, body);
 }
 
 /// Rotates and initializes log file in `~/.local/share/vidgrab/logs/vidgrab.log`.

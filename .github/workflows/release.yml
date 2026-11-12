@@ -1,0 +1,150 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-linux:
+    name: Build Linux Packages & Binaries
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux packaging dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libsqlite3-dev \
+            libssl-dev \
+            pkg-config \
+            rpm \
+            file \
+            squashfs-tools \
+            xdg-utils
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install tauri-cli
+        run: cargo install tauri-cli --version "^2" --locked
+
+      - name: Run tests before packaging
+        run: cargo test --workspace --locked
+
+      - name: Build CLI & Tauri bundles (.deb, .rpm, .AppImage)
+        run: |
+          cargo build --release --locked -p vidgrab-cli
+          cargo tauri build --bundles deb,rpm,appimage -- --locked
+
+      - name: Stage Linux release artifacts
+        run: |
+          mkdir -p dist/linux
+          cp target/release/vidgrab dist/linux/vidgrab
+          cp target/release/vidgrab-cli dist/linux/vidgrab-cli
+          find target/release/bundle/deb -name '*.deb' -exec cp {} dist/linux/ \;
+          find target/release/bundle/rpm -name '*.rpm' -exec cp {} dist/linux/ \;
+          find target/release/bundle/appimage -name '*.AppImage' -exec cp {} dist/linux/ \;
+          ls -lh dist/linux
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: dist/linux/*
+
+  build-windows:
+    name: Build Windows x64 Binaries
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install MinGW-w64 & zip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            mingw-w64 \
+            gcc-mingw-w64-x86-64 \
+            zip
+
+      - name: Add Windows GNU target
+        run: rustup target add x86_64-pc-windows-gnu
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Cross-compile Windows release binaries
+        env:
+          CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
+          CC_x86_64_pc_windows_gnu: x86_64-w64-mingw32-gcc
+          AR_x86_64_pc_windows_gnu: x86_64-w64-mingw32-ar
+        run: cargo build --release --locked --target x86_64-pc-windows-gnu --workspace
+
+      - name: Stage Windows release artifacts
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p dist/windows/bundle
+          cp target/x86_64-pc-windows-gnu/release/vidgrab.exe "dist/windows/4k free video dowloader.exe"
+          cp target/x86_64-pc-windows-gnu/release/vidgrab-cli.exe dist/windows/vidgrab-cli.exe
+          cp target/x86_64-pc-windows-gnu/release/WebView2Loader.dll dist/windows/WebView2Loader.dll
+          cp "dist/windows/4k free video dowloader.exe" dist/windows/bundle/
+          cp dist/windows/vidgrab-cli.exe dist/windows/bundle/
+          cp dist/windows/WebView2Loader.dll dist/windows/bundle/
+          cp LICENSE dist/windows/bundle/LICENSE
+          (cd dist/windows/bundle && zip -r "../4k free video dowloader_${VERSION}_windows_x64.zip" .)
+          rm -rf dist/windows/bundle
+          ls -lh dist/windows
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: dist/windows/*
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Generate SHA256SUMS
+        run: |
+          cd release-assets
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Check if release already exists
+        id: check_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release-assets/*

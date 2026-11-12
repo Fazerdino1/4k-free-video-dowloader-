@@ -1,12 +1,11 @@
 name       : vidgrab
-version    : 0.1.0
+version    : 0.2.0
 release    : 1
 source     :
-    - https://github.com/vidgrab/4kfreedowloader/archive/refs/tags/v0.1.0.tar.gz : SKIP
-homepage   : https://github.com/vidgrab/4kfreedowloader
+    - https://github.com/Fazerdino1/4k-free-video-dowloader-/archive/refs/tags/v0.2.0.tar.gz : SKIP
+homepage   : https://github.com/Fazerdino1/4k-free-video-dowloader-
 license    :
-    - MIT
-    - Apache-2.0
+    - GPL-3.0-or-later
 component  : multimedia.video
 summary    : Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) in Rust
 description: |

@@ -35,7 +35,10 @@ pub fn shared_http_client() -> &'static reqwest::Client {
             .connect_timeout(Duration::from_secs(10))
             .timeout(Duration::from_secs(120))
             .pool_max_idle_per_host(8)
-            .user_agent("4k-free-video-dowloader/0.1.0")
+            .user_agent(concat!(
+                "4k-free-video-dowloader/",
+                env!("CARGO_PKG_VERSION")
+            ))
             .build()
             .unwrap_or_else(|_| reqwest::Client::new())
     })
@@ -185,7 +188,10 @@ pub async fn test_proxy_connection(proxy_url: &str, test_target_url: &str) -> Co
     let client = reqwest::Client::builder()
         .proxy(proxy)
         .timeout(Duration::from_secs(10))
-        .user_agent("4k-free-video-dowloader/0.1.0")
+        .user_agent(concat!(
+            "4k-free-video-dowloader/",
+            env!("CARGO_PKG_VERSION")
+        ))
         .build()?;
 
     let start = std::time::Instant::now();
@@ -212,8 +218,20 @@ pub fn is_within_schedule(settings: &vidgrab_shared::Settings, local_hour: u8) -
     }
 }
 
+/// Applies `CREATE_NO_WINDOW` on Windows so background subprocesses (`yt-dlp.exe`,
+/// `ffmpeg.exe`, `taskkill`, PowerShell) do not flash console windows in GUI mode.
+pub fn configure_background_command(cmd: &mut tokio::process::Command) {
+    #[cfg(target_os = "windows")]
+    {
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+    #[cfg(not(target_os = "windows"))]
+    let _ = cmd;
+}
+
 /// Returns `(available_bytes, total_bytes)` on the filesystem containing `path` (or its closest
-/// existing parent directory) directly via POSIX `statvfs` without spawning `df`.
+/// existing parent directory) directly via OS APIs (`statvfs` on Unix, `GetDiskFreeSpaceExW` on Windows).
 pub fn get_disk_space_bytes(path: &std::path::Path) -> Option<(u64, u64)> {
     let mut target = if path.as_os_str().is_empty() {
         std::path::PathBuf::from(".")
@@ -229,15 +247,44 @@ pub fn get_disk_space_bytes(path: &std::path::Path) -> Option<(u64, u64)> {
             }
         }
     }
-    let stats = nix::sys::statvfs::statvfs(&target).ok()?;
-    let unit = if stats.fragment_size() > 0 {
-        stats.fragment_size()
-    } else {
-        stats.block_size()
-    };
-    let avail = (stats.blocks_available() as u64).saturating_mul(unit);
-    let total = (stats.blocks() as u64).saturating_mul(unit);
-    Some((avail, total))
+    #[cfg(unix)]
+    {
+        let stats = nix::sys::statvfs::statvfs(&target).ok()?;
+        let unit = if stats.fragment_size() > 0 {
+            stats.fragment_size()
+        } else {
+            stats.block_size()
+        };
+        let avail = (stats.blocks_available() as u64).saturating_mul(unit);
+        let total = (stats.blocks() as u64).saturating_mul(unit);
+        Some((avail, total))
+    }
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::ffi::OsStrExt;
+        use windows_sys::Win32::Storage::FileSystem::GetDiskFreeSpaceExW;
+
+        let wide: Vec<u16> = target
+            .as_os_str()
+            .encode_wide()
+            .chain(std::iter::once(0))
+            .collect();
+        let mut avail: u64 = 0;
+        let mut total: u64 = 0;
+        let mut free: u64 = 0;
+        // SAFETY: `wide` is NUL-terminated UTF-16 and output pointers are valid stack locals.
+        let ok = unsafe { GetDiskFreeSpaceExW(wide.as_ptr(), &mut avail, &mut total, &mut free) };
+        if ok != 0 {
+            Some((avail, total))
+        } else {
+            None
+        }
+    }
+    #[cfg(not(any(unix, target_os = "windows")))]
+    {
+        let _ = target;
+        None
+    }
 }
 
 #[cfg(test)]
@@ -258,6 +305,7 @@ mod tests {
     use crate::subscriptions::SubscriptionManager;
     use crate::updater::{compute_sha256_hex, parse_sha256sums, verify_sha256};
     use chrono::Utc;
+    #[cfg(unix)]
     use std::os::unix::fs::PermissionsExt;
     use std::path::{Path, PathBuf};
     use std::sync::{Arc, RwLock};
@@ -323,8 +371,12 @@ mod tests {
         assert!(args.contains(&"--xff".to_string()));
         assert!(args.contains(&"FR".to_string()));
         assert!(args.contains(&"-o".to_string()));
-        assert!(args
-            .contains(&"/tmp/videos/My Channel_ Best_Worst/007 - %(title)s.%(ext)s".to_string()));
+        let expected_out = PathBuf::from("/tmp/videos")
+            .join("My Channel_ Best_Worst")
+            .join("007 - %(title)s.%(ext)s")
+            .to_string_lossy()
+            .into_owned();
+        assert!(args.contains(&expected_out));
         assert_eq!(
             args.last().map(String::as_str),
             Some("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
@@ -525,12 +577,15 @@ mod tests {
         write_netscape_cookies_file(&cookie_path, &cookies)
             .unwrap_or_else(|e| panic!("write cookies failed: {e}"));
 
-        let mode = std::fs::metadata(&cookie_path)
-            .unwrap_or_else(|e| panic!("meta: {e}"))
-            .permissions()
-            .mode()
-            & 0o777;
-        assert_eq!(mode, 0o600);
+        #[cfg(unix)]
+        {
+            let mode = std::fs::metadata(&cookie_path)
+                .unwrap_or_else(|e| panic!("meta: {e}"))
+                .permissions()
+                .mode()
+                & 0o777;
+            assert_eq!(mode, 0o600);
+        }
 
         let raw = format_netscape_cookies(&cookies);
         let parsed = parse_netscape_cookies(&raw);
@@ -911,6 +966,14 @@ mod tests {
         assert_eq!(
             crate::updater::ytdlp_asset_url("yt-dlp_linux_aarch64"),
             "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux_aarch64"
+        );
+        assert_eq!(
+            crate::platform::preferred_ytdlp_asset_names_for_os("windows", "x86_64", "msvc", false),
+            vec!["yt-dlp.exe"]
+        );
+        assert_eq!(
+            crate::updater::ytdlp_asset_url("yt-dlp.exe"),
+            "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"
         );
     }
 

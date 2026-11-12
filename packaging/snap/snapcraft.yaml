@@ -1,6 +1,8 @@
 name: vidgrab
 base: core24
-version: '0.1.0'
+version: '0.2.0'
+license: GPL-3.0-or-later
+source-code: https://github.com/Fazerdino1/4k-free-video-dowloader-
 summary: Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg)
 description: |
   4k free video dowloader (vidgrab) is a lightweight open-source downloader written

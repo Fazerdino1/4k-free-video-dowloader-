@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint-and-packaging-checks:
+    name: Format, Clippy & Packaging Checks
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux & MinGW-w64 dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libsqlite3-dev \
+            libssl-dev \
+            pkg-config \
+            mingw-w64 \
+            gcc-mingw-w64-x86-64
+
+      - name: Configure Rust toolchain
+        run: |
+          rustup component add rustfmt clippy
+          rustup target add x86_64-pc-windows-gnu
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run Clippy (Linux)
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      - name: Run Clippy (Windows GNU target)
+        env:
+          CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
+          CC_x86_64_pc_windows_gnu: x86_64-w64-mingw32-gcc
+          AR_x86_64_pc_windows_gnu: x86_64-w64-mingw32-ar
+        run: cargo clippy --workspace --target x86_64-pc-windows-gnu --locked -- -D warnings
+
+      - name: Validate shell scripts & license consistency
+        run: |
+          bash -n packaging/install-linux.sh
+          bash -n packaging/appimage/build-appimage.sh
+          bash -n packaging/slackware/vidgrab.SlackBuild
+          test -f LICENSE
+          grep -q 'license = "GPL-3.0-or-later"' Cargo.toml
+          ! grep -rn "MIT" packaging/
+          ! grep -rn '"csp": null' src-tauri/tauri.conf.json
+
+  test-linux:
+    name: Workspace Tests (Linux)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            libsqlite3-dev \
+            libssl-dev \
+            pkg-config
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run workspace unit & integration tests
+        run: cargo test --workspace --locked
+
+  build-linux-and-windows:
+    name: Build Linux & Windows Release Binaries
+    needs: [lint-and-packaging-checks, test-linux]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libsqlite3-dev \
+            libssl-dev \
+            pkg-config \
+            mingw-w64 \
+            gcc-mingw-w64-x86-64
+
+      - name: Add Windows GNU target
+        run: rustup target add x86_64-pc-windows-gnu
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Linux release binaries
+        run: cargo build --release --locked --workspace
+
+      - name: Cross-compile Windows x64 binaries
+        env:
+          CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
+          CC_x86_64_pc_windows_gnu: x86_64-w64-mingw32-gcc
+          AR_x86_64_pc_windows_gnu: x86_64-w64-mingw32-ar
+        run: cargo build --release --locked --target x86_64-pc-windows-gnu --workspace
+
+      - name: Verify built binaries exist
+        run: |
+          test -x target/release/vidgrab
+          test -x target/release/vidgrab-cli
+          test -f target/x86_64-pc-windows-gnu/release/vidgrab.exe
+          test -f target/x86_64-pc-windows-gnu/release/vidgrab-cli.exe
+          test -f target/x86_64-pc-windows-gnu/release/WebView2Loader.dll

@@ -226,12 +226,12 @@ pub async fn run_ffmpeg_tool(
     let args = build_ffmpeg_tool_args(input_path, &output_path, action)?;
     let ffmpeg_bin = paths.effective_ffmpeg(settings)?;
 
-    let output = Command::new(&ffmpeg_bin)
-        .args(&args)
+    let mut cmd = Command::new(&ffmpeg_bin);
+    cmd.args(&args)
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output()
-        .await?;
+        .stderr(Stdio::piped());
+    crate::configure_background_command(&mut cmd);
+    let output = cmd.output().await?;
 
     if !output.status.success() {
         let _ = tokio::fs::remove_file(&output_path).await;

@@ -1,14 +1,14 @@
-# Copyright 2026 VidGrab Contributors
-# Distributed under the terms of the MIT or Apache-2.0 License
+# Copyright 2026 Fazerdino1
+# Distributed under the terms of the GNU General Public License v3 or later
 
 EAPI=8
 
 inherit cargo xdg
 
 DESCRIPTION="Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) in Rust"
-HOMEPAGE="https://github.com/vidgrab/4kfreedowloader"
+HOMEPAGE="https://github.com/Fazerdino1/4k-free-video-dowloader-"
 
-LICENSE="MIT Apache-2.0"
+LICENSE="GPL-3+"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64"
 IUSE="+gui wayland X"
@@ -32,11 +32,16 @@ BDEPEND="virtual/pkgconfig"
 src_compile() {
 	local pkgs=( -p vidgrab-cli )
 	use gui && pkgs+=( -p vidgrab-tauri )
-	cargo build --release --offline "${pkgs[@]}" || die
+	if [[ -d vendor ]] || [[ -d "${ECARGO_VENDOR:-/nonexistent}" ]]; then
+		cargo build --release --offline "${pkgs[@]}" || die
+	else
+		cargo build --release --locked "${pkgs[@]}" || die
+	fi
 }
 
 src_install() {
 	dobin target/release/vidgrab-cli
+	dodoc LICENSE README.md
 	if use gui; then
 		dobin target/release/vidgrab
 		insinto /usr/share/applications

@@ -18,29 +18,36 @@ use tokio::process::Command;
 use tracing::info;
 use vidgrab_shared::{AiAudioOperation, Settings};
 
-/// Checks whether Demucs is installed inside `~/.local/share/vidgrab/demucs-venv`.
+fn venv_bin_path(venv_dir: &Path, name: &str) -> PathBuf {
+    #[cfg(target_os = "windows")]
+    {
+        venv_dir.join("Scripts").join(format!("{name}.exe"))
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        venv_dir.join("bin").join(name)
+    }
+}
+
+/// Checks whether Demucs is installed inside the local `demucs-venv` directory.
 pub fn is_demucs_installed(paths: &AppPaths) -> bool {
-    paths.demucs_venv_dir.join("bin").join("demucs").exists()
+    venv_bin_path(&paths.demucs_venv_dir, "demucs").exists()
 }
 
 /// Detects available hardware acceleration (`"cuda"`, `"rocm"`, or `"cpu"`).
 pub async fn detect_compute_device() -> &'static str {
-    if let Ok(out) = Command::new("nvidia-smi")
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .await
-    {
+    let mut nv_cmd = Command::new("nvidia-smi");
+    nv_cmd.stdout(Stdio::null()).stderr(Stdio::null());
+    crate::configure_background_command(&mut nv_cmd);
+    if let Ok(out) = nv_cmd.status().await {
         if out.success() {
             return "cuda";
         }
     }
-    if let Ok(out) = Command::new("rocminfo")
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .await
-    {
+    let mut rocm_cmd = Command::new("rocminfo");
+    rocm_cmd.stdout(Stdio::null()).stderr(Stdio::null());
+    crate::configure_background_command(&mut rocm_cmd);
+    if let Ok(out) = rocm_cmd.status().await {
         if out.success() {
             return "cuda"; // PyTorch ROCm uses the `cuda` device string in Demucs `-d cuda`
         }
@@ -48,34 +55,43 @@ pub async fn detect_compute_device() -> &'static str {
     "cpu"
 }
 
-/// Installs Demucs on-demand into `~/.local/share/vidgrab/demucs-venv`.
+/// Installs Demucs on-demand into the local `demucs-venv` Python environment.
 pub async fn install_demucs_venv(paths: &AppPaths) -> CoreResult<String> {
     let venv_dir = &paths.demucs_venv_dir;
     info!("Creating Python virtual environment at {:?}", venv_dir);
 
-    let status = Command::new("python3")
-        .arg("-m")
-        .arg("venv")
-        .arg(venv_dir)
-        .status()
-        .await
-        .map_err(|e| {
-            CoreError::AiProcessingFailed(format!("Failed to launch python3 -m venv: {e}"))
-        })?;
+    let python_bin = if cfg!(target_os = "windows") {
+        if which::which("python").is_ok() {
+            "python"
+        } else {
+            "python3"
+        }
+    } else {
+        "python3"
+    };
+
+    let mut venv_cmd = Command::new(python_bin);
+    venv_cmd.arg("-m").arg("venv").arg(venv_dir);
+    crate::configure_background_command(&mut venv_cmd);
+    let status = venv_cmd.status().await.map_err(|e| {
+        CoreError::AiProcessingFailed(format!("Failed to launch {python_bin} -m venv: {e}"))
+    })?;
 
     if !status.success() {
         return Err(CoreError::AiProcessingFailed(
-            "python3 -m venv failed. Make sure python3 is installed (sudo dnf install python3)"
-                .to_string(),
+            "python -m venv failed. Make sure Python 3 is installed.".to_string(),
         ));
     }
 
-    let pip_bin = venv_dir.join("bin").join("pip");
+    let pip_bin = venv_bin_path(venv_dir, "pip");
     info!("Installing demucs inside virtual environment...");
-    let output = Command::new(&pip_bin)
+    let mut pip_cmd = Command::new(&pip_bin);
+    pip_cmd
         .args(["install", "--upgrade", "pip", "demucs"])
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
+        .stderr(Stdio::piped());
+    crate::configure_background_command(&mut pip_cmd);
+    let output = pip_cmd
         .output()
         .await
         .map_err(|e| CoreError::AiProcessingFailed(format!("pip install demucs failed: {e}")))?;
@@ -152,11 +168,12 @@ pub async fn process_audio_ai(
 
     // If Demucs is installed and the operation separates stems, run Demucs `--two-stems=vocals`
     if is_demucs_installed(paths) && op != AiAudioOperation::ReduceEchoReverb {
-        let demucs_bin = paths.demucs_venv_dir.join("bin").join("demucs");
+        let demucs_bin = venv_bin_path(&paths.demucs_venv_dir, "demucs");
         let device = detect_compute_device().await;
         let out_root = parent.join("demucs_out");
 
-        let demucs_status = Command::new(&demucs_bin)
+        let mut demucs_cmd = Command::new(&demucs_bin);
+        demucs_cmd
             .args([
                 "--two-stems=vocals",
                 "-d",
@@ -166,9 +183,9 @@ pub async fn process_audio_ai(
                 &input_file.to_string_lossy(),
             ])
             .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .status()
-            .await;
+            .stderr(Stdio::piped());
+        crate::configure_background_command(&mut demucs_cmd);
+        let demucs_status = demucs_cmd.status().await;
 
         if let Ok(st) = demucs_status {
             if st.success() {
@@ -209,20 +226,20 @@ async fn run_ffmpeg_filter(
     output: &Path,
     filter: &str,
 ) -> CoreResult<()> {
-    let out = Command::new(ffmpeg)
-        .args([
-            "-y",
-            "-i",
-            &input.to_string_lossy(),
-            "-vn",
-            "-af",
-            filter,
-            &output.to_string_lossy(),
-        ])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output()
-        .await?;
+    let mut cmd = Command::new(ffmpeg);
+    cmd.args([
+        "-y",
+        "-i",
+        &input.to_string_lossy(),
+        "-vn",
+        "-af",
+        filter,
+        &output.to_string_lossy(),
+    ])
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped());
+    crate::configure_background_command(&mut cmd);
+    let out = cmd.output().await?;
 
     if !out.status.success() {
         let stderr = String::from_utf8_lossy(&out.stderr);

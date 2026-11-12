@@ -14,7 +14,7 @@
 
 (package
   (name "vidgrab")
-  (version "0.1.0")
+  (version "0.2.0")
   (source (local-file "../.." "vidgrab-src" #:recursive? #t))
   (build-system cargo-build-system)
   (arguments
@@ -22,7 +22,7 @@
      #:cargo-build-flags '("--release" "-p" "vidgrab-tauri" "-p" "vidgrab-cli")))
   (native-inputs (list pkg-config))
   (inputs (list webkitgtk-with-libsoup2 gtk+ openssl sqlite librsvg ffmpeg yt-dlp))
-  (home-page "https://github.com/vidgrab/4kfreedowloader")
+  (home-page "https://github.com/Fazerdino1/4k-free-video-dowloader-")
   (synopsis "Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg)")
   (description "Desktop Tauri 2 and headless CLI downloader written in Rust.")
-  (license (list license:expat license:asl2.0)))
+  (license license:gpl3+))
