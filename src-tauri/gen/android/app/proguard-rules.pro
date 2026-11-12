@@ -2,10 +2,17 @@
 -keep class io.github.vidgrab.** { *; }
 -keep class app.tauri.** { *; }
 
-# Keep youtubedl-android & embedded ffmpeg wrappers
--keep class com.yausername.youtubedl_android.** { *; }
--keep class com.yausername.ffmpeg.** { *; }
+# Keep youtubedl-android, ffmpeg, common and dependencies
+-keep class com.yausername.** { *; }
+-keep class org.apache.commons.io.** { *; }
+-keep class com.fasterxml.jackson.** { *; }
+-keep class kotlin.** { *; }
+-keep class kotlinx.** { *; }
 
 -keepclassmembers class * {
     @app.tauri.annotation.Command <methods>;
 }
+
+-dontwarn org.apache.commons.io.**
+-dontwarn com.fasterxml.jackson.**
+-dontwarn com.yausername.**

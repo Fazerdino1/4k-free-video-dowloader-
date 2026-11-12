@@ -1247,12 +1247,17 @@ fn init_app_paths(app: &tauri::App) -> Result<AppPaths, String> {
         let cfg = app
             .path()
             .app_config_dir()
-            .map_err(|e| format!("app_config_dir failed: {e}"))?;
+            .unwrap_or_else(|_| PathBuf::from("/data/data/io.github.vidgrab.VidGrab/files/config"));
         let data = app
             .path()
             .app_data_dir()
-            .map_err(|e| format!("app_data_dir failed: {e}"))?;
-        AppPaths::from_roots(&cfg, &data).map_err(|e| e.to_string())
+            .unwrap_or_else(|_| PathBuf::from("/data/data/io.github.vidgrab.VidGrab/files/data"));
+        AppPaths::from_roots(&cfg, &data)
+            .or_else(|_| {
+                let fallback = PathBuf::from("/data/data/io.github.vidgrab.VidGrab/files");
+                AppPaths::from_roots(&fallback.join("config"), &fallback.join("data"))
+            })
+            .map_err(|e| format!("Impossible d'initialiser les dossiers de l'application: {e}"))
     }
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
@@ -1264,6 +1269,34 @@ fn init_app_paths(app: &tauri::App) -> Result<AppPaths, String> {
 /// Entrypoint shared across Linux, Windows, macOS, and Android (`#[tauri::mobile_entry_point]`).
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    std::panic::set_hook(Box::new(|info| {
+        let msg = format!("Rust panic: {info}\n");
+        eprintln!("{msg}");
+        #[cfg(target_os = "android")]
+        {
+            use std::ffi::CString;
+            if let Ok(c_tag) = CString::new("VidGrabCrash") {
+                if let Ok(c_msg) = CString::new(msg.clone()) {
+                    unsafe {
+                        extern "C" {
+                            fn __android_log_write(
+                                prio: i32,
+                                tag: *const std::os::raw::c_char,
+                                text: *const std::os::raw::c_char,
+                            ) -> i32;
+                        }
+                        __android_log_write(6, c_tag.as_ptr(), c_msg.as_ptr());
+                    }
+                }
+            }
+            for candidate in [
+                "/data/user/0/io.github.vidgrab.VidGrab/files/vidgrab_crash.txt",
+                "/data/data/io.github.vidgrab.VidGrab/files/vidgrab_crash.txt",
+            ] {
+                let _ = std::fs::write(candidate, &msg);
+            }
+        }
+    }));
     #[cfg_attr(not(target_os = "android"), allow(unused_mut))]
     let mut builder = tauri::Builder::default().plugin(tauri_plugin_dialog::init());
     #[cfg(target_os = "android")]

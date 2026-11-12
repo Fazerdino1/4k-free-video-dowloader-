@@ -87,9 +87,8 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
     override fun load(webView: WebView) {
         super.load(webView)
         tauriWebView = webView
-        ensurePermissionsIfNeeded()
         workerPool.execute {
-            runCatching { ensureInitialized() }
+            ensureInitialized()
         }
     }
 
@@ -109,31 +108,28 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
         }
     }
 
-    private fun ensurePermissionsIfNeeded() {
-        val toRequest = mutableListOf<String>()
-        if (Build.VERSION.SDK_INT >= 33 &&
-            ContextCompat.checkSelfPermission(activity, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        ) {
-            toRequest.add(Manifest.permission.POST_NOTIFICATIONS)
-        }
-        if (Build.VERSION.SDK_INT in 24..29 &&
-            ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-        ) {
-            toRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (toRequest.isNotEmpty()) {
-            ActivityCompat.requestPermissions(activity, toRequest.toTypedArray(), 4101)
-        }
-    }
-
     private fun ensureInitialized() {
         if (initDone) return
         synchronized(initLock) {
             if (initDone) return
             val ctx = activity.applicationContext
-            YoutubeDL.getInstance().init(ctx)
-            FFmpeg.getInstance().init(ctx)
-            createNotificationChannel(ctx)
+            try {
+                YoutubeDL.getInstance().init(ctx)
+                android.util.Log.i("VidGrabPlugin", "YoutubeDL initialized successfully")
+            } catch (t: Throwable) {
+                android.util.Log.e("VidGrabPlugin", "YoutubeDL.init failed", t)
+            }
+            try {
+                FFmpeg.getInstance().init(ctx)
+                android.util.Log.i("VidGrabPlugin", "FFmpeg initialized successfully")
+            } catch (t: Throwable) {
+                android.util.Log.e("VidGrabPlugin", "FFmpeg.init failed", t)
+            }
+            try {
+                createNotificationChannel(ctx)
+            } catch (t: Throwable) {
+                android.util.Log.e("VidGrabPlugin", "createNotificationChannel failed", t)
+            }
             initDone = true
         }
     }
@@ -253,7 +249,8 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
                     put("value", resp.out ?: "")
                 }
                 invoke.resolve(out)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                android.util.Log.e("VidGrabPlugin", "runYtDlpJson error", e)
                 invoke.reject(e.message ?: "yt-dlp JSON error")
             }
         }
@@ -286,7 +283,8 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
                 invoke.resolve(JSObject().apply {
                     put("exitCode", resp.exitCode)
                 })
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                android.util.Log.e("VidGrabPlugin", "runYtDlpDownload error", e)
                 invoke.reject(e.message ?: "yt-dlp download failed")
             }
         }
@@ -332,7 +330,8 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
                 } else {
                     invoke.reject("ffmpeg a échoué (code $code) : ${output.takeLast(500)}")
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                android.util.Log.e("VidGrabPlugin", "runFfmpeg error", e)
                 invoke.reject(e.message ?: "Erreur ffmpeg Android")
             }
         }
@@ -349,7 +348,8 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
                 invoke.resolve(JSObject().apply {
                     put("value", ver)
                 })
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                android.util.Log.e("VidGrabPlugin", "updateYtDlp error", e)
                 invoke.reject(e.message ?: "Mise à jour yt-dlp Android impossible")
             }
         }
@@ -365,7 +365,8 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
                 invoke.resolve(JSObject().apply {
                     put("value", ver)
                 })
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                android.util.Log.e("VidGrabPlugin", "getYtDlpVersion error", e)
                 invoke.reject(e.message ?: "Version yt-dlp indisponible")
             }
         }
