@@ -104,9 +104,9 @@
   <a class="skip-link" href="#main-content">Aller au contenu principal</a>
 
   <header class="site-header">
-    <div class="container header-inner">
+    <div class="header-inner">
       <a class="site-brand" href="./">
-        <img src="assets/icon-128.png" alt="" width="34" height="34">
+        <img src="assets/icon-128.png" alt="" width="32" height="32">
         <span>4k free video dowloader</span>
         <span class="version-chip">v0.2.0</span>
       </a>
@@ -118,6 +118,7 @@
           popovertarget="site-menu"
           popovertargetaction="toggle"
           aria-controls="site-menu"
+          aria-expanded="false"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <path d="M4 6h16M4 12h16M4 18h16" />
@@ -125,21 +126,21 @@
           <span>Menu</span>
         </button>
 
-        <ul id="site-menu" class="site-menu">
+        <ul id="site-menu" class="site-menu" popover="auto">
           <li><a href="./" aria-current="page">Accueil</a></li>
           <li><a href="#capacites">Capacités</a></li>
           <li><a href="#cli">Mode CLI</a></li>
           <li><a href="#telechargement">Télécharger</a></li>
-          <li><a href="guide-linux.html">Guide Linux</a></li>
+          <li><a href="guide-linux.html">Linux</a></li>
           <li><a href="#faq">FAQ</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
         <a class="btn-outline-sm" href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">
-          Dépôt GitHub
+          GitHub
         </a>
-        <a class="btn-emerald-sm" href="#telechargement">Télécharger v0.2.0</a>
+        <a class="btn-emerald-sm" href="#telechargement">Télécharger</a>
       </div>
     </div>
   </header>
@@ -151,9 +152,10 @@
         <div class="hero-grid">
           <div>
             <div class="hero-eyebrow">
+              <span class="eyebrow-dot" aria-hidden="true"></span>
               <span>GNU GPL-3.0-or-later</span>
               <span>•</span>
-              <span>Écrit en Rust + Tauri 2</span>
+              <span>Rust + Tauri 2</span>
             </div>
 
             <h1>
@@ -193,8 +195,8 @@
               <img
                 src="assets/logo.png"
                 alt="Icône officielle 4k free video dowloader"
-                width="68"
-                height="68"
+                width="64"
+                height="64"
                 fetchpriority="high"
                 loading="eager"
               >
@@ -225,7 +227,7 @@
           </aside>
         </div>
 
-        <!-- Vitrine fidèle de notre vraie interface sombre -->
+        <!-- Vitrine interactive de notre vraie interface sombre -->
         <div class="studio-showcase">
           <div class="studio-topbar">
             <div class="studio-title">
@@ -236,7 +238,7 @@
               </div>
               <span>Aperçu de l'interface — 4k free video dowloader v0.2.0</span>
             </div>
-            <span class="version-chip">Français / English • Base SQLite locale</span>
+            <span class="version-chip">Français / English • Base SQLite WAL</span>
           </div>
 
           <div class="showcase-tablist" role="tablist" aria-label="Vues de l'application">
@@ -258,29 +260,25 @@
                   <span class="ui-tag">8K</span>
                   <span class="ui-tag on">4K</span>
                   <span class="ui-tag">1080p</span>
-                  <span class="ui-tag on">MKV</span>
-                  <span class="ui-tag">MP4</span>
                 </div>
-
                 <div class="queue-stack">
                   <div class="queue-card">
-                    <div class="thumb-badge">4K 60fps</div>
+                    <div class="thumb-badge">4K 60fps • MKV</div>
                     <div>
-                      <div class="queue-name">Documentaire Alpin — Ultra HD 2160p (VP9 + Opus)</div>
-                      <div class="queue-info">MKV • 3840×2160 • Sous-titres FR intégrés • Métadonnées &amp; chapitres</div>
-                      <div class="meter"><span style="inline-size: 100%"></span></div>
+                      <div class="queue-name">Playlist — Tutoriel Rust &amp; Systèmes Embarqués (12 vidéos)</div>
+                      <div class="queue-info">AV1 + Opus • Sous-titres FR/EN (SRT) • SponsorBlock actif</div>
+                      <div class="meter"><span style="inline-size: 74%;"></span></div>
+                    </div>
+                    <span class="status-pill">74 % • 28,4 Mo/s</span>
+                  </div>
+                  <div class="queue-card">
+                    <div class="thumb-badge purple">AUDIO FLAC</div>
+                    <div>
+                      <div class="queue-name">Concert Live — Bande son haute fidélité</div>
+                      <div class="queue-info">Extraction audio sans perte FLAC • Chapitres intégrés</div>
+                      <div class="meter"><span style="inline-size: 100%;"></span></div>
                     </div>
                     <span class="status-pill">Terminé</span>
-                  </div>
-
-                  <div class="queue-card">
-                    <div class="thumb-badge purple">PLAYLIST</div>
-                    <div>
-                      <div class="queue-name">Conférences Rust Systems (12 épisodes • MP4 1080p)</div>
-                      <div class="queue-info">9 / 12 éléments • 3 téléchargements simultanés • SponsorBlock actif</div>
-                      <div class="meter"><span style="inline-size: 75%"></span></div>
-                    </div>
-                    <span class="status-pill">75 % • En cours</span>
                   </div>
                 </div>
               </div>
@@ -289,21 +287,27 @@
             <div id="panel-search" role="tabpanel" aria-labelledby="tab-search" hidden>
               <div class="panel-inner">
                 <div class="app-toolbar">
-                  <span class="ui-tag on">Onglet YouTube intégré</span>
-                  <span class="ui-tag" style="flex: 1;">Mot-clé : rust async tokio 4k</span>
-                  <span class="ui-btn-green">Rechercher</span>
+                  <span class="ui-tag on">Recherche YouTube intégrée</span>
+                  <span class="ui-tag">Abonnements chaînes</span>
+                  <span class="ui-tag">Miniatures locales</span>
+                  <span class="ui-tag">Import / Export M3U &amp; JSON</span>
                 </div>
-                <p style="margin-block-end: 0.9rem; font-size: 0.92rem;">
-                  Parcourez les résultats YouTube avec durée et miniature mise en cache localement en SQLite, puis lancez le téléchargement directement en Mode Intelligent ou avec choix de format.
-                </p>
                 <div class="queue-stack">
                   <div class="queue-card">
-                    <div class="thumb-badge">18:42</div>
+                    <div class="thumb-badge">RÉSULTATS</div>
                     <div>
-                      <div class="queue-name">Comprendre Tokio et l'asynchrone en Rust</div>
-                      <div class="queue-info">Résultat YouTube • Prêt pour téléchargement vidéo ou audio FLAC/MP3</div>
+                      <div class="queue-name">Recherche directe de vidéos sans quitter le logiciel</div>
+                      <div class="queue-info">Affiche miniature, durée et titre ; téléchargement en 1 clic selon les réglages du Mode Intelligent ou les menus rapides.</div>
                     </div>
-                    <span class="status-pill">Rapide 1-clic</span>
+                    <span class="status-pill">Instantané</span>
+                  </div>
+                  <div class="queue-card">
+                    <div class="thumb-badge">ABONNEMENTS</div>
+                    <div>
+                      <div class="queue-name">Surveillance automatique de chaînes YouTube</div>
+                      <div class="queue-info">Téléchargement automatique des nouvelles publications dès qu'elles apparaissent, enregistré localement dans SQLite.</div>
+                    </div>
+                    <span class="status-pill">Actif</span>
                   </div>
                 </div>
               </div>
@@ -355,7 +359,7 @@ Affichage    : Wayland / X11 / WebView2 / Headless
     </section>
 
     <!-- ==================== 3 PILIERS TECHNIQUES ==================== -->
-    <section class="section" style="padding-block-start: 0;">
+    <section class="section">
       <div class="container">
         <div class="pillars-grid">
           <article class="pillar-card">
@@ -366,7 +370,7 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           <article class="pillar-card">
             <div class="pillar-kicker">Transparence GPL-3.0</div>
             <h3>Code source auditable</h3>
-            <p>Licence GNU GPL-3.0-or-later, CI/CD publique sur GitHub Actions (`rustfmt`, `clippy`, 20 tests Linux + Wine) et empreintes SHA-256.</p>
+            <p>Licence GNU GPL-3.0-or-later, CI/CD publique sur GitHub Actions (<code>rustfmt</code>, <code>clippy</code>, 20 tests Linux + Wine) et empreintes SHA-256.</p>
           </article>
           <article class="pillar-card">
             <div class="pillar-kicker">Multiplateforme réel</div>
@@ -377,8 +381,8 @@ Affichage    : Wayland / X11 / WebView2 / Headless
       </div>
     </section>
 
-    <!-- ==================== BENTO CAPACITÉS ==================== -->
-    <section id="capacites" class="section deferred-section">
+    <!-- ==================== BENTO CAPACITÉS (Grille 6 cols symétrique) ==================== -->
+    <section id="capacites" class="section section-alt">
       <div class="container">
         <div class="section-header">
           <h2>Capacités réelles, vérifiées dans le code</h2>
@@ -386,10 +390,16 @@ Affichage    : Wayland / X11 / WebView2 / Headless
         </div>
 
         <div class="bento-capabilities">
-          <article class="cap-card span-2">
-            <span class="cap-badge">Moteur Vidéo &amp; Playlists</span>
+          <article class="cap-card col-4">
+            <span class="cap-badge">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>
+              Moteur Vidéo &amp; Playlists
+            </span>
             <h3>De la 720p jusqu'à la 8K HDR 60 FPS, avec découpe d'extraits</h3>
             <p>Analysez et téléchargez des vidéos individuelles, des playlists entières ou des chaînes YouTube avec sélection par plage horaire (<code>--start</code> / <code>--end</code>) et organisation automatique par dossier de chaîne.</p>
+            <div class="cap-mini-strip" aria-hidden="true">
+              <span><strong>Résolutions</strong> : 720p → 1080p → 1440p → 4K (2160p) → 8K (4320p)</span>
+            </div>
             <div class="cap-tags">
               <span>MP4</span>
               <span>MKV</span>
@@ -399,8 +409,11 @@ Affichage    : Wayland / X11 / WebView2 / Headless
             </div>
           </article>
 
-          <article class="cap-card">
-            <span class="cap-badge">Audio &amp; Doublage</span>
+          <article class="cap-card col-2">
+            <span class="cap-badge">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              Audio &amp; Doublage
+            </span>
             <h3>6 formats audio &amp; pistes multilingues</h3>
             <p>Extrayez la bande son jusqu'à 320 kbps et conservez les pistes doublées en piste unique, fichiers séparés ou MKV multipiste.</p>
             <div class="cap-tags">
@@ -410,10 +423,13 @@ Affichage    : Wayland / X11 / WebView2 / Headless
             </div>
           </article>
 
-          <article class="cap-card">
-            <span class="cap-badge">Sous-titres &amp; Chapitres</span>
+          <article class="cap-card col-2">
+            <span class="cap-badge">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M4 12h10M4 18h14"/></svg>
+              Sous-titres &amp; Chapitres
+            </span>
             <h3>SRT, ASS et VTT intégrés ou séparés</h3>
-            <p>Téléchargez ou incrustez les sous-titres dans les langues disponibles sur la vidéo, avec miniatures, description et chapitres intégrés ou découpés.</p>
+            <p>Téléchargez ou incrustez les sous-titres disponibles sur la vidéo, avec miniatures, description et chapitres intégrés ou découpés.</p>
             <div class="cap-tags">
               <span>SRT / VTT / ASS</span>
               <span>Chapitres</span>
@@ -421,10 +437,16 @@ Affichage    : Wayland / X11 / WebView2 / Headless
             </div>
           </article>
 
-          <article class="cap-card span-2">
-            <span class="cap-badge">Traitement Audio IA (Demucs) &amp; FFmpeg</span>
+          <article class="cap-card col-4">
+            <span class="cap-badge">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v18M6 8v8M18 8v8M3 11v2M21 11v2"/></svg>
+              Traitement Audio IA (Demucs) &amp; FFmpeg
+            </span>
             <h3>Isolation vocale, karaoké et outils média locaux</h3>
-            <p>Utilisez Demucs dans un environnement virtuel Python local (accélération CUDA/ROCm détectée automatiquement ou CPU), avec repli automatique sur les filtres DSP FFmpeg (<code>afftdn</code> / <code>arnndn</code>) si Python/Demucs n'est pas installé.</p>
+            <p>Utilisez Demucs dans un environnement virtuel Python local (accélération CUDA/ROCm détectée automatiquement ou CPU), avec repli automatique sur les filtres DSP FFmpeg (<code>afftdn</code> / <code>arnndn</code>) si Demucs n'est pas installé.</p>
+            <div class="cap-mini-strip" aria-hidden="true">
+              <span><strong>Pipeline</strong> : nvidia-smi / rocminfo → Demucs venv → repli FFmpeg DSP</span>
+            </div>
             <div class="cap-tags">
               <span>Karaoké (suppression voix)</span>
               <span>A cappella</span>
@@ -433,21 +455,27 @@ Affichage    : Wayland / X11 / WebView2 / Headless
             </div>
           </article>
 
-          <article class="cap-card">
-            <span class="cap-badge">Mode Intelligent &amp; Suivi</span>
+          <article class="cap-card col-3">
+            <span class="cap-badge">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
+              Mode Intelligent &amp; Suivi
+            </span>
             <h3>Presets en 1 clic &amp; abonnements</h3>
             <p>Enregistrez vos réglages favoris pour télécharger dès le collage d'un lien, suivez vos chaînes automatiquement et importez/exportez vos files en JSON ou M3U.</p>
             <div class="cap-tags">
-              <span>Abonnements</span>
+              <span>Abonnements chaînes</span>
               <span>Import / Export JSON</span>
               <span>Notifications désactivables</span>
             </div>
           </article>
 
-          <article class="cap-card span-2">
-            <span class="cap-badge">Réseau, Confidentialité &amp; Respect DRM</span>
+          <article class="cap-card col-3">
+            <span class="cap-badge">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2 4 5v6c0 5.5 3.4 10.6 8 12 4.6-1.4 8-6.5 8-12V5z"/></svg>
+              Réseau, Confidentialité &amp; Respect DRM
+            </span>
             <h3>Proxy, Tor automatique, cookies 0600 et zéro DRM bypass</h3>
-            <p>Configurez un proxy HTTP/HTTPS/SOCKS5 filtrable par domaine (détection Tor sous Tails), utilisez vos cookies navigateur (Firefox, Chrome, Brave, Chromium) protégés en mode <code>0600</code> pour vos vidéos privées autorisées. Les flux chiffrés par DRM (Widevine/PlayReady) sont refusés proprement.</p>
+            <p>Proxy HTTP/HTTPS/SOCKS5 par domaine (détection Tor sous Tails), cookies navigateur protégés en mode <code>0600</code> pour vos vidéos privées autorisées. Les flux chiffrés par DRM sont refusés.</p>
             <div class="cap-tags">
               <span>HTTP / SOCKS5</span>
               <span>Cookies 0600</span>
@@ -460,30 +488,33 @@ Affichage    : Wayland / X11 / WebView2 / Headless
     </section>
 
     <!-- ==================== EXPLORATEUR CLI ==================== -->
-    <section id="cli" class="section deferred-section">
+    <section id="cli" class="section">
       <div class="container">
         <div class="cli-explorer">
           <h2 style="font-size: clamp(1.45rem, 1.1rem + 1.4vw, 2rem); margin-block-end: 0.4rem;">Explorateur CLI (<code>vidgrab-cli</code>)</h2>
           <p>Utilisable directement sous Windows (<code>vidgrab-cli.exe</code>) ou Linux serveur / Docker Alpine sans interface graphique.</p>
 
           <div class="cli-presets" role="group" aria-label="Exemples de commandes CLI">
-            <button type="button" class="preset-btn" aria-pressed="true" data-cmd='vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" -q 2160 --mkv --subs fr,en'>Vidéo 4K MKV + sous-titres</button>
-            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" --audio flac'>Audio FLAC sans perte</button>
-            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" --start 01:15 --end 03:40 --mp4'>Extrait temporel MP4</button>
-            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli ffmpeg trim entree.mp4 --start 00:30 --end 01:45'>Découpe rapide FFmpeg</button>
-            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli diag --json'>Diagnostic système JSON</button>
+            <button type="button" class="preset-btn" aria-pressed="true" data-cmd='vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" -q 2160 --mkv --subs fr,en'>Vidéo 4K MKV + SRT</button>
+            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" --audio flac'>Audio FLAC lossless</button>
+            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli ffmpeg trim entree.mp4 --start 00:30 --end 01:45'>Découpe FFmpeg trim</button>
+            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli diag --json'>Diagnostic JSON</button>
           </div>
 
           <div class="cli-output-row">
             <code id="cli-command-code">vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" -q 2160 --mkv --subs fr,en</code>
             <button id="cli-copy-btn" type="button" class="copy-btn">Copier</button>
           </div>
+
+          <div class="cli-subcommands">
+            Sous-commandes disponibles : <code>diag</code> · <code>update</code> · <code>analyze &lt;URL&gt; --json</code> · <code>download &lt;URL&gt;</code> · <code>ffmpeg &lt;remux|mp3|flac|h264|trim&gt;</code>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- ==================== TÉLÉCHARGEMENTS ==================== -->
-    <section id="telechargement" class="section deferred-section">
+    <section id="telechargement" class="section section-alt">
       <div class="container">
         <div class="section-header">
           <h2>Télécharger la version v0.2.0</h2>
@@ -494,7 +525,10 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           <article class="os-card highlighted">
             <div>
               <div class="os-head">
-                <h3>Windows 10 / 11</h3>
+                <div class="os-title-wrap">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4.5 11 3.4v7.9H3V4.5Zm9.3-1.3L21 2v9.3h-8.7V3.2ZM3 12.7h8v7.9l-8-1.1v-6.8Zm9.3 0H21V22l-8.7-1.2v-8.1Z"/></svg>
+                  <h3>Windows 10 / 11</h3>
+                </div>
                 <span class="os-arch">x86_64</span>
               </div>
               <p>Archive portable prête à l'emploi (<code>6,0 Mo</code>) contenant <code>4k free video dowloader.exe</code> (<code>11 Mo</code>), <code>WebView2Loader.dll</code> (<code>157 Ko</code>) et <code>vidgrab-cli.exe</code> (<code>3,1 Mo</code>).</p>
@@ -511,7 +545,10 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           <article class="os-card">
             <div>
               <div class="os-head">
-                <h3>Ubuntu / Debian / Mint</h3>
+                <div class="os-title-wrap">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
+                  <h3>Ubuntu / Debian / Mint</h3>
+                </div>
                 <span class="os-arch">amd64 .deb</span>
               </div>
               <p>Paquet natif <code>.deb</code> (<code>3,9 Mo</code>) pour Ubuntu LTS, Debian 13, Linux Mint, Pop!_OS, Zorin OS, Elementary, Kali et Parrot OS.</p>
@@ -527,7 +564,10 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           <article class="os-card">
             <div>
               <div class="os-head">
-                <h3>Fedora / RHEL / openSUSE</h3>
+                <div class="os-title-wrap">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M12 12v10"/></svg>
+                  <h3>Fedora / RHEL / openSUSE</h3>
+                </div>
                 <span class="os-arch">x86_64 .rpm</span>
               </div>
               <p>Paquet natif <code>.rpm</code> (<code>4,0 Mo</code>) compatible Fedora, Nobara Linux, RHEL, AlmaLinux, Rocky Linux et openSUSE.</p>
@@ -543,7 +583,10 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           <article class="os-card">
             <div>
               <div class="os-head">
-                <h3>AppImage &amp; Serveurs CLI</h3>
+                <div class="os-title-wrap">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 17 6-6-6-6M12 19h8"/></svg>
+                  <h3>AppImage &amp; Serveurs CLI</h3>
+                </div>
                 <span class="os-arch">Linux universel</span>
               </div>
               <p>Exécutable portable AppImage (<code>111 Mo</code>) pour Arch, CachyOS, Manjaro, SteamOS, Bazzite, ou binaire <code>vidgrab-cli</code> (<code>3,2 Mo</code>) sans dépendance GTK.</p>
@@ -561,7 +604,7 @@ Affichage    : Wayland / X11 / WebView2 / Headless
     </section>
 
     <!-- ==================== FAQ ==================== -->
-    <section id="faq" class="section deferred-section">
+    <section id="faq" class="section">
       <div class="container">
         <div class="section-header">
           <h2 id="faq-heading">Questions fréquentes</h2>
@@ -608,7 +651,7 @@ Affichage    : Wayland / X11 / WebView2 / Headless
     </section>
 
     <!-- ==================== FICHE TECHNIQUE ==================== -->
-    <section class="section deferred-section" style="padding-block-start: 0;">
+    <section class="section" style="padding-block-start: 0;">
       <div class="container">
         <h2 style="font-size: 1.25rem; margin-block-end: 1rem;">Fiche technique (v0.2.0)</h2>
         <dl class="spec-grid">

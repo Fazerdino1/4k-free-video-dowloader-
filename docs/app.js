@@ -53,6 +53,7 @@
     const header = document.querySelector(".site-header");
     const inner = header?.querySelector(".header-inner");
     const menu = document.getElementById("site-menu");
+    const menuBtn = header?.querySelector(".menu-button");
     if (!header || !inner || !menu) return;
 
     if (!Object.hasOwn(HTMLElement.prototype, "popover")) {
@@ -62,17 +63,25 @@
     let lastWidth = header.clientWidth;
 
     const updateLayout = () => {
-      const wasOpen = menu.matches(":popover-open");
+      const wasOpen = menu.matches(":popover-open, .\\:popover-open");
       header.classList.add("is-measuring", "is-wide");
       menu.removeAttribute("popover");
       const fits = inner.scrollWidth <= inner.clientWidth;
       header.classList.toggle("is-wide", fits);
+
       if (!fits) {
         menu.setAttribute("popover", "auto");
         if (wasOpen && typeof menu.showPopover === "function") {
-          menu.showPopover();
+          try {
+            menu.showPopover();
+          } catch (_) {
+            // Ignored
+          }
         }
+      } else if (menuBtn) {
+        menuBtn.setAttribute("aria-expanded", "false");
       }
+
       requestAnimationFrame(() => header.classList.remove("is-measuring"));
     };
 
@@ -87,6 +96,12 @@
     });
     ro.observe(header);
     ro.observe(menu);
+
+    menu.addEventListener("toggle", (event) => {
+      if (menuBtn && !header.classList.contains("is-wide")) {
+        menuBtn.setAttribute("aria-expanded", String(event.newState === "open"));
+      }
+    });
 
     menu.addEventListener("click", (event) => {
       if (!header.classList.contains("is-wide") && event.target.closest("a")) {
@@ -125,7 +140,6 @@
       }
 
       if (focusTab) nextTab.focus();
-      nextTab.scrollIntoView({ block: "nearest", inline: "nearest" });
     };
 
     tablist.addEventListener("click", (event) => {
