@@ -62,7 +62,7 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
             <button id="mob-btn-search-toggle" type="button" class="mob-icon-btn" aria-label="Rechercher" title="Rechercher">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </button>
-            <h1 class="mob-bar-title">4K Video Downloader</h1>
+            <h1 class="mob-bar-title">4K Free Video Downloader</h1>
             <div class="mob-bar-actions">
                 <button id="mob-btn-sort" type="button" class="mob-icon-btn" aria-label="Trier" title="Trier" aria-haspopup="true">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/></svg>
@@ -417,11 +417,11 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
                         <div id="dup-warn" class="dup-warn" hidden>Ce lien est déjà présent dans votre file de téléchargements.</div>
                     </label>
 
-                    <div id="analyzed-preview" hidden style="display:flex;align-items:center;gap:14px;background:var(--bg-input);border:1px solid var(--border);padding:10px;border-radius:8px;">
-                        <img id="analyzed-thumb" src="" alt="Miniature" referrerpolicy="no-referrer" style="width:120px;height:68px;object-fit:cover;border-radius:6px;background:var(--bg-menubar);" />
-                        <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                            <div id="analyzed-title" style="font-weight:600;font-size:14px;color:var(--brand);"></div>
-                            <div id="analyzed-meta" style="font-size:12px;color:var(--text-muted);"></div>
+                    <div id="analyzed-preview" class="analyzed-preview" hidden>
+                        <img id="analyzed-thumb" class="analyzed-thumb" src="" alt="Miniature" referrerpolicy="no-referrer" style="width:96px;height:56px;min-width:96px;max-width:96px;min-height:56px;max-height:56px;object-fit:cover;border-radius:6px;flex-shrink:0;" />
+                        <div class="analyzed-info">
+                            <div id="analyzed-title" class="analyzed-title"></div>
+                            <div id="analyzed-meta" class="analyzed-meta"></div>
                         </div>
                     </div>
 
@@ -597,7 +597,7 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
                     </div>
                 </details>
 
-                <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;">
+                <div class="modal-footer-actions">
                     <button id="btn-confirm-subscribe" type="button" class="btn">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         <span>{sub_btn}</span>
@@ -3260,7 +3260,7 @@ const CLIENT_JS: &str = r##"
 
             bind('mob-act-about', () => {
                 closeAllMobPopups();
-                showToast('VidGrab — 4K Video Downloader v0.3.0 · Libre et gratuit');
+                showToast('4K Free Video Downloader v0.3.0 · Libre et gratuit');
             });
 
             // Mobile category filter
@@ -3355,6 +3355,19 @@ const CLIENT_JS: &str = r##"
                     closeAllMobPopups();
                 }
             });
+
+            // Automatically hide mobile FAB whenever any modal is open
+            const fabEl = document.getElementById('mobile-fab-container');
+            const syncFabModalVisibility = () => {
+                if (!fabEl) return;
+                const anyModalOpen = Array.from(document.querySelectorAll('.modal-backdrop')).some(m => !m.hidden);
+                fabEl.style.display = anyModalOpen ? 'none' : '';
+            };
+            const modalObserver = new MutationObserver(syncFabModalVisibility);
+            document.querySelectorAll('.modal-backdrop').forEach(m => {
+                modalObserver.observe(m, { attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
+            });
+            syncFabModalVisibility();
         }
 
         bindMobileControls();

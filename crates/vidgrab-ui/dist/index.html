@@ -1115,7 +1115,73 @@ button, input, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 500;
+}
+
+.analyzed-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  border-radius: 8px;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.analyzed-preview[hidden] {
+  display: none !important;
+}
+
+.analyzed-thumb {
+  width: 96px;
+  min-width: 96px;
+  max-width: 96px;
+  height: 56px;
+  min-height: 56px;
+  max-height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--bg-menubar);
+  flex-shrink: 0;
+  display: block;
+}
+
+.analyzed-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.analyzed-title {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--brand);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analyzed-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 8px;
 }
 
 .modal {
@@ -1890,6 +1956,11 @@ body {
   .modal-backdrop {
     align-items: flex-end;
     padding: 0;
+    z-index: 500 !important;
+  }
+
+  body:has(.modal-backdrop:not([hidden])) .mobile-fab-container {
+    display: none !important;
   }
 
   .modal,
@@ -1946,16 +2017,16 @@ body {
     align-items: center;
     justify-content: space-between;
     height: 56px;
-    padding: 0 8px;
-    gap: 4px;
+    padding: 0 4px;
+    gap: 2px;
   }
 
   .mob-bar-title {
     flex: 1;
-    font-size: 19px;
+    font-size: clamp(13px, 3.8vw, 16px);
     font-weight: 700;
     color: #ffffff;
-    margin: 0 6px;
+    margin: 0 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1972,14 +2043,17 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
     border-radius: 50%;
     border: none;
     background: transparent;
     color: #ffffff;
     cursor: pointer;
     transition: background 0.15s ease;
+    padding: 0;
+    flex-shrink: 0;
   }
 
   .mob-icon-btn:active {
@@ -2218,11 +2292,13 @@ body {
     justify-content: center;
     position: fixed;
     bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-    left: 14px;
-    right: 14px;
+    left: 0;
+    right: 0;
+    padding: 0 16px;
     z-index: 220;
     pointer-events: none;
-    gap: 12px;
+    gap: 16px;
+    box-sizing: border-box;
   }
 
   .mobile-fab-aux {
@@ -2230,28 +2306,31 @@ body {
     align-items: center;
     background: #24292e;
     border-radius: 28px;
-    padding: 3px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    padding: 4px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     pointer-events: auto;
-    gap: 2px;
+    gap: 4px;
+    flex-shrink: 0;
   }
 
   .mob-aux-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: none;
-    background: #6e7681;
+    background: #475569;
     color: #ffffff;
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: transform 0.1s, background-color 0.15s;
+    flex-shrink: 0;
   }
 
   .mob-aux-btn:active {
     transform: scale(0.92);
+    background: #334155;
   }
 
   .mob-fab-paste {
@@ -2263,15 +2342,17 @@ body {
     color: #ffffff;
     border: none;
     border-radius: 28px;
-    padding: 0 24px;
+    padding: 0 20px;
     height: 48px;
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 800;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.5px;
     box-shadow: 0 4px 16px rgba(75, 179, 0, 0.45);
     cursor: pointer;
     pointer-events: auto;
     transition: transform 0.12s, box-shadow 0.12s;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .mob-fab-paste:active {
@@ -2283,6 +2364,67 @@ body {
     font-size: 20px;
     font-weight: 900;
     line-height: 1;
+  }
+
+  /* Mobile Download Modal Preview Constraints */
+  .analyzed-preview {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 8px 10px !important;
+    overflow: hidden !important;
+  }
+
+  .analyzed-thumb {
+    width: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    object-fit: cover !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+    display: block !important;
+  }
+
+  .analyzed-info {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .analyzed-title {
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .analyzed-meta {
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .modal-footer-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .modal-footer-actions .btn {
+    flex: 1 !important;
+    min-height: 44px !important;
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
   }
 
   /* Mobile Settings Header Styling */
@@ -2308,7 +2450,7 @@ body {
             <button id="mob-btn-search-toggle" type="button" class="mob-icon-btn" aria-label="Rechercher" title="Rechercher">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </button>
-            <h1 class="mob-bar-title">4K Video Downloader</h1>
+            <h1 class="mob-bar-title">4K Free Video Downloader</h1>
             <div class="mob-bar-actions">
                 <button id="mob-btn-sort" type="button" class="mob-icon-btn" aria-label="Trier" title="Trier" aria-haspopup="true">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/></svg>
@@ -2666,11 +2808,11 @@ body {
                         <div id="dup-warn" class="dup-warn" hidden>Ce lien est déjà présent dans votre file de téléchargements.</div>
                     </label>
 
-                    <div id="analyzed-preview" hidden style="display:flex;align-items:center;gap:14px;background:var(--bg-input);border:1px solid var(--border);padding:10px;border-radius:8px;">
-                        <img id="analyzed-thumb" src="" alt="Miniature" referrerpolicy="no-referrer" style="width:120px;height:68px;object-fit:cover;border-radius:6px;background:var(--bg-menubar);" />
-                        <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                            <div id="analyzed-title" style="font-weight:600;font-size:14px;color:var(--brand);"></div>
-                            <div id="analyzed-meta" style="font-size:12px;color:var(--text-muted);"></div>
+                    <div id="analyzed-preview" class="analyzed-preview" hidden>
+                        <img id="analyzed-thumb" class="analyzed-thumb" src="" alt="Miniature" referrerpolicy="no-referrer" style="width:96px;height:56px;min-width:96px;max-width:96px;min-height:56px;max-height:56px;object-fit:cover;border-radius:6px;flex-shrink:0;" />
+                        <div class="analyzed-info">
+                            <div id="analyzed-title" class="analyzed-title"></div>
+                            <div id="analyzed-meta" class="analyzed-meta"></div>
                         </div>
                     </div>
 
@@ -2846,7 +2988,7 @@ body {
                     </div>
                 </details>
 
-                <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;">
+                <div class="modal-footer-actions">
                     <button id="btn-confirm-subscribe" type="button" class="btn">
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         <span>S&#39;abonner</span>
@@ -5468,7 +5610,7 @@ body {
 
             bind('mob-act-about', () => {
                 closeAllMobPopups();
-                showToast('VidGrab — 4K Video Downloader v0.3.0 · Libre et gratuit');
+                showToast('4K Free Video Downloader v0.3.0 · Libre et gratuit');
             });
 
             // Mobile category filter
@@ -5563,6 +5705,19 @@ body {
                     closeAllMobPopups();
                 }
             });
+
+            // Automatically hide mobile FAB whenever any modal is open
+            const fabEl = document.getElementById('mobile-fab-container');
+            const syncFabModalVisibility = () => {
+                if (!fabEl) return;
+                const anyModalOpen = Array.from(document.querySelectorAll('.modal-backdrop')).some(m => !m.hidden);
+                fabEl.style.display = anyModalOpen ? 'none' : '';
+            };
+            const modalObserver = new MutationObserver(syncFabModalVisibility);
+            document.querySelectorAll('.modal-backdrop').forEach(m => {
+                modalObserver.observe(m, { attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
+            });
+            syncFabModalVisibility();
         }
 
         bindMobileControls();
