@@ -80,15 +80,11 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
     private val notifIdCounter = AtomicInteger(1000)
     private var tauriWebView: WebView? = null
 
-    @Volatile
-    private var initDone = false
-    private val initLock = Any()
-
     override fun load(webView: WebView) {
         super.load(webView)
         tauriWebView = webView
         workerPool.execute {
-            ensureInitialized()
+            runCatching { ensureInitialized() }
         }
     }
 
@@ -109,29 +105,15 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
     }
 
     private fun ensureInitialized() {
-        if (initDone) return
-        synchronized(initLock) {
-            if (initDone) return
-            val ctx = activity.applicationContext
-            try {
-                YoutubeDL.getInstance().init(ctx)
-                android.util.Log.i("VidGrabPlugin", "YoutubeDL initialized successfully")
-            } catch (t: Throwable) {
-                android.util.Log.e("VidGrabPlugin", "YoutubeDL.init failed", t)
-            }
-            try {
-                FFmpeg.getInstance().init(ctx)
-                android.util.Log.i("VidGrabPlugin", "FFmpeg initialized successfully")
-            } catch (t: Throwable) {
-                android.util.Log.e("VidGrabPlugin", "FFmpeg.init failed", t)
-            }
-            try {
-                createNotificationChannel(ctx)
-            } catch (t: Throwable) {
-                android.util.Log.e("VidGrabPlugin", "createNotificationChannel failed", t)
-            }
-            initDone = true
+        val err = initError
+        if (err != null) {
+            initEngines(activity.applicationContext)
+            return
         }
+        if (!initDone) {
+            initEngines(activity.applicationContext)
+        }
+        createNotificationChannel(activity.applicationContext)
     }
 
     private fun createNotificationChannel(ctx: Context) {
@@ -521,9 +503,42 @@ class VidGrabAndroidPlugin(private val activity: Activity) : Plugin(activity) {
     companion object {
         private const val CHANNEL_ID = "vidgrab_downloads"
         private val shareLock = Any()
+        private val initLock = Any()
 
         @Volatile
         private var pendingSharedUrl: String? = null
+
+        @Volatile
+        private var initDone = false
+
+        @Volatile
+        private var initError: String? = null
+
+        fun initEngines(ctx: Context) {
+            if (initDone && initError == null) return
+            synchronized(initLock) {
+                if (initDone && initError == null) return
+                try {
+                    android.util.Log.i("VidGrabPlugin", "Initializing YoutubeDL...")
+                    YoutubeDL.getInstance().init(ctx)
+                    android.util.Log.i("VidGrabPlugin", "YoutubeDL initialized successfully")
+                } catch (t: Throwable) {
+                    android.util.Log.e("VidGrabPlugin", "YoutubeDL.init failed", t)
+                    val msg = "YoutubeDL init failed: ${t.javaClass.simpleName}: ${t.message}"
+                    initError = msg
+                    throw RuntimeException(msg, t)
+                }
+                try {
+                    android.util.Log.i("VidGrabPlugin", "Initializing FFmpeg...")
+                    FFmpeg.getInstance().init(ctx)
+                    android.util.Log.i("VidGrabPlugin", "FFmpeg initialized successfully")
+                } catch (t: Throwable) {
+                    android.util.Log.e("VidGrabPlugin", "FFmpeg.init failed", t)
+                }
+                initDone = true
+                initError = null
+            }
+        }
 
         fun enqueueSharedUrl(url: String) {
             synchronized(shareLock) {

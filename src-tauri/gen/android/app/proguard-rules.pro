@@ -5,6 +5,7 @@
 # Keep youtubedl-android, ffmpeg, common and dependencies
 -keep class com.yausername.** { *; }
 -keep class org.apache.commons.io.** { *; }
+-keep class org.apache.commons.compress.** { *; }
 -keep class com.fasterxml.jackson.** { *; }
 -keep class kotlin.** { *; }
 -keep class kotlinx.** { *; }
@@ -14,5 +15,6 @@
 }
 
 -dontwarn org.apache.commons.io.**
+-dontwarn org.apache.commons.compress.**
 -dontwarn com.fasterxml.jackson.**
 -dontwarn com.yausername.**

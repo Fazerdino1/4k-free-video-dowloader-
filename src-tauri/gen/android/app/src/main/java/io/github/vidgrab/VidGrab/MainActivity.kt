@@ -21,6 +21,13 @@ class MainActivity : TauriActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         extractColdShareIntent(intent)
+        Thread {
+            try {
+                VidGrabAndroidPlugin.initEngines(applicationContext)
+            } catch (t: Throwable) {
+                Log.e("VidGrabCrash", "Cold engine initialization failed", t)
+            }
+        }.start()
     }
 
     private fun installCrashHandler() {

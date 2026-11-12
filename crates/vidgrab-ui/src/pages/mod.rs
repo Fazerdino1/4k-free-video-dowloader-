@@ -62,7 +62,7 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
             <button id="mob-btn-search-toggle" type="button" class="mob-icon-btn" aria-label="Rechercher" title="Rechercher">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </button>
-            <h1 class="mob-bar-title">{app_title}</h1>
+            <h1 class="mob-bar-title">4K Video Downloader</h1>
             <div class="mob-bar-actions">
                 <button id="mob-btn-sort" type="button" class="mob-icon-btn" aria-label="Trier" title="Trier" aria-haspopup="true">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/></svg>

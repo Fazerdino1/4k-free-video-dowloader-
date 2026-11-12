@@ -25,6 +25,9 @@ android {
         targetSdk = 35
         versionCode = tauriProperties.getProperty("tauri.android.versionCode", "3000").toInt()
         versionName = tauriProperties.getProperty("tauri.android.versionName", "0.3.0")
+        ndk {
+            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64"))
+        }
     }
     signingConfigs {
         create("release") {
@@ -103,6 +106,10 @@ dependencies {
     implementation("io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1")
     implementation("io.github.junkfood02.youtubedl-android:common:0.18.1")
     implementation("commons-io:commons-io:2.16.1")
+    implementation("org.apache.commons:commons-compress:1.26.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.17.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.4")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
