@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>4k free video dowloader — Téléchargeur vidéo 4K/8K, playlists &amp; audio en Rust</title>
-  <meta name="description" content="Application open source écrite en Rust (Tauri 2 + yt-dlp + FFmpeg) pour télécharger des vidéos 4K/8K HDR, playlists, sous-titres SRT/ASS/VTT et audio MP3/FLAC sur Windows 10/11 et Linux.">
+  <meta name="description" content="Application open source écrite en Rust (Tauri 2 + yt-dlp + FFmpeg) pour télécharger des vidéos 4K/8K HDR, playlists, sous-titres SRT/ASS/VTT et audio MP3/FLAC sur Windows 10/11, Linux et Android (APK).">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <meta name="theme-color" content="#10b981">
   <link rel="canonical" href="https://fazerdino1.github.io/4k-free-video-dowloader-/">
@@ -18,17 +18,17 @@
   <meta property="og:locale" content="fr_FR">
   <meta property="og:site_name" content="4k free video dowloader">
   <meta property="og:title" content="4k free video dowloader — Téléchargeur vidéo 4K/8K &amp; audio open source">
-  <meta property="og:description" content="Logiciel libre en Rust pour Windows 10/11 et Linux : vidéos 4K/8K, playlists YouTube, sous-titres, audio FLAC/MP3, séparation vocale Demucs et CLI serveur.">
+  <meta property="og:description" content="Logiciel libre en Rust pour Windows 10/11, Linux et Android APK : vidéos 4K/8K, playlists YouTube, sous-titres, audio FLAC/MP3, séparation vocale Demucs et CLI serveur.">
   <meta property="og:url" content="https://fazerdino1.github.io/4k-free-video-dowloader-/">
   <meta property="og:image" content="https://fazerdino1.github.io/4k-free-video-dowloader-/assets/logo.png">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="4k free video dowloader — Téléchargeur vidéo 4K/8K open source">
-  <meta name="twitter:description" content="Sans publicité ni paywall : Windows x64, Ubuntu, Debian, Fedora, Arch et CLI headless en Rust.">
+  <meta name="twitter:description" content="Sans publicité ni paywall : Windows x64, Ubuntu, Debian, Fedora, Arch, Android APK arm64 et CLI headless en Rust.">
   <meta name="twitter:image" content="https://fazerdino1.github.io/4k-free-video-dowloader-/assets/logo.png">
 
-  <link rel="stylesheet" href="styles.css?v=2">
-  <script defer src="app.js?v=2"></script>
+  <link rel="stylesheet" href="styles.css?v=3">
+  <script defer src="app.js?v=3"></script>
 
   <script type="application/ld+json">
   {
@@ -39,15 +39,15 @@
         "name": "4k free video dowloader",
         "alternateName": ["4K Free Video Downloader", "vidgrab", "vidgrab-cli"],
         "applicationCategory": "MultimediaApplication",
-        "operatingSystem": "Windows 10, Windows 11, Linux (Ubuntu, Debian, Mint, Fedora, Arch, Alpine)",
-        "softwareVersion": "0.2.0",
+        "operatingSystem": "Windows 10, Windows 11, Linux (Ubuntu, Debian, Mint, Fedora, Arch, Alpine), Android 7.0+ (arm64-v8a)",
+        "softwareVersion": "0.3.0",
         "datePublished": "2026-11-12",
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
         "isAccessibleForFree": true,
         "url": "https://fazerdino1.github.io/4k-free-video-dowloader-/",
-        "downloadUrl": "https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.2.0",
+        "downloadUrl": "https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.3.0",
         "image": "https://fazerdino1.github.io/4k-free-video-dowloader-/assets/logo.png",
-        "description": "Téléchargeur vidéo et audio open source écrit en Rust (Tauri 2 + yt-dlp + FFmpeg + SQLite WAL) pour Windows 10/11 et Linux.",
+        "description": "Téléchargeur vidéo et audio open source écrit en Rust (Tauri 2 + yt-dlp + FFmpeg + SQLite WAL) pour Windows 10/11, Linux et Android (APK arm64-v8a).",
         "author": {
           "@type": "Person",
           "name": "Fazerdino1",
@@ -80,10 +80,10 @@
           },
           {
             "@type": "Question",
-            "name": "Comment lancer l'application sur Windows 10 ou Windows 11 ?",
+            "name": "Comment installer l'application de façon permanente sur Windows 10 ou Windows 11 ?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Téléchargez l'archive 4k.free.video.dowloader_0.2.0_windows_x64.zip, décompressez-la et exécutez 4k free video dowloader.exe tout en conservant WebView2Loader.dll dans le même dossier."
+              "text": "Exécutez l'installateur permanent 4k-free-video-dowloader_0.3.0_setup_x64.exe : il installe automatiquement 4k free video dowloader.exe, WebView2Loader.dll, vidgrab-cli.exe et uninstall.exe dans C:\\Program Files\\4k free video dowloader, crée les raccourcis Menu Démarrer et Bureau et enregistre le désinstallateur Windows."
             }
           },
           {
@@ -92,6 +92,14 @@
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "Le module audio IA s'appuie sur Demucs dans un environnement Python local avec détection CUDA/ROCm ou CPU, et bascule automatiquement sur les filtres DSP de FFmpeg si Demucs n'est pas installé. Le binaire vidgrab-cli fonctionne quant à lui sans interface graphique sur serveur SSH ou conteneur Docker Alpine musl."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "La version Android APK est-elle autonome sans application externe ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Oui. L'APK arm64-v8a embarque directement youtubedl-android 0.18.1, Python et FFmpeg dans l'application, s'intègre au menu Partager d'Android (YouTube, navigateur, réseaux sociaux) et enregistre les vidéos dans Download/4kFreeDownloader avec indexation MediaStore dans la galerie."
             }
           }
         ]
@@ -108,7 +116,7 @@
       <a class="site-brand" href="./">
         <img src="assets/icon-128.png" alt="" width="32" height="32">
         <span>4k free video dowloader</span>
-        <span class="version-chip">v0.2.0</span>
+        <span class="version-chip">v0.3.0</span>
       </a>
 
       <nav class="site-nav" aria-label="Navigation principale">
@@ -164,20 +172,20 @@
             </h1>
 
             <p class="hero-lead">
-              Téléchargez vos vidéos, playlists, chaînes et pistes audio depuis YouTube, Vimeo, TikTok, Twitch, SoundCloud et les sites compatibles <code>yt-dlp</code> — sur <strong>Windows 10/11</strong> et <strong>Linux</strong>, en interface graphique ou en ligne de commande.
+              Téléchargez vos vidéos, playlists, chaînes et pistes audio depuis YouTube, Vimeo, TikTok, Twitch, SoundCloud et les sites compatibles <code>yt-dlp</code> — sur <strong>Windows 10/11</strong>, <strong>Linux</strong> et désormais <strong>Android (APK arm64)</strong>, avec moteur embarqué et interface tactile adaptée.
             </p>
 
             <div class="hero-actions">
               <a
                 id="hero-download-btn"
                 class="btn-primary"
-                href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip"
+                href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k-free-video-dowloader_0.3.0_setup_x64.exe"
               >
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M12 3v12m0 0-4-4m4 4 4-4" />
                   <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
                 </svg>
-                <span id="hero-download-label">Télécharger v0.2.0</span>
+                <span id="hero-download-label">Télécharger v0.3.0</span>
               </a>
 
               <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">
@@ -186,11 +194,11 @@
             </div>
 
             <div id="hero-download-meta" class="hero-meta-line">
-              Windows 10/11 x64 (.zip • 6,0 Mo) • Ubuntu/Debian (.deb) • Fedora/RHEL (.rpm) • AppImage universel
+              Windows 10/11 Installateur .exe (Program Files) • Android 7.0+ APK (arm64-v8a) • Ubuntu/Debian (.deb) • Fedora/RHEL (.rpm) • AppImage
             </div>
           </div>
 
-          <aside class="hero-visual-card" aria-label="Points clés de la version 0.2.0">
+          <aside class="hero-visual-card" aria-label="Points clés de la version 0.3.0">
             <div class="hero-card-head">
               <img
                 src="assets/logo.png"
@@ -201,7 +209,7 @@
                 loading="eager"
               >
               <div>
-                <div class="hero-card-title">4k free video dowloader v0.2.0</div>
+                <div class="hero-card-title">4k free video dowloader v0.3.0</div>
                 <div class="hero-card-sub">Binaire natif Rust • Zéro Electron</div>
               </div>
             </div>
@@ -221,7 +229,7 @@
               </li>
               <li>
                 <span class="fact-dot" aria-hidden="true">✓</span>
-                <span><strong>Desktop + Serveur</strong> : exécutable graphique + binaire CLI headless <code>vidgrab-cli</code> sans GTK.</span>
+                <span><strong>Desktop, Android &amp; Serveur</strong> : Windows 10/11, Linux (<code>.deb</code>, <code>.rpm</code>, <code>AppImage</code>), <strong>APK Android</strong> autonome et CLI <code>vidgrab-cli</code>.</span>
               </li>
             </ul>
           </aside>
@@ -236,13 +244,14 @@
                 <span class="dot-y"></span>
                 <span class="dot-g"></span>
               </div>
-              <span>Aperçu de l'interface — 4k free video dowloader v0.2.0</span>
+              <span>Aperçu de l'interface — 4k free video dowloader v0.3.0</span>
             </div>
             <span class="version-chip">Français / English • Base SQLite WAL</span>
           </div>
 
           <div class="showcase-tablist" role="tablist" aria-label="Vues de l'application">
             <button type="button" role="tab" id="tab-queue" aria-selected="true" tabindex="0">File &amp; Mode Intelligent</button>
+            <button type="button" role="tab" id="tab-android" aria-selected="false" tabindex="-1">Application Android</button>
             <button type="button" role="tab" id="tab-search" aria-selected="false" tabindex="-1">Recherche YouTube</button>
             <button type="button" role="tab" id="tab-audio" aria-selected="false" tabindex="-1">Audio IA &amp; FFmpeg</button>
             <button type="button" role="tab" id="tab-terminal" aria-selected="false" tabindex="-1">Terminal CLI</button>
@@ -284,7 +293,37 @@
               </div>
             </div>
 
-            <div id="panel-search" role="tabpanel" aria-labelledby="tab-search" hidden>
+            <div id="panel-android" role="tabpanel" aria-labelledby="tab-android" hidden="until-found">
+              <div class="panel-inner">
+                <div class="app-toolbar">
+                  <span class="ui-tag on">Android 7.0+ (arm64-v8a)</span>
+                  <span class="ui-tag on">youtubedl-android 0.18.1 + FFmpeg</span>
+                  <span class="ui-tag">Menu Partager Android</span>
+                  <span class="ui-tag">Navigation tactile basse</span>
+                </div>
+                <div class="queue-stack">
+                  <div class="queue-card">
+                    <div class="thumb-badge android">APK AUTONOME</div>
+                    <div>
+                      <div class="queue-name">Moteur yt-dlp &amp; FFmpeg embarqué dans l'APK (58 Mo)</div>
+                      <div class="queue-info">Téléchargement 4K/8K, pause/reprise, extraction MP3/FLAC, découpe et filtres audio directement sur smartphone sans Termux.</div>
+                      <div class="meter"><span style="inline-size: 100%;"></span></div>
+                    </div>
+                    <span class="status-pill">Prêt à l'emploi</span>
+                  </div>
+                  <div class="queue-card">
+                    <div class="thumb-badge">PARTAGE ANDROID</div>
+                    <div>
+                      <div class="queue-name">Réception directe depuis YouTube ou navigateur mobile</div>
+                      <div class="queue-info">Partagez une URL vers 4k free video dowloader : ajout immédiat, sauvegarde dans <code>Download/4kFreeDownloader</code> et galerie MediaStore.</div>
+                    </div>
+                    <span class="status-pill">1 tap</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="panel-search" role="tabpanel" aria-labelledby="tab-search" hidden="until-found">
               <div class="panel-inner">
                 <div class="app-toolbar">
                   <span class="ui-tag on">Recherche YouTube intégrée</span>
@@ -313,7 +352,7 @@
               </div>
             </div>
 
-            <div id="panel-audio" role="tabpanel" aria-labelledby="tab-audio" hidden>
+            <div id="panel-audio" role="tabpanel" aria-labelledby="tab-audio" hidden="until-found">
               <div class="panel-inner">
                 <div class="app-toolbar">
                   <span class="ui-tag on">Demucs (CUDA / ROCm / CPU)</span>
@@ -341,7 +380,7 @@
               </div>
             </div>
 
-            <div id="panel-terminal" role="tabpanel" aria-labelledby="tab-terminal" hidden>
+            <div id="panel-terminal" role="tabpanel" aria-labelledby="tab-terminal" hidden="until-found">
               <div class="panel-inner">
                 <pre class="cli-box"><span class="cli-g">$</span> vidgrab-cli diag
 === 4k free video dowloader — Diagnostic Système ===
@@ -374,8 +413,8 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           </article>
           <article class="pillar-card">
             <div class="pillar-kicker">Multiplateforme réel</div>
-            <h3>Desktop &amp; Serveur</h3>
-            <p>Binaires précompilés x64 pour Windows 10/11 et Linux (<code>.deb</code>, <code>.rpm</code>, <code>.AppImage</code>, CLI sans GTK), plus recettes Arch, Nix et Docker.</p>
+            <h3>Desktop, Android &amp; Serveur</h3>
+            <p>Binaires précompilés x64 pour Windows 10/11 et Linux (<code>.deb</code>, <code>.rpm</code>, <code>.AppImage</code>, CLI sans GTK), plus <strong>APK Android arm64</strong>, Arch, Nix et Docker.</p>
           </article>
         </div>
       </div>
@@ -476,11 +515,39 @@ Affichage    : Wayland / X11 / WebView2 / Headless
             </span>
             <h3>Proxy, Tor automatique, cookies 0600 et zéro DRM bypass</h3>
             <p>Proxy HTTP/HTTPS/SOCKS5 par domaine (détection Tor sous Tails), cookies navigateur protégés en mode <code>0600</code> pour vos vidéos privées autorisées. Les flux chiffrés par DRM sont refusés.</p>
-            <div class="cap-tags">
+              <div class="cap-tags">
               <span>HTTP / SOCKS5</span>
               <span>Cookies 0600</span>
               <span>Plafond débit KiB/s</span>
               <span>Arrêt PC fin de file</span>
+            </div>
+          </article>
+
+          <article class="cap-card col-3">
+            <span class="cap-badge">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 18h4"/></svg>
+              Application Android (APK)
+            </span>
+            <h3>Interface tactile &amp; moteur embarqué</h3>
+            <p>Navigation inférieure à 5 boutons, modales en tiroir bas, marges <code>safe-area</code>, barre Smart Mode glissable et exécution locale via <code>youtubedl-android 0.18.1</code> + <code>FFmpeg</code> sans outil externe.</p>
+            <div class="cap-tags">
+              <span>Android 7.0+ (arm64-v8a)</span>
+              <span>Safe-Area &amp; Tactile</span>
+              <span>Pause / Reprise</span>
+            </div>
+          </article>
+
+          <article class="cap-card col-3">
+            <span class="cap-badge">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              Partage Android &amp; Galerie
+            </span>
+            <h3>Share Sheet &amp; stockage MediaStore</h3>
+            <p>Envoyez une vidéo directement depuis YouTube ou votre navigateur (<code>ACTION_SEND</code>) vers l'application, avec enregistrement dans <code>Download/4kFreeDownloader</code> et indexation immédiate dans la galerie.</p>
+            <div class="cap-tags">
+              <span>Menu Partager (Intent)</span>
+              <span>MediaStore / FileProvider</span>
+              <span>Notifications Android</span>
             </div>
           </article>
         </div>
@@ -517,8 +584,8 @@ Affichage    : Wayland / X11 / WebView2 / Headless
     <section id="telechargement" class="section section-alt">
       <div class="container">
         <div class="section-header">
-          <h2>Télécharger la version v0.2.0</h2>
-          <p>Tous les fichiers sont hébergés sur GitHub Releases et accompagnés de leurs empreintes dans <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/SHA256SUMS.txt">SHA256SUMS.txt</a>.</p>
+          <h2>Télécharger la version v0.3.0</h2>
+          <p>Tous les fichiers sont hébergés sur GitHub Releases et accompagnés de leurs empreintes dans <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/SHA256SUMS.txt">SHA256SUMS.txt</a>.</p>
         </div>
 
         <div class="os-grid">
@@ -531,14 +598,14 @@ Affichage    : Wayland / X11 / WebView2 / Headless
                 </div>
                 <span class="os-arch">x86_64</span>
               </div>
-              <p>Archive portable prête à l'emploi (<code>6,0 Mo</code>) contenant <code>4k free video dowloader.exe</code> (<code>11 Mo</code>), <code>WebView2Loader.dll</code> (<code>157 Ko</code>) et <code>vidgrab-cli.exe</code> (<code>3,1 Mo</code>).</p>
+              <p>Installateur permanent (<code>9,9 Mo</code>) qui copie automatiquement <code>4k free video dowloader.exe</code>, <code>WebView2Loader.dll</code> et <code>vidgrab-cli.exe</code> dans <code>C:\Program Files\4k free video dowloader</code> avec raccourcis Menu Démarrer &amp; Bureau.</p>
             </div>
             <div>
               <div class="os-actions">
-                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip">Archive .zip (6,0 Mo)</a>
-                <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader.exe">.exe seul</a>
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k-free-video-dowloader_0.3.0_setup_x64.exe">Installateur .exe (9,9 Mo)</a>
+                <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k.free.video.dowloader_0.3.0_windows_x64.zip">Archive .zip</a>
               </div>
-              <code class="os-cmd">Garder WebView2Loader.dll dans le même dossier</code>
+              <code class="os-cmd">Installe l'application + WebView2Loader.dll dans Program Files</code>
             </div>
           </article>
 
@@ -555,7 +622,7 @@ Affichage    : Wayland / X11 / WebView2 / Headless
             </div>
             <div>
               <div class="os-actions">
-                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.deb">Télécharger .deb (3,9 Mo)</a>
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k.free.video.dowloader_0.3.0_amd64.deb">Télécharger .deb (3,9 Mo)</a>
               </div>
               <code class="os-cmd">sudo apt install ./4k*.deb</code>
             </div>
@@ -574,9 +641,28 @@ Affichage    : Wayland / X11 / WebView2 / Headless
             </div>
             <div>
               <div class="os-actions">
-                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader-0.2.0-1.x86_64.rpm">Télécharger .rpm (4,0 Mo)</a>
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k.free.video.dowloader-0.3.0-1.x86_64.rpm">Télécharger .rpm (4,0 Mo)</a>
               </div>
               <code class="os-cmd">sudo dnf install ./4k*.rpm</code>
+            </div>
+          </article>
+
+          <article class="os-card highlighted">
+            <div>
+              <div class="os-head">
+                <div class="os-title-wrap">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 18h4"/></svg>
+                  <h3>Android (APK)</h3>
+                </div>
+                <span class="os-arch">arm64-v8a</span>
+              </div>
+              <p>APK natif autonome (<code>58 Mo</code>) pour Android 7.0+ avec <code>youtubedl-android 0.18.1</code> et <code>FFmpeg</code> embarqués, menu Partager et interface mobile adaptée.</p>
+            </div>
+            <div>
+              <div class="os-actions">
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k-free-video-dowloader_0.3.0_android_arm64.apk">Télécharger APK (58 Mo)</a>
+              </div>
+              <code class="os-cmd">Android 7.0+ • Sauvegarde Download/4kFreeDownloader</code>
             </div>
           </article>
 
@@ -593,10 +679,30 @@ Affichage    : Wayland / X11 / WebView2 / Headless
             </div>
             <div>
               <div class="os-actions">
-                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.AppImage">AppImage (111 Mo)</a>
-                <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/vidgrab-cli">vidgrab-cli</a>
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k.free.video.dowloader_0.3.0_amd64.AppImage">AppImage (111 Mo)</a>
+                <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/vidgrab-cli">vidgrab-cli</a>
               </div>
               <code class="os-cmd">chmod +x 4k*.AppImage &amp;&amp; ./4k*.AppImage</code>
+            </div>
+          </article>
+
+          <article class="os-card">
+            <div>
+              <div class="os-head">
+                <div class="os-title-wrap">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18 22 12 16 6M8 6 2 12l6 6"/></svg>
+                  <h3>Arch, Flatpak &amp; Sources</h3>
+                </div>
+                <span class="os-arch">GPL-3.0</span>
+              </div>
+              <p>Recettes de compilation complètes (Arch <code>PKGBUILD</code>, Alpine, Nix Flake, Flatpak, Docker) et vérification d'intégrité de toutes les releases.</p>
+            </div>
+            <div>
+              <div class="os-actions">
+                <a class="btn-secondary" href="guide-linux.html">Guide Linux &amp; Distros</a>
+                <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/SHA256SUMS.txt">SHA256SUMS.txt</a>
+              </div>
+              <code class="os-cmd">git clone https://github.com/Fazerdino1/4k-free-video-dowloader-</code>
             </div>
           </article>
         </div>
@@ -627,9 +733,9 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           </details>
 
           <details>
-            <summary>Comment lancer l'application sur Windows 10 ou Windows 11 ?</summary>
+            <summary>Comment installer l'application de façon permanente sur Windows 10 ou Windows 11 ?</summary>
             <div class="faq-body">
-              <p>Téléchargez l'archive <code>4k.free.video.dowloader_0.2.0_windows_x64.zip</code>, extrayez son contenu et double-cliquez sur <code>4k free video dowloader.exe</code> en gardant <code>WebView2Loader.dll</code> dans le même dossier. Windows 11 et Windows 10 récents intègrent déjà Microsoft Edge WebView2 Runtime.</p>
+              <p>Téléchargez et lancez l'installateur <code>4k-free-video-dowloader_0.3.0_setup_x64.exe</code> : il installe de façon permanente <code>4k free video dowloader.exe</code>, <code>WebView2Loader.dll</code>, <code>vidgrab-cli.exe</code> et <code>uninstall.exe</code> dans <code>C:\Program Files\4k free video dowloader</code>, crée vos raccourcis Menu Démarrer et Bureau, et enregistre l'application dans les Programmes Windows. Une archive portable <code>.zip</code> est également proposée.</p>
             </div>
           </details>
 
@@ -641,9 +747,16 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           </details>
 
           <details>
+            <summary>Comment installer et utiliser la version Android (APK) ?</summary>
+            <div class="faq-body">
+              <p>Téléchargez <code>4k-free-video-dowloader_0.3.0_android_arm64.apk</code> sur votre appareil Android 7.0+ (architecture 64 bits <code>arm64-v8a</code>) et autorisez l'installation depuis les sources inconnues si demandé. L'APK embarque déjà <code>youtubedl-android 0.18.1</code>, Python et <code>FFmpeg</code> : vous pouvez coller un lien ou utiliser le bouton <strong>Partager</strong> depuis YouTube/navigateur pour enregistrer vos médias dans <code>Download/4kFreeDownloader</code>.</p>
+            </div>
+          </details>
+
+          <details>
             <summary>Comment vérifier l'intégrité des exécutables ?</summary>
             <div class="faq-body">
-              <p>Comparez l'empreinte de votre fichier téléchargé avec le fichier officiel <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/SHA256SUMS.txt">SHA256SUMS.txt</a> publié dans la Release <code>v0.2.0</code> (<code>sha256sum -c SHA256SUMS.txt</code> sous Linux ou <code>Get-FileHash</code> sous PowerShell).</p>
+              <p>Comparez l'empreinte de votre fichier téléchargé avec le fichier officiel <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/SHA256SUMS.txt">SHA256SUMS.txt</a> publié dans la Release <code>v0.3.0</code> (<code>sha256sum -c SHA256SUMS.txt</code> sous Linux ou <code>Get-FileHash</code> sous PowerShell).</p>
             </div>
           </details>
         </section>
@@ -653,11 +766,11 @@ Affichage    : Wayland / X11 / WebView2 / Headless
     <!-- ==================== FICHE TECHNIQUE ==================== -->
     <section class="section" style="padding-block-start: 0;">
       <div class="container">
-        <h2 style="font-size: 1.25rem; margin-block-end: 1rem;">Fiche technique (v0.2.0)</h2>
+        <h2 style="font-size: 1.25rem; margin-block-end: 1rem;">Fiche technique (v0.3.0)</h2>
         <dl class="spec-grid">
           <div class="spec-cell">
             <dt>Version &amp; Date</dt>
-            <dd>v0.2.0 • 12 novembre 2026</dd>
+            <dd>v0.3.0 • 12 novembre 2026</dd>
           </div>
           <div class="spec-cell">
             <dt>Licence &amp; Auteur</dt>
@@ -665,7 +778,7 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           </div>
           <div class="spec-cell">
             <dt>Plateformes</dt>
-            <dd>Binaires x86_64 (Win 10/11 &amp; Linux) • Sources ARM64</dd>
+            <dd>Windows x64 • Linux x64 (.deb/.rpm/AppImage) • Android APK (arm64-v8a)</dd>
           </div>
           <div class="spec-cell">
             <dt>Langues de l'UI</dt>
@@ -688,10 +801,11 @@ Affichage    : Wayland / X11 / WebView2 / Headless
         <div>
           <h4>Téléchargements</h4>
           <ul>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip">Windows x64 (.zip)</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.deb">Ubuntu / Debian (.deb)</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader-0.2.0-1.x86_64.rpm">Fedora / RHEL (.rpm)</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.AppImage">AppImage Linux</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k-free-video-dowloader_0.3.0_setup_x64.exe">Windows Installateur (.exe)</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k-free-video-dowloader_0.3.0_android_arm64.apk">Android APK (arm64)</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k.free.video.dowloader_0.3.0_amd64.deb">Ubuntu / Debian (.deb)</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k.free.video.dowloader-0.3.0-1.x86_64.rpm">Fedora / RHEL (.rpm)</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/4k.free.video.dowloader_0.3.0_amd64.AppImage">AppImage Linux</a></li>
           </ul>
         </div>
         <div>
@@ -699,7 +813,7 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           <ul>
             <li><a href="guide-linux.html">Guide Linux &amp; CLI</a></li>
             <li><a href="#cli">Commandes vidgrab-cli</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/SHA256SUMS.txt">Empreintes SHA-256</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0/SHA256SUMS.txt">Empreintes SHA-256</a></li>
             <li><a href="sitemap.xml">Plan du site XML</a></li>
           </ul>
         </div>
@@ -707,7 +821,7 @@ Affichage    : Wayland / X11 / WebView2 / Headless
           <h4>Code source GitHub</h4>
           <ul>
             <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">Dépôt Fazerdino1</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.2.0" target="_blank" rel="noopener noreferrer">Release v0.2.0</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.3.0" target="_blank" rel="noopener noreferrer">Release v0.3.0</a></li>
             <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/actions" target="_blank" rel="noopener noreferrer">GitHub Actions CI</a></li>
             <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/issues" target="_blank" rel="noopener noreferrer">Signaler un bug</a></li>
           </ul>

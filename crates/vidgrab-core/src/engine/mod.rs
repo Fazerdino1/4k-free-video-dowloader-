@@ -64,37 +64,50 @@ pub async fn analyze_url(
         }
     }
 
-    let yt_dlp = paths.effective_yt_dlp(settings);
-    if !yt_dlp.exists() {
-        return Err(CoreError::YtDlpMissing(
-            yt_dlp.to_string_lossy().into_owned(),
-        ));
-    }
-
     let cmd_args = args::build_analyze_args(url, flat_playlist, settings);
-    debug!("Running yt-dlp analyze: {:?} {:?}", yt_dlp, cmd_args);
 
-    let mut cmd = Command::new(&yt_dlp);
-    cmd.args(&cmd_args)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
-    crate::configure_background_command(&mut cmd);
-    let fut = cmd.output();
+    let stdout = if let Some(bridge) = crate::mobile_bridge::get() {
+        debug!("Running mobile yt-dlp analyze: {:?}", cmd_args);
+        tokio::time::timeout(ANALYZE_TIMEOUT, bridge.run_yt_dlp_json(cmd_args))
+            .await
+            .map_err(|_| {
+                CoreError::YtDlpFailed(
+                    "Délai dépassé (45 s) lors de l'analyse du lien par yt-dlp".to_string(),
+                )
+            })??
+    } else {
+        let yt_dlp = paths.effective_yt_dlp(settings);
+        if !yt_dlp.exists() {
+            return Err(CoreError::YtDlpMissing(
+                yt_dlp.to_string_lossy().into_owned(),
+            ));
+        }
 
-    let output = tokio::time::timeout(ANALYZE_TIMEOUT, fut)
-        .await
-        .map_err(|_| {
-            CoreError::YtDlpFailed(
-                "Délai dépassé (45 s) lors de l'analyse du lien par yt-dlp".to_string(),
-            )
-        })??;
+        debug!("Running yt-dlp analyze: {:?} {:?}", yt_dlp, cmd_args);
 
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(CoreError::from_yt_dlp_stderr(&stderr));
-    }
+        let mut cmd = Command::new(&yt_dlp);
+        cmd.args(&cmd_args)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        crate::configure_background_command(&mut cmd);
+        let fut = cmd.output();
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
+        let output = tokio::time::timeout(ANALYZE_TIMEOUT, fut)
+            .await
+            .map_err(|_| {
+                CoreError::YtDlpFailed(
+                    "Délai dépassé (45 s) lors de l'analyse du lien par yt-dlp".to_string(),
+                )
+            })??;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(CoreError::from_yt_dlp_stderr(&stderr));
+        }
+
+        String::from_utf8_lossy(&output.stdout).into_owned()
+    };
+
     let info = parser::parse_video_info(&stdout)?;
 
     if let Ok(mut guard) = analyze_cache().lock() {
@@ -110,26 +123,33 @@ pub async fn analyze_url(
 
 /// Lists all extractors supported by the installed `yt-dlp` binary (`yt-dlp --list-extractors`).
 pub async fn list_extractors(paths: &AppPaths, settings: &Settings) -> CoreResult<Vec<String>> {
-    let yt_dlp = paths.effective_yt_dlp(settings);
-    if !yt_dlp.exists() {
-        return Err(CoreError::YtDlpMissing(
-            yt_dlp.to_string_lossy().into_owned(),
-        ));
-    }
+    let stdout = if let Some(bridge) = crate::mobile_bridge::get() {
+        bridge
+            .run_yt_dlp_json(vec!["--list-extractors".to_string()])
+            .await?
+    } else {
+        let yt_dlp = paths.effective_yt_dlp(settings);
+        if !yt_dlp.exists() {
+            return Err(CoreError::YtDlpMissing(
+                yt_dlp.to_string_lossy().into_owned(),
+            ));
+        }
 
-    let mut cmd = Command::new(&yt_dlp);
-    cmd.arg("--list-extractors")
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
-    crate::configure_background_command(&mut cmd);
-    let output = cmd.output().await?;
+        let mut cmd = Command::new(&yt_dlp);
+        cmd.arg("--list-extractors")
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        crate::configure_background_command(&mut cmd);
+        let output = cmd.output().await?;
 
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(CoreError::YtDlpFailed(stderr.into_owned()));
-    }
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(CoreError::YtDlpFailed(stderr.into_owned()));
+        }
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
+        String::from_utf8_lossy(&output.stdout).into_owned()
+    };
+
     let list = stdout
         .lines()
         .map(str::trim)
@@ -204,8 +224,28 @@ pub fn cleanup_partial_files(output_dir: &Path, title_or_id: &str) -> CoreResult
     Ok(removed)
 }
 
-/// Spawns a `yt-dlp` download subprocess, streaming progress updates over `progress_tx`.
-/// Also registers the child PID via `pid_callback` so the queue manager can pause/cancel it.
+/// Parses one `yt-dlp` output line, updating `last_progress` and forwarding progress snapshots.
+fn process_yt_dlp_line(
+    req_id: uuid::Uuid,
+    line: &str,
+    last_progress: &mut DownloadProgress,
+    progress_tx: &mpsc::UnboundedSender<DownloadProgress>,
+) {
+    if let Some(path) = line.trim().strip_prefix(args::FINAL_PATH_PREFIX) {
+        last_progress.output_path = Some(std::path::PathBuf::from(path.trim()));
+        return;
+    }
+    if let Some(mut prog) = parser::parse_progress_line(req_id, line) {
+        if prog.output_path.is_none() {
+            prog.output_path = last_progress.output_path.clone();
+        }
+        *last_progress = prog.clone();
+        let _ = progress_tx.send(prog);
+    }
+}
+
+/// Executes `yt-dlp` (native subprocess on desktop, or registered [`MobileEngineBridge`] on Android),
+/// streaming progress updates over `progress_tx` and registering desktop PID when applicable.
 pub async fn run_download<F>(
     paths: &AppPaths,
     req: &DownloadRequest,
@@ -221,16 +261,6 @@ where
         CoreError::check_drm_url(&req.url)?;
     }
 
-    // Ensure ffmpeg is available before starting video/audio merges
-    let _ = paths.effective_ffmpeg(settings)?;
-
-    let yt_dlp = paths.effective_yt_dlp(settings);
-    if !yt_dlp.exists() {
-        return Err(CoreError::YtDlpMissing(
-            yt_dlp.to_string_lossy().into_owned(),
-        ));
-    }
-
     std::fs::create_dir_all(&req.output_dir)?;
 
     let mut cmd_args = args::build_args(req, settings);
@@ -240,6 +270,65 @@ where
         for (i, arg) in extra_args.iter().enumerate() {
             cmd_args.insert(insert_pos + i, arg.clone());
         }
+    }
+
+    let req_id = req.id;
+
+    if let Some(bridge) = crate::mobile_bridge::get() {
+        info!("Starting mobile yt-dlp download {}: {:?}", req.id, cmd_args);
+        let _ = pid_callback;
+        let (line_tx, mut line_rx) = mpsc::unbounded_channel::<String>();
+        let tx_clone = progress_tx.clone();
+
+        let consume_handle = tokio::spawn(async move {
+            let mut last_progress = DownloadProgress {
+                id: req_id,
+                status: DownloadStatus::Downloading,
+                ..Default::default()
+            };
+            while let Some(line) = line_rx.recv().await {
+                process_yt_dlp_line(req_id, &line, &mut last_progress, &tx_clone);
+            }
+            last_progress
+        });
+
+        let bridge_res = bridge
+            .run_yt_dlp_download(req_id.to_string(), cmd_args, line_tx)
+            .await;
+        let mut final_progress = consume_handle.await.unwrap_or_else(|_| DownloadProgress {
+            id: req_id,
+            ..Default::default()
+        });
+
+        return match bridge_res {
+            Ok(()) => {
+                final_progress.status = DownloadStatus::Completed;
+                final_progress.percent = 100.0;
+                if let Some(out) = &final_progress.output_path {
+                    let _ = bridge
+                        .scan_media_file(out.to_string_lossy().into_owned())
+                        .await;
+                }
+                let _ = progress_tx.send(final_progress.clone());
+                Ok(final_progress)
+            }
+            Err(err) => {
+                final_progress.status = DownloadStatus::Failed;
+                final_progress.error_message = Some(err.to_string());
+                let _ = progress_tx.send(final_progress);
+                Err(err)
+            }
+        };
+    }
+
+    // Ensure ffmpeg is available before starting video/audio merges
+    let _ = paths.effective_ffmpeg(settings)?;
+
+    let yt_dlp = paths.effective_yt_dlp(settings);
+    if !yt_dlp.exists() {
+        return Err(CoreError::YtDlpMissing(
+            yt_dlp.to_string_lossy().into_owned(),
+        ));
     }
 
     info!("Starting yt-dlp download {}: {:?}", req.id, cmd_args);
@@ -266,7 +355,6 @@ where
         .take()
         .ok_or_else(|| CoreError::YtDlpFailed("Failed to capture yt-dlp stderr".to_string()))?;
 
-    let req_id = req.id;
     let tx_clone = progress_tx.clone();
 
     let stdout_task = tokio::spawn(async move {
@@ -277,17 +365,7 @@ where
             ..Default::default()
         };
         while let Ok(Some(line)) = reader.next_line().await {
-            if let Some(path) = line.trim().strip_prefix(args::FINAL_PATH_PREFIX) {
-                last_progress.output_path = Some(std::path::PathBuf::from(path.trim()));
-                continue;
-            }
-            if let Some(mut prog) = parser::parse_progress_line(req_id, &line) {
-                if prog.output_path.is_none() {
-                    prog.output_path = last_progress.output_path.clone();
-                }
-                last_progress = prog.clone();
-                let _ = tx_clone.send(prog);
-            }
+            process_yt_dlp_line(req_id, &line, &mut last_progress, &tx_clone);
         }
         last_progress
     });

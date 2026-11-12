@@ -1,8 +1,8 @@
 name       : vidgrab
-version    : 0.2.0
+version    : 0.3.0
 release    : 1
 source     :
-    - https://github.com/Fazerdino1/4k-free-video-dowloader-/archive/refs/tags/v0.2.0.tar.gz : SKIP
+    - https://github.com/Fazerdino1/4k-free-video-dowloader-/archive/refs/tags/v0.3.0.tar.gz : SKIP
 homepage   : https://github.com/Fazerdino1/4k-free-video-dowloader-
 license    :
     - GPL-3.0-or-later

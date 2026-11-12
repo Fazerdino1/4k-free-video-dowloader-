@@ -224,6 +224,18 @@ pub async fn run_ffmpeg_tool(
 
     let output_path = build_output_path(input_path, action);
     let args = build_ffmpeg_tool_args(input_path, &output_path, action)?;
+
+    if let Some(bridge) = crate::mobile_bridge::get() {
+        if let Err(err) = bridge.run_ffmpeg(args).await {
+            let _ = tokio::fs::remove_file(&output_path).await;
+            return Err(err);
+        }
+        let _ = bridge
+            .scan_media_file(output_path.to_string_lossy().into_owned())
+            .await;
+        return Ok(output_path);
+    }
+
     let ffmpeg_bin = paths.effective_ffmpeg(settings)?;
 
     let mut cmd = Command::new(&ffmpeg_bin);

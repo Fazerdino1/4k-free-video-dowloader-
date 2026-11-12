@@ -1,6 +1,6 @@
 pkgbase = vidgrab
 	pkgdesc = Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) written in Rust
-	pkgver = 0.2.0
+	pkgver = 0.3.0
 	pkgrel = 1
 	url = https://github.com/Fazerdino1/4k-free-video-dowloader-
 	arch = x86_64

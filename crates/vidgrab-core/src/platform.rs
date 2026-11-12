@@ -238,9 +238,33 @@ pub fn preferred_ytdlp_asset_names(arch: &str, libc: &str, is_nixos: bool) -> Ve
     preferred_ytdlp_asset_names_for_os("linux", arch, libc, is_nixos)
 }
 
-/// Inspects the running host environment (Linux or Windows) and returns a complete compatibility summary.
+/// Inspects the running host environment (Linux, Windows, or Android) and returns a complete compatibility summary.
 #[must_use]
 pub fn detect_platform_info(paths: &AppPaths, settings: &Settings) -> LinuxPlatformInfo {
+    #[cfg(target_os = "android")]
+    {
+        let _ = (paths, settings);
+        let arch = std::env::consts::ARCH.to_string();
+        return LinuxPlatformInfo {
+            distro_id: "android".to_string(),
+            distro_name: "Android".to_string(),
+            distro_like: vec!["android".to_string(), "linux".to_string()],
+            arch,
+            libc: "bionic".to_string(),
+            init_system: "android-zygote".to_string(),
+            display_backend: "Android WebView".to_string(),
+            sandbox: "android-apk".to_string(),
+            is_immutable: true,
+            has_nvidia: false,
+            is_qubes: false,
+            is_tails: false,
+            recommended_tor_proxy: detect_local_tor_socks5(),
+            yt_dlp_path: Some("youtubedl-android (embedded)".to_string()),
+            yt_dlp_asset: "youtubedl-android".to_string(),
+            ffmpeg_path: Some("ffmpeg-android (embedded)".to_string()),
+        };
+    }
+
     #[cfg(target_os = "windows")]
     {
         let arch = std::env::consts::ARCH.to_string();
@@ -285,7 +309,7 @@ pub fn detect_platform_info(paths: &AppPaths, settings: &Settings) -> LinuxPlatf
         }
     }
 
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_os = "windows", target_os = "android")))]
     {
         let os_raw = fs::read_to_string("/etc/os-release")
             .or_else(|_| fs::read_to_string("/usr/lib/os-release"))

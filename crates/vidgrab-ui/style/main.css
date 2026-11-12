@@ -1663,3 +1663,314 @@ body.drop-hover::after {
     border: 1px solid ButtonText;
   }
 }
+
+/* ==========================================================================
+   Android & Mobile Touch Ergonomics (100% Adapted Mobile APK Layout)
+   ========================================================================== */
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+  touch-action: manipulation;
+}
+
+.is-android .android-hide {
+  display: none !important;
+}
+
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menubar {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .menubar-items > .menu-btn {
+    display: none;
+  }
+
+  .menubar-items {
+    min-width: 0;
+  }
+
+  .app-brand-chip span {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+  }
+
+  .badge-free {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+
+  .toolbar {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .toolbar-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .toolbar-actions-left {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .btn-paste-hero {
+    min-height: 46px;
+    justify-content: center;
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .smart-switch {
+    min-height: 46px;
+    padding: 8px 12px;
+  }
+
+  .toolbar-right {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .tool-chip-btn {
+    min-height: 42px;
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .smart-inline-bar {
+    padding: 6px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .smart-inline-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .preset-groups {
+    flex-wrap: nowrap;
+    width: max-content;
+    gap: 10px;
+  }
+
+  .pill-opt {
+    min-height: 36px;
+    padding: 6px 11px;
+  }
+
+  .subbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .nav-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 4px;
+  }
+
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tab {
+    min-height: 40px;
+    flex-shrink: 0;
+    padding: 8px 10px;
+  }
+
+  .subbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-box {
+    flex: 1;
+  }
+
+  .search-box input {
+    width: 100%;
+    min-height: 40px;
+    font-size: 16px;
+  }
+
+  .queue-bar {
+    padding: 8px 12px;
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .queue-bar-left,
+  .queue-bar-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .queue-btn {
+    min-height: 38px;
+    padding: 6px 11px;
+    font-size: 12px;
+  }
+
+  .download-list {
+    padding: 10px 12px 92px;
+    gap: 10px;
+  }
+
+  .download-card {
+    grid-template-columns: 88px 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px 12px;
+    padding: 10px;
+  }
+
+  .thumb-wrap {
+    width: 88px;
+    height: 58px;
+  }
+
+  .card-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  .icon-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .statusbar {
+    display: none;
+  }
+
+  .fab-browser {
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+    right: 12px;
+  }
+
+  .clipboard-banner {
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+    left: 10px;
+    right: 10px;
+    transform: none;
+    max-width: none;
+    flex-wrap: wrap;
+  }
+
+  .toast {
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 24px);
+    text-align: center;
+  }
+
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal,
+  .modal.modal-wide {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
+    border-bottom: none;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  .modal-body {
+    padding: 14px 16px;
+  }
+
+  .form-grid,
+  .check-grid {
+    grid-template-columns: 1fr;
+  }
+
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px;
+    min-height: 42px;
+  }
+
+  .btn {
+    min-height: 42px;
+    padding: 8px 14px;
+  }
+
+  .mobile-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 180;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    backdrop-filter: blur(10px);
+  }
+
+  .mob-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 48px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 10.5px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    padding: 4px 2px;
+  }
+
+  .mob-nav-btn.primary {
+    color: var(--brand);
+  }
+
+  .mob-nav-btn:active {
+    background: var(--bg-card-hover);
+    color: var(--text-main);
+  }
+}

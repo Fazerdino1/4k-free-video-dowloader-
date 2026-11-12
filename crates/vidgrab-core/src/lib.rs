@@ -18,6 +18,7 @@ pub mod updater;
 
 pub mod cli;
 pub mod media_tools;
+pub mod mobile_bridge;
 pub mod platform;
 
 use crate::error::{CoreError, CoreResult};
@@ -251,9 +252,9 @@ pub fn get_disk_space_bytes(path: &std::path::Path) -> Option<(u64, u64)> {
     {
         let stats = nix::sys::statvfs::statvfs(&target).ok()?;
         let unit = if stats.fragment_size() > 0 {
-            stats.fragment_size()
+            stats.fragment_size() as u64
         } else {
-            stats.block_size()
+            stats.block_size() as u64
         };
         let avail = (stats.blocks_available() as u64).saturating_mul(unit);
         let total = (stats.blocks() as u64).saturating_mul(unit);

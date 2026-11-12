@@ -9,7 +9,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 license = "GPL-3.0-or-later"
 authors = ["Fazerdino1"]
@@ -29,7 +29,7 @@ url = { version = "2.5", features = ["serde"] }
 sha2 = "0.10"
 hex = "0.4"
 regex = "1.10"
-reqwest = { version = "0.12", features = ["json", "stream", "socks"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "socks", "rustls-tls", "charset", "http2"] }
 nix = { version = "0.25", features = ["signal", "fs"] }
 dirs = "7.0"
 which = "7.0"

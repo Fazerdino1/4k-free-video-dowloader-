@@ -13,7 +13,7 @@ use std::sync::Mutex;
 use uuid::Uuid;
 use vidgrab_shared::{DownloadItem, DownloadStatus, ExportBundle, Subscription};
 
-#[cfg(target_os = "windows")]
+#[cfg(any(target_os = "windows", target_os = "android"))]
 use libsqlite3_sys as _;
 
 #[repr(C)]
@@ -31,7 +31,10 @@ const SQLITE_ROW: c_int = 100;
 const SQLITE_DONE: c_int = 101;
 const SQLITE_TRANSIENT: isize = -1;
 
-#[cfg_attr(not(target_os = "windows"), link(name = "sqlite3"))]
+#[cfg_attr(
+    not(any(target_os = "windows", target_os = "android")),
+    link(name = "sqlite3")
+)]
 extern "C" {
     fn sqlite3_open(filename: *const c_char, pp_db: *mut *mut sqlite3) -> c_int;
     fn sqlite3_close(db: *mut sqlite3) -> c_int;

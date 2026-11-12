@@ -1,6 +1,6 @@
 # Template file for 'vidgrab' (Void Linux xbps-src)
 pkgname=vidgrab
-version=0.2.0
+version=0.3.0
 revision=1
 build_style=cargo
 hostmakedepends="pkg-config"

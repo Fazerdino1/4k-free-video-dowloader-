@@ -174,6 +174,7 @@ impl DownloadQueue {
             info!("Pausing download {} (PID {}) via SIGTERM", id, pid);
             let _ = engine::terminate_process(pid);
         }
+        crate::mobile_bridge::cancel_task_if_registered(id);
         let res = self.update_status(id, DownloadStatus::Paused, None);
         self.concurrency_notify.notify_waiters();
         self.schedule_notify.notify_waiters();
@@ -200,6 +201,7 @@ impl DownloadQueue {
             info!("Cancelling download {} (PID {})", id, pid);
             let _ = engine::terminate_process(pid);
         }
+        crate::mobile_bridge::cancel_task_if_registered(id);
 
         let maybe_req = self
             .items

@@ -1,5 +1,5 @@
 Name:           vidgrab
-Version:        0.2.0
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) in Rust
 License:        GPL-3.0-or-later
@@ -79,5 +79,5 @@ install -Dm644 src-tauri/icons/icon.png %{buildroot}%{_datadir}/icons/hicolor/51
 %{_bindir}/vidgrab-cli
 
 %changelog
-* Thu Nov 12 2026 Fazerdino1 <187407683+Fazerdino1@users.noreply.github.com> - 0.2.0-1
+* Thu Nov 12 2026 Fazerdino1 <187407683+Fazerdino1@users.noreply.github.com> - 0.3.0-1
 - Harmonize GPL-3.0-or-later license, harden Tauri WebView CSP, and support Windows .exe

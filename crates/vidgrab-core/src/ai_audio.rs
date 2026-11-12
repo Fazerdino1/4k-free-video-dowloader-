@@ -226,18 +226,28 @@ async fn run_ffmpeg_filter(
     output: &Path,
     filter: &str,
 ) -> CoreResult<()> {
+    let args = vec![
+        "-y".to_string(),
+        "-i".to_string(),
+        input.to_string_lossy().into_owned(),
+        "-vn".to_string(),
+        "-af".to_string(),
+        filter.to_string(),
+        output.to_string_lossy().into_owned(),
+    ];
+
+    if let Some(bridge) = crate::mobile_bridge::get() {
+        bridge.run_ffmpeg(args).await?;
+        let _ = bridge
+            .scan_media_file(output.to_string_lossy().into_owned())
+            .await;
+        return Ok(());
+    }
+
     let mut cmd = Command::new(ffmpeg);
-    cmd.args([
-        "-y",
-        "-i",
-        &input.to_string_lossy(),
-        "-vn",
-        "-af",
-        filter,
-        &output.to_string_lossy(),
-    ])
-    .stdout(Stdio::piped())
-    .stderr(Stdio::piped());
+    cmd.args(&args)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
     crate::configure_background_command(&mut cmd);
     let out = cmd.output().await?;
 

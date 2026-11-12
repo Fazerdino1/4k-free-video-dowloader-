@@ -2,20 +2,21 @@
 
 Site officiel : **[fazerdino1.github.io/4k-free-video-dowloader-](https://fazerdino1.github.io/4k-free-video-dowloader-/)** • Dépôt : [Fazerdino1/4k-free-video-dowloader-](https://github.com/Fazerdino1/4k-free-video-dowloader-) • Licence : **[GPL-3.0-or-later](LICENSE)**
 
-Application **open source**, écrite **100 % en Rust** (Tauri 2 + WebView2 / WebKitGTK + CLI headless), propulsée par **yt-dlp** et **ffmpeg**, compatible avec **Windows 10/11 (x64)** et l'ensemble des distributions Linux **Desktop, Serveur, ARM, Gaming, Cybersécurité et Conteneurs**.
+Application **open source**, écrite **100 % en Rust** (Tauri 2 + WebView2 / WebKitGTK / Android + CLI headless), propulsée par **yt-dlp** et **ffmpeg**, compatible avec **Windows 10/11 (x64)**, **Android 7.0+ (APK arm64-v8a)** et l'ensemble des distributions Linux **Desktop, Serveur, ARM, Gaming, Cybersécurité et Conteneurs**.
 
-## Téléchargements précompilés (`v0.2.0`)
+## Téléchargements précompilés (`v0.3.0`)
 
-Tous les binaires et paquets précompilés sont distribués exclusivement via la [**Release GitHub `v0.2.0`**](https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.2.0) (accompagnés du fichier `SHA256SUMS.txt` ; le dépôt Git ne contient que les sources) :
+Tous les binaires et paquets précompilés sont distribués exclusivement via la [**Release GitHub `v0.3.0`**](https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.3.0) (accompagnés du fichier `SHA256SUMS.txt` ; le dépôt Git ne contient que les sources) :
 
 | Plateforme / Format | Usage cible | Fichier |
 |---|---|---|
-| **Windows GUI (x64)** | Application Desktop Windows 10/11 *(placer `WebView2Loader.dll` dans le même dossier)* | `4k free video dowloader.exe` + `WebView2Loader.dll` |
-| **Windows Archive complète** | Archive portable prête à l'emploi (`4k free video dowloader.exe` + `vidgrab-cli.exe` + `WebView2Loader.dll` + `LICENSE`) | `4k free video dowloader_0.2.0_windows_x64.zip` |
-| **Windows CLI (x64)** | Ligne de commande headless Windows | `vidgrab-cli.exe` |
-| **AppImage** (universel Linux) | Toute distribution Linux (`chmod +x`) | `4k free video dowloader_0.2.0_amd64.AppImage` |
-| **RPM** | Fedora, Nobara, RHEL, AlmaLinux, Rocky, openSUSE | `4k free video dowloader-0.2.0-1.x86_64.rpm` |
-| **DEB** | Ubuntu, Linux Mint, Debian, Pop!_OS, Kali, Parrot, Zorin | `4k free video dowloader_0.2.0_amd64.deb` |
+| **Windows Installateur permanent (x64)** | Installe dans `C:\Program Files\4k free video dowloader` (`4k free video dowloader.exe` + `WebView2Loader.dll` + `vidgrab-cli.exe` + `uninstall.exe` + raccourcis) | `4k-free-video-dowloader_0.3.0_setup_x64.exe` |
+| **Windows Archive portable** | Archive portable prête à l'emploi (`4k free video dowloader.exe` + `vidgrab-cli.exe` + `WebView2Loader.dll` + `LICENSE`) | `4k free video dowloader_0.3.0_windows_x64.zip` |
+| **Windows GUI / CLI (x64)** | Exécutables Windows individuels | `4k free video dowloader.exe` / `vidgrab-cli.exe` |
+| **Android APK (arm64-v8a)** | Smartphone / tablette Android 7.0+ (`youtubedl-android 0.18.1` + `FFmpeg` embarqués + menu Partager) | `4k-free-video-dowloader_0.3.0_android_arm64.apk` |
+| **AppImage** (universel Linux) | Toute distribution Linux (`chmod +x`) | `4k free video dowloader_0.3.0_amd64.AppImage` |
+| **RPM** | Fedora, Nobara, RHEL, AlmaLinux, Rocky, openSUSE | `4k free video dowloader-0.3.0-1.x86_64.rpm` |
+| **DEB** | Ubuntu, Linux Mint, Debian, Pop!_OS, Kali, Parrot, Zorin | `4k free video dowloader_0.3.0_amd64.deb` |
 | **GUI Linux (x86_64)** | Exécutable Desktop Rust/WebKitGTK | `vidgrab` |
 | **CLI Headless (x86_64)** | Serveurs, Raspberry Pi / SSH / conteneurs sans GTK | `vidgrab-cli` |
 

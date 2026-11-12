@@ -627,16 +627,24 @@ img {
 
 .showcase-tablist {
   display: flex;
+  flex-wrap: nowrap;
   gap: 0.35rem;
   overflow-x: auto;
+  scroll-snap-type: inline proximity;
+  scrollbar-width: none;
   padding: 0.5rem 1rem 0;
   background: #090e14;
   border-block-end: 1px solid var(--border);
 }
 
+.showcase-tablist::-webkit-scrollbar {
+  display: none;
+}
+
 .showcase-tablist [role="tab"] {
   position: relative;
   flex: none;
+  scroll-snap-align: start;
   padding: 0.62rem 1rem;
   border: 0;
   border-radius: 0.55rem 0.55rem 0 0;
@@ -645,6 +653,7 @@ img {
   font: inherit;
   font-size: 0.87rem;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -743,6 +752,10 @@ img {
 
 .thumb-badge.purple {
   background: linear-gradient(135deg, #7c3aed, #db2777);
+}
+
+.thumb-badge.android {
+  background: linear-gradient(135deg, #10b981, #059669);
 }
 
 .queue-name {
@@ -1084,15 +1097,16 @@ img {
 }
 
 /* ==========================================================================
-   TÉLÉCHARGEMENTS MULTI-OS (v0.2.0 vérifiés)
+   TÉLÉCHARGEMENTS MULTI-OS (v0.3.0 vérifiés)
    ========================================================================== */
 .os-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
 }
 
 .os-card {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1100,7 +1114,7 @@ img {
   background: linear-gradient(180deg, var(--surface) 0%, #0e161f 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 1.65rem;
+  padding: 1.5rem;
 }
 
 .os-card.highlighted {
@@ -1166,9 +1180,25 @@ img {
   color: var(--cyan);
 }
 
-@media (max-width: 780px) {
+@media (max-width: 1060px) {
+  .os-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
   .os-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@container (max-width: 300px) {
+  .os-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .os-actions a {
+    justify-content: center;
   }
 }
 

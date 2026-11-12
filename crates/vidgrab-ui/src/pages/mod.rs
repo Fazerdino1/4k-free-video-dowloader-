@@ -50,7 +50,7 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
 <html lang="{lang}" data-theme="{init_theme}" style="--brand:{init_accent};--border-focus:{init_accent};">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="color-scheme" content="dark light" />
     <title>{app_title}</title>
     <style>{MAIN_CSS}</style>
@@ -255,8 +255,32 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
         {cards_html}
     </main>
 
-    <!-- 5. Floating Built-in Browser Button -->
-    <button id="btn-browser" type="button" class="fab-browser" title="Ouvrir le navigateur intégré (YouTube, Vimeo, TikTok, Cookies)" aria-label="{browser_label}">
+    <!-- 4c. Mobile / Android Bottom Navigation Dock -->
+    <nav id="mobile-bottom-nav" class="mobile-bottom-nav" aria-label="Navigation mobile">
+        <button id="mob-nav-paste" type="button" class="mob-nav-btn primary">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Coller</span>
+        </button>
+        <button id="mob-nav-queue" type="button" class="mob-nav-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>File</span>
+        </button>
+        <button id="mob-nav-subs" type="button" class="mob-nav-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>Abos</span>
+        </button>
+        <button id="mob-nav-logs" type="button" class="mob-nav-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <span>Logs</span>
+        </button>
+        <button id="mob-nav-settings" type="button" class="mob-nav-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Réglages</span>
+        </button>
+    </nav>
+
+    <!-- 5. Floating Built-in Browser Button (Desktop only) -->
+    <button id="btn-browser" type="button" class="fab-browser android-hide" title="Ouvrir le navigateur intégré (YouTube, Vimeo, TikTok, Cookies)" aria-label="{browser_label}">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <span data-i18n="fab_browser">Navigateur</span>
     </button>
@@ -703,13 +727,13 @@ const SETTINGS_MODAL_HTML: &str = r##"    <!-- Modal 4: Settings Window (4 Tabs)
                             <div class="pill-selector" data-target="set-post-action">
                                 <button type="button" class="pill-opt" data-val="nothing" aria-checked="false">Aucune</button>
                                 <button type="button" class="pill-opt" data-val="notify" aria-checked="true">Notifier</button>
-                                <button type="button" class="pill-opt" data-val="shutdown_system" aria-checked="false">Éteindre PC</button>
+                                <button type="button" class="pill-opt android-hide" data-val="shutdown_system" aria-checked="false">Éteindre PC</button>
                             </div>
                         </div>
                     </div>
                     <div class="check-grid">
-                        <label class="check-field"><input id="set-autostart" type="checkbox" /><span>Lancer au démarrage</span></label>
-                        <label class="check-field"><input id="set-min-tray" type="checkbox" checked /><span>Réduire dans le tray à la fermeture</span></label>
+                        <label class="check-field android-hide"><input id="set-autostart" type="checkbox" /><span>Lancer au démarrage</span></label>
+                        <label class="check-field android-hide"><input id="set-min-tray" type="checkbox" checked /><span>Réduire dans le tray à la fermeture</span></label>
                         <label class="check-field"><input id="set-auto-clip" type="checkbox" checked /><span>Détecter les liens du presse-papiers</span></label>
                         <label class="check-field"><input id="set-notifications" type="checkbox" checked /><span>Notifications bureau et bannières</span></label>
                     </div>
@@ -832,11 +856,11 @@ const SETTINGS_MODAL_HTML: &str = r##"    <!-- Modal 4: Settings Window (4 Tabs)
                         <span>Cookies du navigateur</span>
                         <div class="pill-selector" data-target="set-cookies-browser">
                             <button type="button" class="pill-opt" data-val="none" aria-checked="true">Aucun</button>
-                            <button type="button" class="pill-opt" data-val="internalwebview" aria-checked="false">Intégré</button>
-                            <button type="button" class="pill-opt" data-val="firefox" aria-checked="false">Firefox</button>
-                            <button type="button" class="pill-opt" data-val="chrome" aria-checked="false">Chrome</button>
-                            <button type="button" class="pill-opt" data-val="brave" aria-checked="false">Brave</button>
-                            <button type="button" class="pill-opt" data-val="chromium" aria-checked="false">Chromium</button>
+                            <button type="button" class="pill-opt android-hide" data-val="internalwebview" aria-checked="false">Intégré</button>
+                            <button type="button" class="pill-opt android-hide" data-val="firefox" aria-checked="false">Firefox</button>
+                            <button type="button" class="pill-opt android-hide" data-val="chrome" aria-checked="false">Chrome</button>
+                            <button type="button" class="pill-opt android-hide" data-val="brave" aria-checked="false">Brave</button>
+                            <button type="button" class="pill-opt android-hide" data-val="chromium" aria-checked="false">Chromium</button>
                         </div>
                     </div>
                     <label class="form-field">
@@ -2951,24 +2975,74 @@ const CLIENT_JS: &str = r##"
             try {
                 const info = await invoke('cmd_get_platform_info');
                 const el = document.getElementById('status-platform');
-                if (!info || !el) return;
-                const tags = [
-                    info.distro_name || info.distro_id || 'Linux',
-                    (info.arch || '') + (info.libc === 'musl' ? ' musl' : ''),
-                    info.display_backend || '',
-                ];
-                if (info.sandbox && info.sandbox !== 'native') tags.push(info.sandbox);
-                if (info.is_tails || info.recommended_tor_proxy) tags.push('Tor SOCKS5');
-                el.textContent = tags.filter(Boolean).join(' • ');
+                if (!info) return;
+                if (info.distro_id === 'android') {
+                    document.documentElement.classList.add('is-android');
+                    const folderLabel = document.querySelector('#btn-quick-folder .folder-name');
+                    if (folderLabel) folderLabel.textContent = 'Téléchargements';
+                }
+                if (el) {
+                    const tags = [
+                        info.distro_name || info.distro_id || 'Linux',
+                        (info.arch || '') + (info.libc === 'musl' ? ' musl' : ''),
+                        info.display_backend || '',
+                    ];
+                    if (info.sandbox && info.sandbox !== 'native') tags.push(info.sandbox);
+                    if (info.is_tails || info.recommended_tor_proxy) tags.push('Tor SOCKS5');
+                    el.textContent = tags.filter(Boolean).join(' • ');
+                }
             } catch (_) {}
         }
 
+        async function consumePendingShareUrl() {
+            if (!invoke) return;
+            try {
+                const sharedUrl = await invoke('cmd_take_pending_share_url');
+                if (sharedUrl && String(sharedUrl).trim()) {
+                    openPasteDialog(String(sharedUrl).trim(), false);
+                }
+            } catch (_) {}
+        }
+
+        function bindMobileBottomNav() {
+            const bind = (id, fn) => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', fn);
+            };
+            bind('mob-nav-paste', () => document.getElementById('btn-paste')?.click());
+            bind('mob-nav-queue', () => {
+                document.querySelector('.nav-tab[data-filter="all"]')?.click();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            bind('mob-nav-subs', () => document.getElementById('btn-subscriptions')?.click());
+            bind('mob-nav-logs', () => document.getElementById('menu-logs')?.click());
+            bind('mob-nav-settings', () => document.getElementById('btn-settings')?.click());
+        }
+
+        bindMobileBottomNav();
         syncInitialSettings();
         refreshPlatformInfo();
+        consumePendingShareUrl();
         refreshList();
         setInterval(refreshDiskAndSchedule, 15000);
 
+        window.addEventListener('vidgrab-android-share', (e) => {
+            if (e && e.detail) {
+                openPasteDialog(String(e.detail).trim(), false);
+            }
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                consumePendingShareUrl();
+            }
+        });
+
         if (listen) {
+            listen('android-share-url', (event) => {
+                if (event.payload) {
+                    openPasteDialog(String(event.payload).trim(), false);
+                }
+            });
             listen('download-progress', (event) => {
                 const prog = event.payload;
                 if (!prog) return;

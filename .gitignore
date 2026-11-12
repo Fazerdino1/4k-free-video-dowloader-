@@ -23,4 +23,17 @@
 *.exe
 *.dll
 *.zip
+*.apk
+*.aab
+*.keystore
+*.jks
 SHA256SUMS.txt
+
+# Android Gradle build & generated JNI artifacts
+src-tauri/gen/android/.gradle/
+src-tauri/gen/android/build/
+src-tauri/gen/android/app/build/
+src-tauri/gen/android/app/src/main/jniLibs/
+src-tauri/gen/android/local.properties
+src-tauri/gen/android/.kotlin/
+src-tauri/gen/android/.idea/

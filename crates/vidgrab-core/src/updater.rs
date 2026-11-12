@@ -94,6 +94,13 @@ async fn probe_yt_dlp_version(bin: &Path) -> Option<String> {
 /// Ensures `yt-dlp` is ready (preferring sandbox/musl/NixOS system binary when applicable,
 /// otherwise managing `~/.local/share/vidgrab/bin/yt-dlp` for the current CPU architecture/libc).
 pub async fn ensure_or_update_yt_dlp(paths: &AppPaths, force_download: bool) -> CoreResult<String> {
+    if let Some(bridge) = crate::mobile_bridge::get() {
+        return if force_download {
+            bridge.update_yt_dlp().await
+        } else {
+            bridge.get_yt_dlp_version().await
+        };
+    }
     let is_musl = crate::platform::detect_libc() == "musl";
     let is_nixos = Path::new("/etc/NIXOS").exists();
     let in_sandbox = std::env::var_os("FLATPAK_ID").is_some()

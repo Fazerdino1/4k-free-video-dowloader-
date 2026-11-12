@@ -60,6 +60,7 @@ jobs:
           bash -n packaging/install-linux.sh
           bash -n packaging/appimage/build-appimage.sh
           bash -n packaging/slackware/vidgrab.SlackBuild
+          bash -n packaging/windows/build-installer.sh
           test -f LICENSE
           grep -q 'license = "GPL-3.0-or-later"' Cargo.toml
           ! grep -rn "MIT" packaging/
@@ -134,3 +135,5 @@ jobs:
           test -f target/x86_64-pc-windows-gnu/release/vidgrab.exe
           test -f target/x86_64-pc-windows-gnu/release/vidgrab-cli.exe
           test -f target/x86_64-pc-windows-gnu/release/WebView2Loader.dll
+          ./packaging/windows/build-installer.sh target/x86_64-pc-windows-gnu/release dist/windows/4k-free-video-dowloader_0.3.0_setup_x64.exe
+          test -f dist/windows/4k-free-video-dowloader_0.3.0_setup_x64.exe

@@ -118,6 +118,9 @@ impl AppPaths {
 
     /// Resolves the effective `yt-dlp` binary path based on user settings, portable sidecar, sandbox, and libc compatibility.
     pub fn effective_yt_dlp(&self, settings: &Settings) -> PathBuf {
+        if crate::mobile_bridge::is_registered() {
+            return PathBuf::from("youtubedl-android");
+        }
         if let Some(custom) = &settings.custom_yt_dlp_path {
             if !custom.as_os_str().is_empty() {
                 return custom.clone();
@@ -179,6 +182,9 @@ impl AppPaths {
     /// Resolves the effective `ffmpeg` binary path across native, Windows portable/WinGet/Scoop/Choco,
     /// Flatpak, Snap, AppImage, NixOS, GNU Guix, and RPMFusion (`ffmpeg-free`) installations.
     pub fn effective_ffmpeg(&self, settings: &Settings) -> CoreResult<PathBuf> {
+        if crate::mobile_bridge::is_registered() {
+            return Ok(PathBuf::from("ffmpeg-android"));
+        }
         if let Some(custom) = &settings.custom_ffmpeg_path {
             if custom.exists() {
                 return Ok(custom.clone());
@@ -253,17 +259,45 @@ impl AppPaths {
     }
 }
 
-/// Loads `Settings` from disk, or writes and returns defaults tailored to the detected Linux OS.
+/// Loads `Settings` from disk, or writes and returns defaults tailored to the detected OS.
 pub fn load_or_create_settings(paths: &AppPaths) -> CoreResult<Settings> {
+    load_or_create_settings_with_dirs(paths, None, None)
+}
+
+/// Loads `Settings` from disk, or writes defaults using optional platform-provided base directories
+/// (used on Android where `dirs::video_dir()` / `dirs::audio_dir()` are unavailable).
+pub fn load_or_create_settings_with_dirs(
+    paths: &AppPaths,
+    preferred_video_dir: Option<&Path>,
+    preferred_audio_dir: Option<&Path>,
+) -> CoreResult<Settings> {
     if paths.config_file.exists() {
         let raw = fs::read_to_string(&paths.config_file)?;
         let settings: Settings = toml::from_str(&raw)?;
         Ok(settings)
     } else {
         let mut settings = Settings::default();
-        let fallback_home = dirs::home_dir().unwrap_or_else(|| paths.data_dir.clone());
-        let video_base = dirs::video_dir().unwrap_or_else(|| fallback_home.join("Videos"));
-        let audio_base = dirs::audio_dir().unwrap_or_else(|| fallback_home.join("Music"));
+        let fallback_home = dirs::home_dir().unwrap_or_else(|| {
+            if cfg!(target_os = "android") {
+                PathBuf::from("/storage/emulated/0")
+            } else {
+                paths.data_dir.clone()
+            }
+        });
+        let video_base = preferred_video_dir
+            .map(Path::to_path_buf)
+            .or_else(dirs::video_dir)
+            .unwrap_or_else(|| {
+                if cfg!(target_os = "android") {
+                    fallback_home.join("Download")
+                } else {
+                    fallback_home.join("Videos")
+                }
+            });
+        let audio_base = preferred_audio_dir
+            .map(Path::to_path_buf)
+            .or_else(dirs::audio_dir)
+            .unwrap_or_else(|| fallback_home.join("Music"));
         settings.video_output_dir = video_base.join("4kFreeDownloader");
         settings.smart_mode.output_dir = settings.video_output_dir.clone();
         settings.audio_output_dir = audio_base.join("4kFreeDownloader");

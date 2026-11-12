@@ -36,7 +36,7 @@
   </categories>
   <content_rating type="oars-1.1" />
   <releases>
-    <release version="0.2.0" date="2026-11-12">
+    <release version="0.3.0" date="2026-11-12">
       <description>
         <p>Security &amp; distribution release: unified GPL-3.0-or-later licensing, restrictive WebView CSP &amp; capabilities, pinned Flatpak yt-dlp SHA-256, GitHub Actions CI/CD, and native Windows x64 support.</p>
       </description>

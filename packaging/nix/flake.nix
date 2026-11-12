@@ -18,7 +18,7 @@
         in {
           vidgrab-cli = pkgs.rustPlatform.buildRustPackage {
             pname = "vidgrab-cli";
-            version = "0.2.0";
+            version = "0.3.0";
             src = ../..;
             inherit cargoLock;
             cargoBuildFlags = [ "-p" "vidgrab-cli" ];
@@ -32,7 +32,7 @@
 
           vidgrab = pkgs.rustPlatform.buildRustPackage {
             pname = "vidgrab";
-            version = "0.2.0";
+            version = "0.3.0";
             src = ../..;
             inherit cargoLock;
             cargoBuildFlags = [ "-p" "vidgrab-tauri" "-p" "vidgrab-cli" ];

@@ -1,34 +1,40 @@
 (() => {
   "use strict";
 
-  const RELEASE_BASE = "https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0";
+  const RELEASE_BASE = "https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.3.0";
 
   const OS_TARGETS = {
+    android: {
+      label: "Télécharger l'APK Android (arm64)",
+      meta: "Android 7.0+ (arm64-v8a) • APK 58 Mo (youtubedl-android 0.18.1 + FFmpeg embarqués)",
+      url: `${RELEASE_BASE}/4k-free-video-dowloader_0.3.0_android_arm64.apk`,
+    },
     windows: {
-      label: "Télécharger pour Windows 64 bits (.zip)",
-      meta: "Windows 10/11 x64 • Archive 6,0 Mo (4k free video dowloader.exe + WebView2Loader.dll + vidgrab-cli.exe)",
-      url: `${RELEASE_BASE}/4k.free.video.dowloader_0.2.0_windows_x64.zip`,
+      label: "Télécharger l'Installateur Windows (.exe)",
+      meta: "Windows 10/11 x64 • Installateur permanent dans Programmes (4k free video dowloader.exe + WebView2Loader.dll + CLI)",
+      url: `${RELEASE_BASE}/4k-free-video-dowloader_0.3.0_setup_x64.exe`,
     },
     ubuntu: {
       label: "Télécharger pour Ubuntu / Debian (.deb)",
       meta: "Paquet natif .deb x86_64 (3,9 Mo) • Ubuntu, Debian, Linux Mint, Pop!_OS, Zorin, Kali",
-      url: `${RELEASE_BASE}/4k.free.video.dowloader_0.2.0_amd64.deb`,
+      url: `${RELEASE_BASE}/4k.free.video.dowloader_0.3.0_amd64.deb`,
     },
     fedora: {
       label: "Télécharger pour Fedora / RHEL (.rpm)",
       meta: "Paquet natif .rpm x86_64 (4,0 Mo) • Fedora, Nobara, RHEL, AlmaLinux, Rocky, openSUSE",
-      url: `${RELEASE_BASE}/4k.free.video.dowloader-0.2.0-1.x86_64.rpm`,
+      url: `${RELEASE_BASE}/4k.free.video.dowloader-0.3.0-1.x86_64.rpm`,
     },
     linux: {
       label: "Télécharger pour Linux (AppImage)",
       meta: "AppImage universel x86_64 (111 Mo) • Fonctionne sur Arch, CachyOS, Manjaro, SteamOS, Bazzite",
-      url: `${RELEASE_BASE}/4k.free.video.dowloader_0.2.0_amd64.AppImage`,
+      url: `${RELEASE_BASE}/4k.free.video.dowloader_0.3.0_amd64.AppImage`,
     },
   };
 
   function detectTargetOS() {
     const platform = (navigator.userAgentData?.platform || navigator.platform || "").toLowerCase();
     const ua = navigator.userAgent.toLowerCase();
+    if (platform.includes("android") || ua.includes("android")) return "android";
     if (platform.includes("win") || ua.includes("windows")) return "windows";
     if (ua.includes("ubuntu") || ua.includes("debian") || ua.includes("mint")) return "ubuntu";
     if (ua.includes("fedora") || ua.includes("red hat") || ua.includes("centos") || ua.includes("suse")) return "fedora";
@@ -140,6 +146,7 @@
       }
 
       if (focusTab) nextTab.focus();
+      nextTab.scrollIntoView({ block: "nearest", inline: "nearest" });
     };
 
     tablist.addEventListener("click", (event) => {
