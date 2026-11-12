@@ -27,8 +27,8 @@
   <meta name="twitter:description" content="Sans publicité ni paywall : Windows x64, Ubuntu, Debian, Fedora, Arch et CLI headless en Rust.">
   <meta name="twitter:image" content="https://fazerdino1.github.io/4k-free-video-dowloader-/assets/logo.png">
 
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="app.js"></script>
+  <link rel="stylesheet" href="styles.css?v=2">
+  <script defer src="app.js?v=2"></script>
 
   <script type="application/ld+json">
   {
@@ -343,14 +343,14 @@
 
             <div id="panel-terminal" role="tabpanel" aria-labelledby="tab-terminal" hidden>
               <div class="panel-inner">
-                <div class="cli-box"><span class="cli-g">$</span> vidgrab-cli diag
+                <pre class="cli-box"><span class="cli-g">$</span> vidgrab-cli diag
 === 4k free video dowloader — Diagnostic Système ===
 Distribution : Windows / Ubuntu / Fedora / Arch / Alpine (x86_64 | libc | init)
 Affichage    : Wayland / X11 / WebView2 / Headless
 <span class="cli-c">yt-dlp       : détecté + mise à jour SHA-256 intégrée (`vidgrab-cli update`)</span>
 <span class="cli-c">ffmpeg       : détecté pour fusion vidéo/audio et découpe temporelle</span>
 
-<span class="cli-g">$</span> vidgrab-cli download "https://www.youtube.com/watch?v=dQw4w9WgXcQ" -q 2160 --mkv --subs fr,en</div>
+<span class="cli-g">$</span> vidgrab-cli download "https://www.youtube.com/watch?v=dQw4w9WgXcQ" -q 2160 --mkv --subs fr,en</pre>
               </div>
             </div>
           </div>

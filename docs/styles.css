@@ -782,6 +782,7 @@ img {
 }
 
 .cli-box {
+  margin: 0;
   background: #05080b;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
