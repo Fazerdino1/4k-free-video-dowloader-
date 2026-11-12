@@ -1,0 +1,66 @@
+name: vidgrab
+base: core24
+version: '0.1.0'
+summary: Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg)
+description: |
+  4k free video dowloader (vidgrab) is a lightweight open-source downloader written
+  100% in Rust (Tauri 2 + WebKitGTK) powered by yt-dlp and ffmpeg. Includes both
+  the desktop application (`vidgrab`) and headless CLI (`vidgrab-cli`).
+grade: stable
+confinement: strict
+platforms:
+  amd64:
+  arm64:
+
+apps:
+  vidgrab:
+    command: usr/bin/vidgrab
+    extensions: [gnome]
+    desktop: usr/share/applications/vidgrab.desktop
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
+      - audio-playback
+      - opengl
+      - x11
+      - wayland
+      - desktop
+      - desktop-legacy
+
+  cli:
+    command: usr/bin/vidgrab-cli
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
+
+parts:
+  vidgrab:
+    plugin: nil
+    source: ../..
+    build-packages:
+      - cargo
+      - rustc
+      - pkg-config
+      - libwebkit2gtk-4.1-dev
+      - libssl-dev
+      - libsqlite3-dev
+      - librsvg2-dev
+      - libayatana-appindicator3-dev
+    stage-packages:
+      - libwebkit2gtk-4.1-0
+      - libayatana-appindicator3-1
+      - ffmpeg
+      - python3
+      - wl-clipboard
+      - xclip
+    override-build: |
+      cargo build --release --locked -p vidgrab-tauri -p vidgrab-cli
+      install -Dm755 target/release/vidgrab "$CRAFT_PART_INSTALL/usr/bin/vidgrab"
+      install -Dm755 target/release/vidgrab-cli "$CRAFT_PART_INSTALL/usr/bin/vidgrab-cli"
+      install -Dm644 packaging/vidgrab.desktop "$CRAFT_PART_INSTALL/usr/share/applications/vidgrab.desktop"
+      install -Dm644 src-tauri/icons/128x128.png "$CRAFT_PART_INSTALL/usr/share/icons/hicolor/128x128/apps/vidgrab.png"
+      sed -i 's|^Icon=vidgrab$|Icon=/usr/share/icons/hicolor/128x128/apps/vidgrab.png|' "$CRAFT_PART_INSTALL/usr/share/applications/vidgrab.desktop"

@@ -1,0 +1,23 @@
+Source: vidgrab
+Section: video
+Priority: optional
+Maintainer: VidGrab Contributors <maintainers@example.org>
+Build-Depends: debhelper-compat (= 13), cargo, rustc, pkg-config, libwebkit2gtk-4.1-dev, libssl-dev, libsqlite3-dev, librsvg2-dev, libayatana-appindicator3-dev | libappindicator3-dev
+Standards-Version: 4.6.2
+
+Package: vidgrab
+Architecture: amd64 arm64 armhf
+Depends: ${shlibs:Depends}, ${misc:Depends}, libwebkit2gtk-4.1-0
+Recommends: ffmpeg, yt-dlp, libayatana-appindicator3-1 | libappindicator3-1, wl-clipboard | xclip, libnotify-bin, ca-certificates
+Description: Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg)
+ Desktop application written 100% in Rust (Tauri 2 + WebKitGTK) supporting
+ Ubuntu 26.04 LTS, Debian 13 Trixie, Linux Mint 22.3, Pop!_OS 24.04, Zorin OS,
+ Elementary OS, Kali Linux, Parrot OS, Tails, MX Linux, and Raspberry Pi OS.
+
+Package: vidgrab-cli
+Architecture: amd64 arm64 armhf
+Depends: ${shlibs:Depends}, ${misc:Depends}, ca-certificates
+Recommends: ffmpeg, yt-dlp, python3
+Description: Headless CLI for 4k free video dowloader (servers & Raspberry Pi OS Lite)
+ Zero-GTK command-line binary for Ubuntu Server, Debian Server, Raspberry Pi OS Lite,
+ and headless environments.

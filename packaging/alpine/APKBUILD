@@ -1,0 +1,27 @@
+# Maintainer: VidGrab Contributors
+pkgname=vidgrab
+pkgver=0.1.0
+pkgrel=0
+pkgdesc="Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) in Rust"
+url="https://github.com/vidgrab/4kfreedowloader"
+arch="x86_64 aarch64 armv7"
+license="MIT OR Apache-2.0"
+depends="ca-certificates ffmpeg yt-dlp python3"
+makedepends="cargo sqlite-dev openssl-dev"
+subpackages="$pkgname-cli"
+source="$pkgname-$pkgver.tar.gz"
+options="!check"
+
+build() {
+	cargo build --release --locked -p vidgrab-cli
+}
+
+package() {
+	install -Dm755 target/release/vidgrab-cli "$pkgdir"/usr/bin/vidgrab-cli
+}
+
+cli() {
+	pkgdesc="$pkgdesc (headless musl CLI)"
+	depends="ca-certificates ffmpeg yt-dlp python3"
+	amove usr/bin/vidgrab-cli
+}

@@ -1,0 +1,48 @@
+app-id: io.github.vidgrab.VidGrab
+runtime: org.gnome.Platform
+runtime-version: '47'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: vidgrab
+
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=network
+  - --device=dri
+  - --filesystem=xdg-videos
+  - --filesystem=xdg-music
+  - --filesystem=xdg-download
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.kde.StatusNotifierWatcher
+
+modules:
+  - name: yt-dlp
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 yt-dlp /app/bin/yt-dlp
+    sources:
+      - type: file
+        url: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
+        # Pin sha256 in release CI before Flathub submission
+
+  - name: vidgrab
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/rust-stable/bin
+      env:
+        CARGO_HOME: /run/build/vidgrab/cargo
+    build-commands:
+      - cargo build --release --offline -p vidgrab-tauri -p vidgrab-cli
+      - install -Dm755 target/release/vidgrab /app/bin/vidgrab
+      - install -Dm755 target/release/vidgrab-cli /app/bin/vidgrab-cli
+      - install -Dm644 packaging/vidgrab.desktop /app/share/applications/io.github.vidgrab.VidGrab.desktop
+      - install -Dm644 packaging/metainfo/io.github.vidgrab.VidGrab.metainfo.xml /app/share/metainfo/io.github.vidgrab.VidGrab.metainfo.xml
+      - install -Dm644 src-tauri/icons/128x128.png /app/share/icons/hicolor/128x128/apps/vidgrab.png
+      - install -Dm644 src-tauri/icons/32x32.png /app/share/icons/hicolor/32x32/apps/vidgrab.png
+      - install -Dm644 src-tauri/icons/icon.png /app/share/icons/hicolor/512x512/apps/vidgrab.png
+    sources:
+      - type: dir
+        path: ../..

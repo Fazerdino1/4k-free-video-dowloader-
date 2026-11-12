@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.vidgrab.VidGrab</id>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>MIT OR Apache-2.0</project_license>
+  <name>4k free video dowloader</name>
+  <summary>Download 4K/8K videos, playlists, and audio powered by yt-dlp and ffmpeg</summary>
+  <summary xml:lang="fr">Téléchargez des vidéos 4K/8K, playlists et pistes audio avec yt-dlp et ffmpeg</summary>
+
+  <description>
+    <p>
+      4k free video dowloader (vidgrab) is a lightweight, 100% open-source Rust desktop and headless CLI
+      downloader built with Tauri 2, WebKitGTK, yt-dlp, and ffmpeg.
+    </p>
+    <p xml:lang="fr">
+      4k free video dowloader (vidgrab) est un téléchargeur vidéo/audio léger, open source et 100 % Rust
+      (interface Tauri 2 + CLI headless), propulsé par yt-dlp et ffmpeg.
+    </p>
+    <ul>
+      <li>4K / 8K HDR &amp; 60fps video downloads (MP4, MKV)</li>
+      <li>Lossless FLAC, MP3 320kbps, Opus, and multi-track audio extraction</li>
+      <li>Built-in channel/playlist subscriptions and FFmpeg post-processing toolbox</li>
+      <li>Headless CLI (`vidgrab-cli`) for servers, containers, Alpine/musl, and Raspberry Pi</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.vidgrab.VidGrab.desktop</launchable>
+  <provides>
+    <binary>vidgrab</binary>
+    <binary>vidgrab-cli</binary>
+  </provides>
+  <categories>
+    <category>AudioVideo</category>
+    <category>Video</category>
+    <category>Network</category>
+  </categories>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1.0" date="2026-11-12">
+      <description>
+        <p>Universal Linux support across Debian, Ubuntu, Mint, Pop!_OS, Fedora, RHEL, Alma, Rocky, openSUSE, Arch, CachyOS, Manjaro, Gentoo, Alpine, Void, NixOS, Guix, Solus, Slackware, Bazzite, SteamOS, Nobara, Tails, Qubes, Raspberry Pi OS, Flatpak, Snap, and AppImage.</p>
+      </description>
+    </release>
+  </releases>
+</component>

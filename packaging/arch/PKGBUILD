@@ -1,0 +1,52 @@
+# Maintainer: VidGrab Contributors
+pkgbase=vidgrab
+pkgname=('vidgrab' 'vidgrab-cli')
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) written in Rust"
+arch=('x86_64' 'aarch64' 'armv7h')
+url="https://github.com/vidgrab/4kfreedowloader"
+license=('MIT' 'Apache-2.0')
+makedepends=('cargo' 'pkgconf' 'webkit2gtk-4.1' 'openssl' 'sqlite' 'librsvg' 'libayatana-appindicator')
+
+prepare() {
+  cd "${srcdir}/4kfreedowloader" || cd "${startdir}/../.."
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "${srcdir}/4kfreedowloader" || cd "${startdir}/../.."
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo build --frozen --release -p vidgrab-tauri -p vidgrab-cli
+}
+
+package_vidgrab() {
+  depends=('webkit2gtk-4.1' 'gtk3' 'openssl' 'sqlite')
+  optdepends=(
+    'ffmpeg: media muxing, conversion and clipping'
+    'yt-dlp: system yt-dlp binary (auto-managed in ~/.local/share/vidgrab if absent)'
+    'libayatana-appindicator: system tray icon integration'
+    'wl-clipboard: Wayland clipboard paste support'
+    'xclip: X11 clipboard paste support'
+    'vidgrab-cli: standalone zero-GTK command-line binary'
+  )
+
+  cd "${srcdir}/4kfreedowloader" || cd "${startdir}/../.."
+  install -Dm755 target/release/vidgrab "${pkgdir}/usr/bin/vidgrab"
+  install -Dm644 packaging/vidgrab.desktop "${pkgdir}/usr/share/applications/vidgrab.desktop"
+  install -Dm644 packaging/metainfo/io.github.vidgrab.VidGrab.metainfo.xml "${pkgdir}/usr/share/metainfo/io.github.vidgrab.VidGrab.metainfo.xml"
+  install -Dm644 src-tauri/icons/128x128.png "${pkgdir}/usr/share/icons/hicolor/128x128/apps/vidgrab.png"
+  install -Dm644 src-tauri/icons/32x32.png "${pkgdir}/usr/share/icons/hicolor/32x32/apps/vidgrab.png"
+  install -Dm644 src-tauri/icons/icon.png "${pkgdir}/usr/share/icons/hicolor/512x512/apps/vidgrab.png"
+}
+
+package_vidgrab-cli() {
+  pkgdesc="Headless CLI for 4k free video dowloader (zero GTK/WebKit dependency)"
+  depends=('openssl' 'sqlite')
+  optdepends=('ffmpeg: media muxing and transcoding' 'yt-dlp: system downloader engine')
+
+  cd "${srcdir}/4kfreedowloader" || cd "${startdir}/../.."
+  install -Dm755 target/release/vidgrab-cli "${pkgdir}/usr/bin/vidgrab-cli"
+}

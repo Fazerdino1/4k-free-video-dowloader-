@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=4k free video dowloader
+GenericName=Video & Audio Downloader
+Comment=Download 4K/8K videos, playlists, channels and audio streams powered by yt-dlp and ffmpeg
+Comment[fr]=Téléchargez des vidéos 4K/8K, playlists, chaînes et pistes audio avec yt-dlp et ffmpeg
+Exec=vidgrab
+Icon=vidgrab
+Terminal=false
+Categories=AudioVideo;Video;
+StartupWMClass=vidgrab
+Keywords=youtube;video;downloader;yt-dlp;4k;8k;mp3;mkv;

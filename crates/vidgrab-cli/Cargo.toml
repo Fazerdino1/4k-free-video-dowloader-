@@ -1,0 +1,17 @@
+[package]
+name = "vidgrab-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Headless CLI for 4k free video dowloader (compatible servers, ARM, musl, containers)"
+
+[[bin]]
+name = "vidgrab-cli"
+path = "src/main.rs"
+
+[dependencies]
+vidgrab-shared = { path = "../vidgrab-shared" }
+vidgrab-core = { path = "../vidgrab-core" }
+tokio.workspace = true
+serde_json.workspace = true

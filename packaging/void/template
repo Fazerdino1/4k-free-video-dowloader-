@@ -1,0 +1,26 @@
+# Template file for 'vidgrab' (Void Linux xbps-src)
+pkgname=vidgrab
+version=0.1.0
+revision=1
+build_style=cargo
+hostmakedepends="pkg-config"
+makedepends="webkit2gtk41-devel openssl-devel sqlite-devel librsvg-devel libayatana-appindicator-devel"
+depends="webkit2gtk41 ffmpeg"
+short_desc="Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) in Rust"
+maintainer="VidGrab Contributors <maintainers@example.org>"
+license="MIT, Apache-2.0"
+homepage="https://github.com/vidgrab/4kfreedowloader"
+
+do_build() {
+	cargo build --release --locked -p vidgrab-tauri -p vidgrab-cli
+}
+
+do_install() {
+	vbin target/${RUST_TARGET}/release/vidgrab 2>/dev/null || vbin target/release/vidgrab
+	vbin target/${RUST_TARGET}/release/vidgrab-cli 2>/dev/null || vbin target/release/vidgrab-cli
+	vinstall packaging/vidgrab.desktop 644 usr/share/applications
+	vinstall packaging/metainfo/io.github.vidgrab.VidGrab.metainfo.xml 644 usr/share/metainfo
+	vinstall src-tauri/icons/128x128.png 644 usr/share/icons/hicolor/128x128/apps vidgrab.png
+	vinstall src-tauri/icons/32x32.png 644 usr/share/icons/hicolor/32x32/apps vidgrab.png
+	vinstall src-tauri/icons/icon.png 644 usr/share/icons/hicolor/512x512/apps vidgrab.png
+}

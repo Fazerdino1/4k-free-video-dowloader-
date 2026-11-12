@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+       |-----handy-ruler------------------------------------------------------|
+vidgrab: vidgrab (Open-source 4K/8K video & audio downloader)
+vidgrab:
+vidgrab: 4k free video dowloader (vidgrab) is a fast, 100% open-source Rust
+vidgrab: downloader powered by yt-dlp and ffmpeg. Supports 4K/8K HDR video,
+vidgrab: playlists, channel subscriptions, lossless FLAC/MP3 extraction, and
+vidgrab: includes a zero-GTK headless CLI (`vidgrab-cli`) for servers.
+vidgrab:
+vidgrab: Homepage: https://github.com/vidgrab/4kfreedowloader
+vidgrab:
+vidgrab:
+vidgrab:

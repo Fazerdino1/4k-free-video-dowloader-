@@ -1,0 +1,46 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/vidgrab-shared",
+    "crates/vidgrab-core",
+    "crates/vidgrab-cli",
+    "crates/vidgrab-ui",
+    "src-tauri",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+authors = ["4k free dowloader Contributors"]
+repository = "https://github.com/vidgrab/vidgrab"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+anyhow = "1.0"
+tokio = { version = "1.40", features = ["full"] }
+uuid = { version = "1.10", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+toml = "0.8"
+tracing = { version = "0.1", default-features = false, features = ["std"] }
+url = { version = "2.5", features = ["serde"] }
+sha2 = "0.10"
+hex = "0.4"
+regex = "1.10"
+reqwest = { version = "0.12", features = ["json", "stream", "socks"] }
+nix = { version = "0.25", features = ["signal", "fs"] }
+dirs = "7.0"
+which = "7.0"
+open = "5.4"
+tempfile = "3.10"
+futures-util = "0.3"
+vidgrab-shared = { path = "crates/vidgrab-shared" }
+vidgrab-core = { path = "crates/vidgrab-core" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"

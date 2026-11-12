@@ -1,0 +1,30 @@
+[package]
+name = "vidgrab-tauri"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "vidgrab"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+vidgrab-shared.workspace = true
+vidgrab-core.workspace = true
+vidgrab-ui = { path = "../crates/vidgrab-ui" }
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+tracing.workspace = true
+open.workspace = true
+dirs.workspace = true
+url.workspace = true
+tauri = { version = "2.0", features = ["tray-icon"] }
+tauri-plugin-dialog = "2.0"
+webkit2gtk = { version = "2.0", features = ["v2_20"] }

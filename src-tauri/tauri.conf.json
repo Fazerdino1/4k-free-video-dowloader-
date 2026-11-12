@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "4k free video dowloader",
+  "version": "0.1.0",
+  "identifier": "io.github.vidgrab.VidGrab",
+  "build": {
+    "frontendDist": "../crates/vidgrab-ui/dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "4k free video dowloader",
+        "width": 1180,
+        "height": 760,
+        "minWidth": 900,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["rpm", "deb", "appimage"],
+    "category": "Video",
+    "shortDescription": "Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg)",
+    "icon": [
+      "icons/128x128.png",
+      "icons/256x256.png",
+      "icons/icon.png",
+      "icons/64x64.png",
+      "icons/32x32.png"
+    ],
+    "linux": {
+      "appimage": {
+        "files": {
+          "/usr/share/icons/hicolor/32x32/apps/4k-free-video-dowloader.png": "icons/32x32.png",
+          "/usr/share/icons/hicolor/64x64/apps/4k-free-video-dowloader.png": "icons/64x64.png",
+          "/usr/share/icons/hicolor/128x128/apps/4k-free-video-dowloader.png": "icons/128x128.png",
+          "/usr/share/icons/hicolor/256x256/apps/4k-free-video-dowloader.png": "icons/256x256.png",
+          "/usr/share/pixmaps/4k-free-video-dowloader.png": "icons/128x128.png"
+        }
+      },
+      "rpm": {
+        "depends": [],
+        "obsoletes": ["4k-free-dowloader"],
+        "desktopTemplate": "../packaging/desktop-tauri.hbs",
+        "postInstallScript": "../packaging/post-install.sh",
+        "files": {
+          "/usr/share/icons/hicolor/32x32/apps/4k-free-video-dowloader.png": "icons/32x32.png",
+          "/usr/share/icons/hicolor/64x64/apps/4k-free-video-dowloader.png": "icons/64x64.png",
+          "/usr/share/icons/hicolor/128x128/apps/4k-free-video-dowloader.png": "icons/128x128.png",
+          "/usr/share/icons/hicolor/256x256/apps/4k-free-video-dowloader.png": "icons/256x256.png",
+          "/usr/share/icons/hicolor/512x512/apps/4k-free-video-dowloader.png": "icons/icon.png",
+          "/usr/share/pixmaps/4k-free-video-dowloader.png": "icons/128x128.png"
+        }
+      },
+      "deb": {
+        "depends": [
+          "libwebkit2gtk-4.1-0",
+          "libayatana-appindicator3-1 | libappindicator3-1",
+          "ffmpeg"
+        ],
+        "replaces": ["4k-free-dowloader"],
+        "conflicts": ["4k-free-dowloader"],
+        "desktopTemplate": "../packaging/desktop-tauri.hbs",
+        "postInstallScript": "../packaging/post-install.sh",
+        "files": {
+          "/usr/share/icons/hicolor/32x32/apps/4k-free-video-dowloader.png": "icons/32x32.png",
+          "/usr/share/icons/hicolor/64x64/apps/4k-free-video-dowloader.png": "icons/64x64.png",
+          "/usr/share/icons/hicolor/128x128/apps/4k-free-video-dowloader.png": "icons/128x128.png",
+          "/usr/share/icons/hicolor/256x256/apps/4k-free-video-dowloader.png": "icons/256x256.png",
+          "/usr/share/icons/hicolor/512x512/apps/4k-free-video-dowloader.png": "icons/icon.png",
+          "/usr/share/pixmaps/4k-free-video-dowloader.png": "icons/128x128.png"
+        }
+      }
+    }
+  }
+}

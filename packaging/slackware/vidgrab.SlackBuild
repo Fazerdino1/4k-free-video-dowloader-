@@ -1,0 +1,50 @@
+#!/bin/bash
+# Slackware build script for vidgrab (4k free video dowloader)
+set -euo pipefail
+
+PRGNAM=vidgrab
+VERSION=${VERSION:-0.1.0}
+BUILD=${BUILD:-1}
+TAG=${TAG:-_SBo}
+
+if [ -z "${ARCH:-}" ]; then
+  case "$(uname -m)" in
+    x86_64) ARCH=x86_64 ;;
+    aarch64) ARCH=aarch64 ;;
+    arm*) ARCH=arm ;;
+    *) ARCH=$(uname -m) ;;
+  esac
+fi
+
+TMP=${TMP:-/tmp/SBo}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+if [ "${DRY_RUN:-0}" = "1" ]; then
+  echo "[DRY-RUN] SlackBuild target: $PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz from $ROOT_DIR"
+  exit 0
+fi
+
+rm -rf "$PKG"
+mkdir -p "$TMP" "$PKG" "$OUTPUT"
+
+cd "$ROOT_DIR"
+cargo build --release --offline -p vidgrab-tauri -p vidgrab-cli
+
+install -Dm755 target/release/vidgrab "$PKG/usr/bin/vidgrab"
+install -Dm755 target/release/vidgrab-cli "$PKG/usr/bin/vidgrab-cli"
+install -Dm644 packaging/vidgrab.desktop "$PKG/usr/share/applications/vidgrab.desktop"
+install -Dm644 packaging/metainfo/io.github.vidgrab.VidGrab.metainfo.xml \
+  "$PKG/usr/share/metainfo/io.github.vidgrab.VidGrab.metainfo.xml"
+install -Dm644 src-tauri/icons/128x128.png "$PKG/usr/share/icons/hicolor/128x128/apps/vidgrab.png"
+install -Dm644 src-tauri/icons/32x32.png "$PKG/usr/share/icons/hicolor/32x32/apps/vidgrab.png"
+install -Dm644 src-tauri/icons/icon.png "$PKG/usr/share/icons/hicolor/512x512/apps/vidgrab.png"
+
+mkdir -p "$PKG/install"
+cp "$SCRIPT_DIR/slack-desc" "$PKG/install/slack-desc"
+
+cd "$PKG"
+/sbin/makepkg -l y -c n "$OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.txz"

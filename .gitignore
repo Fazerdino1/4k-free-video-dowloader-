@@ -1,0 +1,16 @@
+# Rust build cache & local runtime/test artifacts
+/target/
+/Videos/
+*.mp4
+*.mkv
+*.webm
+*.part
+*.ytdl
+*.db
+*.db-shm
+*.db-wal
+*.log
+.DS_Store
+
+# AppImage exceeds GitHub's 100 MiB Git blob limit (110.76 MiB) — hosted in GitHub Releases v0.1.0
+*.AppImage

@@ -1,0 +1,36 @@
+pkgbase = vidgrab
+	pkgdesc = Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) written in Rust
+	pkgver = 0.1.0
+	pkgrel = 1
+	url = https://github.com/vidgrab/4kfreedowloader
+	arch = x86_64
+	arch = aarch64
+	arch = armv7h
+	license = MIT
+	license = Apache-2.0
+	makedepends = cargo
+	makedepends = pkgconf
+	makedepends = webkit2gtk-4.1
+	makedepends = openssl
+	makedepends = sqlite
+	makedepends = librsvg
+	makedepends = libayatana-appindicator
+
+pkgname = vidgrab
+	depends = webkit2gtk-4.1
+	depends = gtk3
+	depends = openssl
+	depends = sqlite
+	optdepends = ffmpeg: media muxing, conversion and clipping
+	optdepends = yt-dlp: system yt-dlp binary (auto-managed in ~/.local/share/vidgrab if absent)
+	optdepends = libayatana-appindicator: system tray icon integration
+	optdepends = wl-clipboard: Wayland clipboard paste support
+	optdepends = xclip: X11 clipboard paste support
+	optdepends = vidgrab-cli: standalone zero-GTK command-line binary
+
+pkgname = vidgrab-cli
+	pkgdesc = Headless CLI for 4k free video dowloader (zero GTK/WebKit dependency)
+	depends = openssl
+	depends = sqlite
+	optdepends = ffmpeg: media muxing and transcoding
+	optdepends = yt-dlp: system downloader engine

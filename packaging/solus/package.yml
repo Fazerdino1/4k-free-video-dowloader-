@@ -1,0 +1,33 @@
+name       : vidgrab
+version    : 0.1.0
+release    : 1
+source     :
+    - https://github.com/vidgrab/4kfreedowloader/archive/refs/tags/v0.1.0.tar.gz : SKIP
+homepage   : https://github.com/vidgrab/4kfreedowloader
+license    :
+    - MIT
+    - Apache-2.0
+component  : multimedia.video
+summary    : Open-source 4K/8K video & audio downloader (yt-dlp + ffmpeg) in Rust
+description: |
+    4k free video dowloader (vidgrab) is a lightweight open-source video, playlist, and audio
+    downloader powered by yt-dlp and ffmpeg, including both GUI (vidgrab) and CLI (vidgrab-cli).
+networking : no
+builddeps  :
+    - pkgconfig(webkit2gtk-4.1)
+    - pkgconfig(ayatana-appindicator3-0.1)
+    - pkgconfig(librsvg-2.0)
+    - pkgconfig(openssl)
+    - pkgconfig(sqlite3)
+    - cargo
+rundeps    :
+    - ffmpeg
+    - yt-dlp
+build      : |
+    cargo build --release --locked -p vidgrab-tauri -p vidgrab-cli
+install    : |
+    install -Dm00755 target/release/vidgrab $installdir/usr/bin/vidgrab
+    install -Dm00755 target/release/vidgrab-cli $installdir/usr/bin/vidgrab-cli
+    install -Dm00644 packaging/vidgrab.desktop $installdir/usr/share/applications/vidgrab.desktop
+    install -Dm00644 packaging/metainfo/io.github.vidgrab.VidGrab.metainfo.xml $installdir/usr/share/metainfo/io.github.vidgrab.VidGrab.metainfo.xml
+    install -Dm00644 src-tauri/icons/128x128.png $installdir/usr/share/icons/hicolor/128x128/apps/vidgrab.png
