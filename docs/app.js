@@ -5,23 +5,23 @@
 
   const OS_TARGETS = {
     windows: {
-      label: "Télécharger pour Windows 64 bits",
-      meta: "Windows 10/11 x64 (.zip • 6,0 Mo) — inclut 4k free video dowloader.exe + WebView2Loader.dll",
+      label: "Télécharger pour Windows 64 bits (.zip)",
+      meta: "Windows 10/11 x64 • Archive 6,0 Mo (4k free video dowloader.exe + WebView2Loader.dll + vidgrab-cli.exe)",
       url: `${RELEASE_BASE}/4k.free.video.dowloader_0.2.0_windows_x64.zip`,
     },
     ubuntu: {
-      label: "Télécharger le paquet .deb (Ubuntu / Debian)",
-      meta: "Installateur Debian / Ubuntu / Mint / Pop!_OS / Kali (.deb • 3,9 Mo) • 100 % Open Source",
+      label: "Télécharger pour Ubuntu / Debian (.deb)",
+      meta: "Paquet natif .deb x86_64 (3,9 Mo) • Ubuntu, Debian, Linux Mint, Pop!_OS, Zorin, Kali",
       url: `${RELEASE_BASE}/4k.free.video.dowloader_0.2.0_amd64.deb`,
     },
     fedora: {
-      label: "Télécharger le paquet .rpm (Fedora / RHEL)",
-      meta: "Installateur Fedora / Nobara / RHEL / Alma / openSUSE (.rpm • 4,0 Mo) • 100 % Open Source",
+      label: "Télécharger pour Fedora / RHEL (.rpm)",
+      meta: "Paquet natif .rpm x86_64 (4,0 Mo) • Fedora, Nobara, RHEL, AlmaLinux, Rocky, openSUSE",
       url: `${RELEASE_BASE}/4k.free.video.dowloader-0.2.0-1.x86_64.rpm`,
     },
     linux: {
       label: "Télécharger pour Linux (AppImage)",
-      meta: "AppImage universel Linux 64 bits (111 Mo) • Compatible toute distribution",
+      meta: "AppImage universel x86_64 (111 Mo) • Fonctionne sur Arch, CachyOS, Manjaro, SteamOS, Bazzite",
       url: `${RELEASE_BASE}/4k.free.video.dowloader_0.2.0_amd64.AppImage`,
     },
   };
@@ -40,7 +40,6 @@
     const heroBtn = document.getElementById("hero-download-btn");
     const heroBtnLabel = document.getElementById("hero-download-label");
     const heroMeta = document.getElementById("hero-download-meta");
-    const floatingBtn = document.getElementById("floating-download-btn");
     if (!heroBtn || !heroBtnLabel || !heroMeta) return;
 
     const targetKey = detectTargetOS();
@@ -48,10 +47,6 @@
     heroBtn.href = info.url;
     heroBtnLabel.textContent = info.label;
     heroMeta.textContent = info.meta;
-
-    if (floatingBtn) {
-      floatingBtn.href = info.url;
-    }
   }
 
   function initResponsiveNavbar() {
@@ -99,7 +94,7 @@
           try {
             menu.hidePopover();
           } catch (_) {
-            // Ignored if popover isn't open
+            // Ignored
           }
         }
       }
@@ -129,9 +124,7 @@
         }
       }
 
-      if (focusTab) {
-        nextTab.focus();
-      }
+      if (focusTab) nextTab.focus();
       nextTab.scrollIntoView({ block: "nearest", inline: "nearest" });
     };
 
@@ -157,7 +150,6 @@
       }
     });
 
-    // Recherche navigateur (Ctrl+F) dans les onglets masqués via hidden="until-found"
     document.addEventListener("beforematch", (event) => {
       const panel = event.target.closest('[role="tabpanel"]');
       if (!panel) return;
@@ -167,24 +159,35 @@
     });
   }
 
-  function initFloatingPill() {
-    const pill = document.getElementById("floating-pill");
-    const heroCta = document.getElementById("hero-cta-sentinel");
-    if (!pill || !heroCta || !("IntersectionObserver" in window)) return;
+  function initCliExplorer() {
+    const buttons = Array.from(document.querySelectorAll(".preset-btn"));
+    const codeEl = document.getElementById("cli-command-code");
+    const copyBtn = document.getElementById("cli-copy-btn");
+    if (!buttons.length || !codeEl || !copyBtn) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          pill.hidden = entry.isIntersecting;
-        }
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(heroCta);
+    for (const btn of buttons) {
+      btn.addEventListener("click", () => {
+        for (const b of buttons) b.setAttribute("aria-pressed", String(b === btn));
+        codeEl.textContent = btn.dataset.cmd || "";
+        copyBtn.textContent = "Copier";
+      });
+    }
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(codeEl.textContent || "");
+        copyBtn.textContent = "Copié";
+        setTimeout(() => {
+          copyBtn.textContent = "Copier";
+        }, 1600);
+      } catch (_) {
+        copyBtn.textContent = "Sélectionnez et Ctrl+C";
+      }
+    });
   }
 
   initDownloadDetector();
   initResponsiveNavbar();
   initShowcaseTabs();
-  initFloatingPill();
+  initCliExplorer();
 })();

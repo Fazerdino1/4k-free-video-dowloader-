@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4k free video dowloader — Téléchargeur vidéo 4K/8K gratuit &amp; open source (Windows &amp; Linux)</title>
-  <meta name="description" content="Téléchargez gratuitement des vidéos YouTube en 4K, 8K, 60 FPS, playlists, chaînes, sous-titres SRT/ASS et MP3 avec 4k free video dowloader. 100 % Open Source en Rust pour Windows 10/11 et Linux.">
+  <title>4k free video dowloader — Téléchargeur vidéo 4K/8K, playlists &amp; audio en Rust</title>
+  <meta name="description" content="Application open source écrite en Rust (Tauri 2 + yt-dlp + FFmpeg) pour télécharger des vidéos 4K/8K HDR, playlists, sous-titres SRT/ASS/VTT et audio MP3/FLAC sur Windows 10/11 et Linux.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-  <meta name="theme-color" content="#7bc81d">
+  <meta name="theme-color" content="#10b981">
   <link rel="canonical" href="https://fazerdino1.github.io/4k-free-video-dowloader-/">
 
   <link rel="icon" href="favicon.ico" sizes="any">
@@ -14,24 +14,22 @@
   <link rel="apple-touch-icon" href="assets/icon-256.png">
   <link rel="manifest" href="site.webmanifest">
 
-  <!-- Open Graph / Twitter Cards pour le partage et l'aperçu Google -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="fr_FR">
   <meta property="og:site_name" content="4k free video dowloader">
-  <meta property="og:title" content="4k free video dowloader — Téléchargeur vidéo 4K/8K gratuit &amp; open source">
-  <meta property="og:description" content="Téléchargeur vidéo 4K/8K, playlists YouTube, extraction MP3, sous-titres 50+ langues et séparation audio IA. Écrit en Rust (Tauri 2) pour Windows &amp; Linux.">
+  <meta property="og:title" content="4k free video dowloader — Téléchargeur vidéo 4K/8K &amp; audio open source">
+  <meta property="og:description" content="Logiciel libre en Rust pour Windows 10/11 et Linux : vidéos 4K/8K, playlists YouTube, sous-titres, audio FLAC/MP3, séparation vocale Demucs et CLI serveur.">
   <meta property="og:url" content="https://fazerdino1.github.io/4k-free-video-dowloader-/">
   <meta property="og:image" content="https://fazerdino1.github.io/4k-free-video-dowloader-/assets/logo.png">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="4k free video dowloader — Téléchargeur vidéo 4K/8K gratuit &amp; open source">
-  <meta name="twitter:description" content="Téléchargez vidéos 4K/8K, playlists YouTube et audio MP3 sans pub ni limite sur Windows 10/11 et Linux.">
+  <meta name="twitter:title" content="4k free video dowloader — Téléchargeur vidéo 4K/8K open source">
+  <meta name="twitter:description" content="Sans publicité ni paywall : Windows x64, Ubuntu, Debian, Fedora, Arch et CLI headless en Rust.">
   <meta name="twitter:image" content="https://fazerdino1.github.io/4k-free-video-dowloader-/assets/logo.png">
 
   <link rel="stylesheet" href="styles.css">
   <script defer src="app.js"></script>
 
-  <!-- Données structurées JSON-LD pour Google Rich Results -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -41,7 +39,7 @@
         "name": "4k free video dowloader",
         "alternateName": ["4K Free Video Downloader", "vidgrab", "vidgrab-cli"],
         "applicationCategory": "MultimediaApplication",
-        "operatingSystem": "Windows 10, Windows 11, Linux (Ubuntu, Debian, Fedora, Arch, Mint, openSUSE)",
+        "operatingSystem": "Windows 10, Windows 11, Linux (Ubuntu, Debian, Mint, Fedora, Arch, Alpine)",
         "softwareVersion": "0.2.0",
         "datePublished": "2026-11-12",
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -49,7 +47,7 @@
         "url": "https://fazerdino1.github.io/4k-free-video-dowloader-/",
         "downloadUrl": "https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.2.0",
         "image": "https://fazerdino1.github.io/4k-free-video-dowloader-/assets/logo.png",
-        "description": "Application open source écrite en Rust avec Tauri 2, yt-dlp et FFmpeg pour télécharger des vidéos 4K/8K, playlists YouTube, pistes audio doublées, sous-titres et flux audio sur Windows et Linux.",
+        "description": "Téléchargeur vidéo et audio open source écrit en Rust (Tauri 2 + yt-dlp + FFmpeg + SQLite WAL) pour Windows 10/11 et Linux.",
         "author": {
           "@type": "Person",
           "name": "Fazerdino1",
@@ -66,34 +64,34 @@
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "4k free video dowloader est-il vraiment gratuit et sans limite ?",
+            "name": "Quelles sont les différences avec les téléchargeurs commerciaux ?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Oui. Le logiciel est 100 % open source sous licence GNU GPL-3.0-or-later, sans abonnement, sans paywall et sans limitation sur le nombre de vidéos ou de playlists téléchargées."
+              "text": "4k free video dowloader est un logiciel libre sous licence GNU GPL-3.0-or-later écrit en Rust. Il ne comporte ni limitation de playlists, ni version payante, ni publicité, ni télémétrie : toutes les données restent dans votre base SQLite locale."
             }
           },
           {
             "@type": "Question",
-            "name": "Quelles plateformes et résolutions vidéo sont prises en charge ?",
+            "name": "Quels formats vidéo, audio et sous-titres sont gérés ?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Propulsé par yt-dlp et FFmpeg, le logiciel prend en charge YouTube, Vimeo, TikTok, SoundCloud, Twitch, Facebook, Bilibili et plus de 1000 sites en résolutions 720p, 1080p, 2K, 4K UHD et 8K HDR à 60 FPS aux formats MKV, MP4, WebM, MP3, M4A, FLAC ou Opus."
+              "text": "Vidéo en MP4 et MKV jusqu'en 8K (4320p), 4K (2160p), 2K (1440p), 1080p et 720p (60 FPS et HDR10/HLG/Dolby Vision selon la source) avec choix du codec H.264, VP9 ou AV1. Audio en MP3, M4A, OGG, Opus, FLAC et WAV jusqu'à 320 kbps, et sous-titres SRT, VTT ou ASS."
             }
           },
           {
             "@type": "Question",
-            "name": "Quels systèmes d'exploitation sont compatibles ?",
+            "name": "Comment lancer l'application sur Windows 10 ou Windows 11 ?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "La version v0.2.0 prend en charge Windows 10/11 64 bits (4k free video dowloader.exe) ainsi que la quasi-totalité des distributions Linux en paquets .deb, .rpm, .AppImage et binaire CLI headless (vidgrab-cli) pour serveurs et conteneurs Docker."
+              "text": "Téléchargez l'archive 4k.free.video.dowloader_0.2.0_windows_x64.zip, décompressez-la et exécutez 4k free video dowloader.exe tout en conservant WebView2Loader.dll dans le même dossier."
             }
           },
           {
             "@type": "Question",
-            "name": "Comment vérifier la sécurité et l'authenticité des fichiers téléchargés ?",
+            "name": "Comment fonctionne le traitement audio IA et le mode CLI ?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Le code source est intégralement public sur GitHub, compilé par GitHub Actions, durci par une politique CSP restrictive WebView et livré avec un fichier SHA256SUMS.txt permettant de vérifier chaque exécutable."
+              "text": "Le module audio IA s'appuie sur Demucs dans un environnement Python local avec détection CUDA/ROCm ou CPU, et bascule automatiquement sur les filtres DSP de FFmpeg si Demucs n'est pas installé. Le binaire vidgrab-cli fonctionne quant à lui sans interface graphique sur serveur SSH ou conteneur Docker Alpine musl."
             }
           }
         ]
@@ -105,13 +103,12 @@
 <body>
   <a class="skip-link" href="#main-content">Aller au contenu principal</a>
 
-  <!-- Navbar responsive conforme modern-web-guidance -->
   <header class="site-header">
     <div class="container header-inner">
       <a class="site-brand" href="./">
         <img src="assets/icon-128.png" alt="" width="34" height="34">
         <span>4k free video dowloader</span>
-        <span class="brand-pill">v0.2.0 Open Source</span>
+        <span class="version-chip">v0.2.0</span>
       </a>
 
       <nav class="site-nav" aria-label="Navigation principale">
@@ -129,633 +126,509 @@
         </button>
 
         <ul id="site-menu" class="site-menu">
-          <li><a href="./" aria-current="page">Présentation</a></li>
-          <li><a href="#fonctionnalites">Fonctionnalités</a></li>
-          <li><a href="#telechargement">Téléchargement</a></li>
-          <li><a href="guide-linux.html">Linux &amp; CLI</a></li>
+          <li><a href="./" aria-current="page">Accueil</a></li>
+          <li><a href="#capacites">Capacités</a></li>
+          <li><a href="#cli">Mode CLI</a></li>
+          <li><a href="#telechargement">Télécharger</a></li>
+          <li><a href="guide-linux.html">Guide Linux</a></li>
           <li><a href="#faq">FAQ</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
-        <a class="nav-github" href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">
-          Code source GitHub
+        <a class="btn-outline-sm" href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">
+          Dépôt GitHub
         </a>
-        <a class="nav-cta" href="#telechargement">Téléchargement gratuit</a>
+        <a class="btn-emerald-sm" href="#telechargement">Télécharger v0.2.0</a>
       </div>
     </div>
   </header>
 
   <main id="main-content">
-    <!-- ==================== HERO SECTION ==================== -->
+    <!-- ==================== HERO ==================== -->
     <section class="hero">
       <div class="container">
-        <div class="hero-badge-icon">
-          <img
-            src="assets/logo.png"
-            alt="Logo 4k free video dowloader"
-            width="84"
-            height="84"
-            fetchpriority="high"
-            loading="eager"
-          >
-        </div>
+        <div class="hero-grid">
+          <div>
+            <div class="hero-eyebrow">
+              <span>GNU GPL-3.0-or-later</span>
+              <span>•</span>
+              <span>Écrit en Rust + Tauri 2</span>
+            </div>
 
-        <h1>4k free video dowloader</h1>
+            <h1>
+              <span>4k free video dowloader</span>
+              <span class="h1-accent">Vos vidéos 4K &amp; 8K, sans limite ni pub.</span>
+            </h1>
 
-        <p class="hero-subtitle">
-          Téléchargez des vidéos, playlists, chaînes et pistes audio sans limite à partir de tous vos sites préférés :
-          <span class="site-chips">
-            <span class="site-chip"><span class="site-dot" style="background:#ef4444"></span>YouTube</span>
-            <span class="site-chip"><span class="site-dot" style="background:#0ea5e9"></span>Vimeo</span>
-            <span class="site-chip"><span class="site-dot" style="background:#111827"></span>TikTok</span>
-            <span class="site-chip"><span class="site-dot" style="background:#f97316"></span>SoundCloud</span>
-            <span class="site-chip"><span class="site-dot" style="background:#2563eb"></span>Facebook</span>
-            <span class="site-chip"><span class="site-dot" style="background:#7c3aed"></span>Twitch</span>
-            <span class="site-chip"><span class="site-dot" style="background:#06b6d4"></span>Bilibili</span>
-          </span>
-          et plus de 1&nbsp;000 sites en qualité <strong>4K &amp; 8K HDR</strong>.
-        </p>
+            <p class="hero-lead">
+              Téléchargez vos vidéos, playlists, chaînes et pistes audio depuis YouTube, Vimeo, TikTok, Twitch, SoundCloud et les sites compatibles <code>yt-dlp</code> — sur <strong>Windows 10/11</strong> et <strong>Linux</strong>, en interface graphique ou en ligne de commande.
+            </p>
 
-        <div id="hero-cta-sentinel" class="hero-cta-wrap">
-          <a
-            id="hero-download-btn"
-            class="btn-hero"
-            href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip"
-          >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3v12m0 0-4-4m4 4 4-4" />
-              <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-            </svg>
-            <span id="hero-download-label">Téléchargement gratuit (v0.2.0)</span>
-          </a>
+            <div class="hero-actions">
+              <a
+                id="hero-download-btn"
+                class="btn-primary"
+                href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip"
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3v12m0 0-4-4m4 4 4-4" />
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </svg>
+                <span id="hero-download-label">Télécharger v0.2.0</span>
+              </a>
 
-          <div class="hero-meta">
-            <span id="hero-download-meta">Windows 10/11 x64 &amp; Linux (.deb, .rpm, .AppImage)</span>
-            <span>•</span>
-            <a href="#telechargement">Voir toutes les options d'OS &amp; CLI</a>
-            <span>•</span>
-            <span>Licence <strong>GPL-3.0-or-later</strong></span>
+              <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">
+                Voir le code source
+              </a>
+            </div>
+
+            <div id="hero-download-meta" class="hero-meta-line">
+              Windows 10/11 x64 (.zip • 6,0 Mo) • Ubuntu/Debian (.deb) • Fedora/RHEL (.rpm) • AppImage universel
+            </div>
           </div>
+
+          <aside class="hero-visual-card" aria-label="Points clés de la version 0.2.0">
+            <div class="hero-card-head">
+              <img
+                src="assets/logo.png"
+                alt="Icône officielle 4k free video dowloader"
+                width="68"
+                height="68"
+                fetchpriority="high"
+                loading="eager"
+              >
+              <div>
+                <div class="hero-card-title">4k free video dowloader v0.2.0</div>
+                <div class="hero-card-sub">Binaire natif Rust • Zéro Electron</div>
+              </div>
+            </div>
+
+            <ul class="hero-facts-list">
+              <li>
+                <span class="fact-dot" aria-hidden="true">✓</span>
+                <span><strong>Qualités 720p à 8K HDR</strong> en conteneur <code>MP4</code> ou <code>MKV</code> avec sélection H.264, VP9 ou AV1.</span>
+              </li>
+              <li>
+                <span class="fact-dot" aria-hidden="true">✓</span>
+                <span><strong>File d'attente asynchrone</strong> avec vraie mise en pause/reprise, limitation de débit et planification horaire.</span>
+              </li>
+              <li>
+                <span class="fact-dot" aria-hidden="true">✓</span>
+                <span><strong>Sécurité vérifiée</strong> : Content Security Policy stricte, cookies <code>0600</code> et sommes <code>SHA256SUMS.txt</code>.</span>
+              </li>
+              <li>
+                <span class="fact-dot" aria-hidden="true">✓</span>
+                <span><strong>Desktop + Serveur</strong> : exécutable graphique + binaire CLI headless <code>vidgrab-cli</code> sans GTK.</span>
+              </li>
+            </ul>
+          </aside>
         </div>
 
-        <!-- Vitrine interactive inspirée du sélecteur de capture #2 -->
-        <div class="showcase-shell">
-          <div class="showcase-tabs-wrap">
-            <div class="app-frame">
-              <div class="app-titlebar">
-                <div class="app-title-left">
-                  <div class="window-dots" aria-hidden="true">
-                    <span class="dot-r"></span>
-                    <span class="dot-y"></span>
-                    <span class="dot-g"></span>
-                  </div>
-                  <span>4k free video dowloader — v0.2.0</span>
-                </div>
-                <span class="pill-oss">100 % Open Source • Rust + Tauri 2</span>
+        <!-- Vitrine fidèle de notre vraie interface sombre -->
+        <div class="studio-showcase">
+          <div class="studio-topbar">
+            <div class="studio-title">
+              <div class="window-dots" aria-hidden="true">
+                <span class="dot-r"></span>
+                <span class="dot-y"></span>
+                <span class="dot-g"></span>
               </div>
+              <span>Aperçu de l'interface — 4k free video dowloader v0.2.0</span>
+            </div>
+            <span class="version-chip">Français / English • Base SQLite locale</span>
+          </div>
 
-              <div class="app-panels">
-                <!-- Onglet 1 : Interface Desktop -->
-                <div id="panel-desktop" role="tabpanel" aria-labelledby="tab-desktop" tabindex="0">
-                  <div class="panel-body">
-                    <div class="app-toolbar">
-                      <span class="ui-btn-primary">Coller le lien</span>
-                      <span class="ui-pill active">Mode intelligent : ON</span>
-                      <span class="ui-pill">Vidéo</span>
-                      <span class="ui-pill active">4K UHD</span>
-                      <span class="ui-pill">8K</span>
-                      <span class="ui-pill active">MKV</span>
-                      <span class="ui-pill">MP4</span>
-                    </div>
+          <div class="showcase-tablist" role="tablist" aria-label="Vues de l'application">
+            <button type="button" role="tab" id="tab-queue" aria-selected="true" tabindex="0">File &amp; Mode Intelligent</button>
+            <button type="button" role="tab" id="tab-search" aria-selected="false" tabindex="-1">Recherche YouTube</button>
+            <button type="button" role="tab" id="tab-audio" aria-selected="false" tabindex="-1">Audio IA &amp; FFmpeg</button>
+            <button type="button" role="tab" id="tab-terminal" aria-selected="false" tabindex="-1">Terminal CLI</button>
+          </div>
 
-                    <div class="queue-list">
-                      <div class="queue-row">
-                        <div class="thumb-mock">4K HDR</div>
-                        <div>
-                          <div class="queue-title">Documentaire Nature — Ultra HD 4K 60fps (VP9 + Opus)</div>
-                          <div class="queue-sub">MKV • 3840×2160 • 60 FPS • Sous-titres FR/EN inclus</div>
-                          <div class="progress-track"><div class="progress-fill" style="inline-size: 100%"></div></div>
-                        </div>
-                        <span class="queue-badge">Terminé • 1,42 Go</span>
-                      </div>
-                      <div class="queue-row">
-                        <div class="thumb-mock alt">PLAYLIST</div>
-                        <div>
-                          <div class="queue-title">Playlist Formation Rust &amp; Systèmes (24 vidéos • 1080p MP4)</div>
-                          <div class="queue-sub">MP4 • 18/24 téléchargées • 42,6 Mo/s • File parallèle illimitée</div>
-                          <div class="progress-track"><div class="progress-fill" style="inline-size: 76%"></div></div>
-                        </div>
-                        <span class="queue-badge">76 % • En cours</span>
-                      </div>
-                    </div>
-                  </div>
+          <div class="studio-panels">
+            <div id="panel-queue" role="tabpanel" aria-labelledby="tab-queue" tabindex="0">
+              <div class="panel-inner">
+                <div class="app-toolbar">
+                  <span class="ui-btn-green">Coller le lien</span>
+                  <span class="ui-tag on">Mode intelligent</span>
+                  <span class="ui-tag on">Vidéo</span>
+                  <span class="ui-tag">Audio</span>
+                  <span class="ui-tag">Sous-titres</span>
+                  <span class="ui-tag">8K</span>
+                  <span class="ui-tag on">4K</span>
+                  <span class="ui-tag">1080p</span>
+                  <span class="ui-tag on">MKV</span>
+                  <span class="ui-tag">MP4</span>
                 </div>
 
-                <!-- Onglet 2 : Recherche YouTube intégrée -->
-                <div id="panel-youtube" role="tabpanel" aria-labelledby="tab-youtube" hidden>
-                  <div class="panel-body">
-                    <div class="app-toolbar">
-                      <span class="ui-pill active">Recherche YouTube intégrée</span>
-                      <span class="ui-pill" style="flex: 1; text-align: start;">concert live 4k hdr...</span>
-                      <span class="ui-btn-primary">Rechercher</span>
+                <div class="queue-stack">
+                  <div class="queue-card">
+                    <div class="thumb-badge">4K 60fps</div>
+                    <div>
+                      <div class="queue-name">Documentaire Alpin — Ultra HD 2160p (VP9 + Opus)</div>
+                      <div class="queue-info">MKV • 3840×2160 • Sous-titres FR intégrés • Métadonnées &amp; chapitres</div>
+                      <div class="meter"><span style="inline-size: 100%"></span></div>
                     </div>
-                    <div class="yt-mock-grid">
-                      <div class="yt-card">
-                        <div class="yt-card-img">14:28 • 4K</div>
-                        <div class="yt-card-body">
-                          <div class="yt-card-title">Session Acoustique Studio 4K 60fps</div>
-                          <span class="ui-btn-primary" style="padding: 0.3rem 0.65rem; font-size: 0.76rem;">Télécharger 1-clic</span>
-                        </div>
-                      </div>
-                      <div class="yt-card">
-                        <div class="yt-card-img" style="background: linear-gradient(135deg, #312e81, #7c3aed);">42:10 • 8K</div>
-                        <div class="yt-card-body">
-                          <div class="yt-card-title">Survol des Alpes en Drone 8K HDR</div>
-                          <span class="ui-btn-primary" style="padding: 0.3rem 0.65rem; font-size: 0.76rem;">Télécharger 1-clic</span>
-                        </div>
-                      </div>
-                      <div class="yt-card">
-                        <div class="yt-card-img" style="background: linear-gradient(135deg, #7c2d12, #ea580c);">09:04 • FLAC</div>
-                        <div class="yt-card-body">
-                          <div class="yt-card-title">Masterclass Audio Hi-Res &amp; Voix</div>
-                          <span class="ui-btn-primary" style="padding: 0.3rem 0.65rem; font-size: 0.76rem;">Audio seul</span>
-                        </div>
-                      </div>
+                    <span class="status-pill">Terminé</span>
+                  </div>
+
+                  <div class="queue-card">
+                    <div class="thumb-badge purple">PLAYLIST</div>
+                    <div>
+                      <div class="queue-name">Conférences Rust Systems (12 épisodes • MP4 1080p)</div>
+                      <div class="queue-info">9 / 12 éléments • 3 téléchargements simultanés • SponsorBlock actif</div>
+                      <div class="meter"><span style="inline-size: 75%"></span></div>
                     </div>
+                    <span class="status-pill">75 % • En cours</span>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <!-- Onglet 3 : Traitement IA & FFmpeg -->
-                <div id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" hidden>
-                  <div class="panel-body">
-                    <div class="app-toolbar">
-                      <span class="ui-pill active">Séparation audio IA (Demucs)</span>
-                      <span class="ui-pill">Sous-titres SRT / ASS / VTT</span>
-                      <span class="ui-pill">Découpe FFmpeg précise</span>
+            <div id="panel-search" role="tabpanel" aria-labelledby="tab-search" hidden>
+              <div class="panel-inner">
+                <div class="app-toolbar">
+                  <span class="ui-tag on">Onglet YouTube intégré</span>
+                  <span class="ui-tag" style="flex: 1;">Mot-clé : rust async tokio 4k</span>
+                  <span class="ui-btn-green">Rechercher</span>
+                </div>
+                <p style="margin-block-end: 0.9rem; font-size: 0.92rem;">
+                  Parcourez les résultats YouTube avec durée et miniature mise en cache localement en SQLite, puis lancez le téléchargement directement en Mode Intelligent ou avec choix de format.
+                </p>
+                <div class="queue-stack">
+                  <div class="queue-card">
+                    <div class="thumb-badge">18:42</div>
+                    <div>
+                      <div class="queue-name">Comprendre Tokio et l'asynchrone en Rust</div>
+                      <div class="queue-info">Résultat YouTube • Prêt pour téléchargement vidéo ou audio FLAC/MP3</div>
                     </div>
-                    <div class="queue-list">
-                      <div class="queue-row">
-                        <div class="thumb-mock" style="background: linear-gradient(135deg, #9333ea, #ec4899);">DEMUCS IA</div>
-                        <div>
-                          <div class="queue-title">Extraction Voix seule / Instrumental (Sans musique de fond)</div>
-                          <div class="queue-sub">Traitement local GPU/CPU sans envoi de vos fichiers dans le cloud</div>
-                          <div class="progress-track"><div class="progress-fill" style="inline-size: 100%"></div></div>
-                        </div>
-                        <span class="queue-badge">Voix isolée (WAV)</span>
-                      </div>
-                      <div class="queue-row">
-                        <div class="thumb-mock" style="background: linear-gradient(135deg, #0284c7, #2563eb);">CLIP 01:15</div>
-                        <div>
-                          <div class="queue-title">Découpe temporelle directe (--download-sections 01:15–03:40)</div>
-                          <div class="queue-sub">Télécharge uniquement l'extrait utile sans ré-encodage inutile</div>
-                          <div class="progress-track"><div class="progress-fill" style="inline-size: 100%"></div></div>
-                        </div>
-                        <span class="queue-badge">Extrait MP4 prêt</span>
-                      </div>
-                    </div>
+                    <span class="status-pill">Rapide 1-clic</span>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <!-- Onglet 4 : CLI Headless Serveur -->
-                <div id="panel-cli" role="tabpanel" aria-labelledby="tab-cli" hidden>
-                  <div class="panel-body">
-                    <div class="cli-terminal"><span class="cli-prompt">$</span> vidgrab-cli diag
+            <div id="panel-audio" role="tabpanel" aria-labelledby="tab-audio" hidden>
+              <div class="panel-inner">
+                <div class="app-toolbar">
+                  <span class="ui-tag on">Demucs (CUDA / ROCm / CPU)</span>
+                  <span class="ui-tag">Repli FFmpeg DSP</span>
+                  <span class="ui-tag">Découpe --start / --end</span>
+                </div>
+                <div class="queue-stack">
+                  <div class="queue-card">
+                    <div class="thumb-badge purple">IA AUDIO</div>
+                    <div>
+                      <div class="queue-name">Séparation de pistes &amp; nettoyage sonore local</div>
+                      <div class="queue-info">Suppression de voix (karaoké), extraction a cappella, isolation vocale, suppression musique de fond et réduction d'écho.</div>
+                    </div>
+                    <span class="status-pill">100 % local</span>
+                  </div>
+                  <div class="queue-card">
+                    <div class="thumb-badge">FFMPEG</div>
+                    <div>
+                      <div class="queue-name">Outils média : remux MP4 (+faststart), MP3 320 kbps, FLAC, H.264 et découpe trim</div>
+                      <div class="queue-info">Exécutés directement depuis l'interface ou via <code>vidgrab-cli ffmpeg</code>.</div>
+                    </div>
+                    <span class="status-pill">Sans perte</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="panel-terminal" role="tabpanel" aria-labelledby="tab-terminal" hidden>
+              <div class="panel-inner">
+                <div class="cli-box"><span class="cli-g">$</span> vidgrab-cli diag
 === 4k free video dowloader — Diagnostic Système ===
-Distribution : Linux / Windows (x86_64 | aarch64 | musl | mingw)
-Affichage    : Wayland / X11 / WebView2 / Headless CLI
-<span class="cli-ok">yt-dlp       : opérationnel (vérification SHA-256)</span>
-<span class="cli-ok">ffmpeg       : prêt pour fusion 4K/8K &amp; conversion audio</span>
+Distribution : Windows / Ubuntu / Fedora / Arch / Alpine (x86_64 | libc | init)
+Affichage    : Wayland / X11 / WebView2 / Headless
+<span class="cli-c">yt-dlp       : détecté + mise à jour SHA-256 intégrée (`vidgrab-cli update`)</span>
+<span class="cli-c">ffmpeg       : détecté pour fusion vidéo/audio et découpe temporelle</span>
 
-<span class="cli-prompt">$</span> vidgrab-cli download "https://www.youtube.com/watch?v=..." --quality 2160p --format mkv --subs fr,en
-<span class="cli-ok">[vidgrab] Téléchargement 4K MKV + sous-titres FR/EN terminé en 4.2s</span></div>
-                  </div>
-                </div>
+<span class="cli-g">$</span> vidgrab-cli download "https://www.youtube.com/watch?v=dQw4w9WgXcQ" -q 2160 --mkv --subs fr,en</div>
               </div>
             </div>
-
-            <div class="showcase-tablist" role="tablist" aria-label="Aperçus de l'interface">
-              <button type="button" role="tab" id="tab-desktop" aria-selected="true" tabindex="0">Interface Desktop</button>
-              <button type="button" role="tab" id="tab-youtube" aria-selected="false" tabindex="-1">Recherche YouTube</button>
-              <button type="button" role="tab" id="tab-ai" aria-selected="false" tabindex="-1">IA Audio &amp; FFmpeg</button>
-              <button type="button" role="tab" id="tab-cli" aria-selected="false" tabindex="-1">CLI Serveur &amp; Docker</button>
-            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ==================== LAURELS & INTRO ==================== -->
-    <section class="laurels-section">
+    <!-- ==================== 3 PILIERS TECHNIQUES ==================== -->
+    <section class="section" style="padding-block-start: 0;">
       <div class="container">
-        <div class="laurels-grid">
-          <div class="laurel-item">
-            <div class="laurel-value">100 % Rust + Tauri 2</div>
-            <p class="laurel-desc">Exécutable natif léger (~11 Mo), mémoire sûre et réactivité instantanée sans Electron.</p>
+        <div class="pillars-grid">
+          <article class="pillar-card">
+            <div class="pillar-kicker">Architecture Rust</div>
+            <h3>Rapide, natif et sobre</h3>
+            <p>Compilé en binaire natif avec Tauri 2, Tokio et SQLite WAL : pas de navigateur Chromium embarqué de 150 Mo en mémoire.</p>
+          </article>
+          <article class="pillar-card">
+            <div class="pillar-kicker">Transparence GPL-3.0</div>
+            <h3>Code source auditable</h3>
+            <p>Licence GNU GPL-3.0-or-later, CI/CD publique sur GitHub Actions (`rustfmt`, `clippy`, 20 tests Linux + Wine) et empreintes SHA-256.</p>
+          </article>
+          <article class="pillar-card">
+            <div class="pillar-kicker">Multiplateforme réel</div>
+            <h3>Desktop &amp; Serveur</h3>
+            <p>Binaires précompilés x64 pour Windows 10/11 et Linux (<code>.deb</code>, <code>.rpm</code>, <code>.AppImage</code>, CLI sans GTK), plus recettes Arch, Nix et Docker.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BENTO CAPACITÉS ==================== -->
+    <section id="capacites" class="section deferred-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Capacités réelles, vérifiées dans le code</h2>
+          <p>Chaque fonction présentée ci-dessous correspond directement aux modules implémentés dans <code>vidgrab-core</code> et <code>vidgrab-ui</code>.</p>
+        </div>
+
+        <div class="bento-capabilities">
+          <article class="cap-card span-2">
+            <span class="cap-badge">Moteur Vidéo &amp; Playlists</span>
+            <h3>De la 720p jusqu'à la 8K HDR 60 FPS, avec découpe d'extraits</h3>
+            <p>Analysez et téléchargez des vidéos individuelles, des playlists entières ou des chaînes YouTube avec sélection par plage horaire (<code>--start</code> / <code>--end</code>) et organisation automatique par dossier de chaîne.</p>
+            <div class="cap-tags">
+              <span>MP4</span>
+              <span>MKV</span>
+              <span>H.264 / VP9 / AV1</span>
+              <span>HDR10 / HLG / Dolby Vision</span>
+              <span>SponsorBlock optionnel</span>
+            </div>
+          </article>
+
+          <article class="cap-card">
+            <span class="cap-badge">Audio &amp; Doublage</span>
+            <h3>6 formats audio &amp; pistes multilingues</h3>
+            <p>Extrayez la bande son jusqu'à 320 kbps et conservez les pistes doublées en piste unique, fichiers séparés ou MKV multipiste.</p>
+            <div class="cap-tags">
+              <span>MP3 / M4A</span>
+              <span>FLAC / WAV</span>
+              <span>Opus / OGG</span>
+            </div>
+          </article>
+
+          <article class="cap-card">
+            <span class="cap-badge">Sous-titres &amp; Chapitres</span>
+            <h3>SRT, ASS et VTT intégrés ou séparés</h3>
+            <p>Téléchargez ou incrustez les sous-titres dans les langues disponibles sur la vidéo, avec miniatures, description et chapitres intégrés ou découpés.</p>
+            <div class="cap-tags">
+              <span>SRT / VTT / ASS</span>
+              <span>Chapitres</span>
+              <span>Miniatures SQLite</span>
+            </div>
+          </article>
+
+          <article class="cap-card span-2">
+            <span class="cap-badge">Traitement Audio IA (Demucs) &amp; FFmpeg</span>
+            <h3>Isolation vocale, karaoké et outils média locaux</h3>
+            <p>Utilisez Demucs dans un environnement virtuel Python local (accélération CUDA/ROCm détectée automatiquement ou CPU), avec repli automatique sur les filtres DSP FFmpeg (<code>afftdn</code> / <code>arnndn</code>) si Python/Demucs n'est pas installé.</p>
+            <div class="cap-tags">
+              <span>Karaoké (suppression voix)</span>
+              <span>A cappella</span>
+              <span>Réduction bruit &amp; écho</span>
+              <span>Remux +faststart</span>
+            </div>
+          </article>
+
+          <article class="cap-card">
+            <span class="cap-badge">Mode Intelligent &amp; Suivi</span>
+            <h3>Presets en 1 clic &amp; abonnements</h3>
+            <p>Enregistrez vos réglages favoris pour télécharger dès le collage d'un lien, suivez vos chaînes automatiquement et importez/exportez vos files en JSON ou M3U.</p>
+            <div class="cap-tags">
+              <span>Abonnements</span>
+              <span>Import / Export JSON</span>
+              <span>Notifications désactivables</span>
+            </div>
+          </article>
+
+          <article class="cap-card span-2">
+            <span class="cap-badge">Réseau, Confidentialité &amp; Respect DRM</span>
+            <h3>Proxy, Tor automatique, cookies 0600 et zéro DRM bypass</h3>
+            <p>Configurez un proxy HTTP/HTTPS/SOCKS5 filtrable par domaine (détection Tor sous Tails), utilisez vos cookies navigateur (Firefox, Chrome, Brave, Chromium) protégés en mode <code>0600</code> pour vos vidéos privées autorisées. Les flux chiffrés par DRM (Widevine/PlayReady) sont refusés proprement.</p>
+            <div class="cap-tags">
+              <span>HTTP / SOCKS5</span>
+              <span>Cookies 0600</span>
+              <span>Plafond débit KiB/s</span>
+              <span>Arrêt PC fin de file</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== EXPLORATEUR CLI ==================== -->
+    <section id="cli" class="section deferred-section">
+      <div class="container">
+        <div class="cli-explorer">
+          <h2 style="font-size: clamp(1.45rem, 1.1rem + 1.4vw, 2rem); margin-block-end: 0.4rem;">Explorateur CLI (<code>vidgrab-cli</code>)</h2>
+          <p>Utilisable directement sous Windows (<code>vidgrab-cli.exe</code>) ou Linux serveur / Docker Alpine sans interface graphique.</p>
+
+          <div class="cli-presets" role="group" aria-label="Exemples de commandes CLI">
+            <button type="button" class="preset-btn" aria-pressed="true" data-cmd='vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" -q 2160 --mkv --subs fr,en'>Vidéo 4K MKV + sous-titres</button>
+            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" --audio flac'>Audio FLAC sans perte</button>
+            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" --start 01:15 --end 03:40 --mp4'>Extrait temporel MP4</button>
+            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli ffmpeg trim entree.mp4 --start 00:30 --end 01:45'>Découpe rapide FFmpeg</button>
+            <button type="button" class="preset-btn" aria-pressed="false" data-cmd='vidgrab-cli diag --json'>Diagnostic système JSON</button>
           </div>
-          <div class="laurel-item">
-            <div class="laurel-value">Windows &amp; 30+ Linux</div>
-            <p class="laurel-desc">Compatible Windows 10/11 x64, Ubuntu, Debian, Mint, Fedora, Arch, Alpine musl et Docker.</p>
-          </div>
-          <div class="laurel-item">
-            <div class="laurel-value">Zéro paywall, zéro pub</div>
-            <p class="laurel-desc">Licence libre GNU GPL-3.0-or-later : playlists complètes, 8K et téléchargements illimités gratuits.</p>
+
+          <div class="cli-output-row">
+            <code id="cli-command-code">vidgrab-cli download "https://www.youtube.com/watch?v=VIDEO_ID" -q 2160 --mkv --subs fr,en</code>
+            <button id="cli-copy-btn" type="button" class="copy-btn">Copier</button>
           </div>
         </div>
-
-        <div class="intro-copy">
-          <h2>Votre outil open source de référence pour télécharger vos vidéos rapidement</h2>
-          <p>
-            <strong>4k free video dowloader</strong> réunit la simplicité d'une interface claire et moderne avec la puissance brute d'un cœur écrit en Rust pilotant <code>yt-dlp</code>, <code>FFmpeg</code> et une base SQLite WAL locale. Enregistrez vos vidéos, playlists, chaînes entières, sous-titres et extraits audio en un clic, sur votre PC ou en ligne de commande sur serveur.
-          </p>
-        </div>
-
-        <div class="tech-strip" aria-label="Technologies vérifiées">
-          <span class="tech-badge">Rust 2021</span>
-          <span class="tech-badge">Tauri 2 + WebView2 / WebKitGTK</span>
-          <span class="tech-badge">yt-dlp + FFmpeg</span>
-          <span class="tech-badge">SQLite WAL local</span>
-          <span class="tech-badge">CSP durcie &amp; SHA-256</span>
-          <span class="tech-badge">GitHub Actions CI</span>
-        </div>
       </div>
     </section>
 
-    <!-- ==================== BENTO VISUAL GRADIENT CARDS ==================== -->
-    <section id="fonctionnalites" class="bento-section deferred-section">
+    <!-- ==================== TÉLÉCHARGEMENTS ==================== -->
+    <section id="telechargement" class="section deferred-section">
       <div class="container">
-        <div class="bento-grid">
-          <article class="bento-card wide bento-coral">
-            <div class="bento-icons-row" aria-hidden="true">
-              <span class="glass-icon">Shorts</span>
-              <span class="glass-icon">4K</span>
-              <span class="glass-icon">List</span>
-              <span class="glass-icon">Play</span>
-              <span class="glass-icon">Clip</span>
-              <span class="glass-icon">Live</span>
-            </div>
-            <h3>Téléchargez des playlists, des chaînes et des résultats de recherche YouTube en un seul clic</h3>
-            <p>
-              Enregistrez des playlists complètes, des chaînes entières, vos listes privées (« À regarder plus tard », « Vidéos aimées ») et vos recherches YouTube en haute qualité dans divers formats vidéo ou audio, sans aucune limite de nombre de vidéos.
-            </p>
-          </article>
-
-          <article class="bento-card bento-navy">
-            <h3>Obtenez des vidéos en qualité 4K UHD &amp; 8K HDR</h3>
-            <p>
-              Enregistrez vos vidéos en 720p, 1080p Full HD, 2K, 4K ou 8K à 60 FPS dans des conteneurs MP4, MKV ou WebM optimisés pour PC, TV connectées, tablettes et smartphones.
-            </p>
-            <div class="quality-stack" aria-hidden="true">
-              <div class="q-chip">8K UHD <span>4320p HDR • 60 FPS</span></div>
-              <div class="q-chip">4K UHD <span>2160p • VP9 / AV1</span></div>
-              <div class="q-chip">1080p HD <span>MP4 / MKV universel</span></div>
-            </div>
-          </article>
-
-          <article class="bento-card bento-purple">
-            <h3>Extrayez des sous-titres YouTube dans 50+ langues</h3>
-            <p>
-              Récupérez les sous-titres manuels ou générés automatiquement au format <strong>SRT</strong>, <strong>ASS</strong> ou <strong>VTT</strong> pour une vidéo seule, une playlist complète ou toute une chaîne.
-            </p>
-            <div class="lang-badges" aria-hidden="true">
-              <span class="lang-pill">Français (.srt)</span>
-              <span class="lang-pill">English (.ass)</span>
-              <span class="lang-pill">Español</span>
-              <span class="lang-pill">Deutsch</span>
-              <span class="lang-pill">日本語</span>
-              <span class="lang-pill">+50 langues</span>
-            </div>
-          </article>
-
-          <article class="bento-card wide bento-obsidian">
-            <div>
-              <h3>Traitement audio IA &amp; Outils FFmpeg</h3>
-              <p>
-                Améliorez l'audio localement grâce à l'IA (Demucs) : isolez la piste vocale pour vos podcasts, retirez la voix pour créer des versions instrumentales/karaoké, normalisez le volume sonore ou découpez précisément un extrait temporel sans outil tiers.
-              </p>
-            </div>
-            <div class="waveform-box" aria-hidden="true">
-              <div class="wave-bars">
-                <span style="block-size: 30%"></span>
-                <span style="block-size: 62%"></span>
-                <span style="block-size: 88%"></span>
-                <span style="block-size: 48%"></span>
-                <span style="block-size: 95%"></span>
-                <span style="block-size: 72%"></span>
-                <span style="block-size: 54%"></span>
-                <span style="block-size: 84%"></span>
-                <span style="block-size: 40%"></span>
-                <span style="block-size: 68%"></span>
-              </div>
-              <div style="font-size: 0.82rem; color: #cbd5e1; display: flex; justify-content: space-between;">
-                <span>Voix isolée • Demucs local</span>
-                <strong style="color: #a3e635;">WAV / MP3 320 kbps</strong>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== FEATURE GRID (captures #5-#7) ==================== -->
-    <section class="features-section deferred-section">
-      <div class="container">
-        <div class="section-heading">
-          <h2>Tout ce qu'il faut pour vos vidéos et musiques</h2>
-          <p>Des fonctionnalités avancées habituellement réservées aux logiciels payants, offertes gratuitement et sans télémétrie.</p>
-        </div>
-
-        <div class="cards-2col">
-          <article class="feature-card">
-            <div class="feature-icon fi-red" aria-hidden="true">▶</div>
-            <h3>Prise en charge de YouTube Shorts, Directs et Flux HLS</h3>
-            <p>Téléchargez des vidéos classiques, Shorts verticaux, rediffusions Twitch, flux M3U8 et listes en masse avec gestion automatique des miniatures.</p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-icon fi-teal" aria-hidden="true">♫</div>
-            <h3>Télécharger l'audio YouTube doublé &amp; Hi-Res</h3>
-            <p>Enregistrez vos pistes audio dans vos langues préférées ou extrayez directement l'audio en MP3, M4A, Opus ou FLAC sans perte.</p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-icon fi-blue" aria-hidden="true">🔒</div>
-            <h3>Accès aux contenus privés avec cookies chiffrés</h3>
-            <p>Importez les cookies de votre navigateur (protégés localement avec permissions <code>0600</code>) pour récupérer les vidéos privées auxquelles vous avez accès.</p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-icon fi-amber" aria-hidden="true">⚡</div>
-            <h3>La fonctionnalité Mode Intelligent</h3>
-            <p>Définissez une seule fois vos préférences (vidéo/audio, qualité 4K/1080p, format MKV/MP4, dossier cible) et collez vos liens : tout démarre automatiquement.</p>
-          </article>
-        </div>
-
-        <div class="flat-features-grid">
-          <article class="flat-feature">
-            <div class="feature-icon fi-indigo" aria-hidden="true">🔍</div>
-            <h3>Recherche YouTube intégrée</h3>
-            <p>Trouvez vos vidéos par mots-clés directement dans l'application sans ouvrir de navigateur et lancez le téléchargement en un clic depuis les vignettes.</p>
-          </article>
-
-          <article class="flat-feature">
-            <div class="feature-icon fi-blue" aria-hidden="true">🌐</div>
-            <h3>Connexion Proxy HTTP / HTTPS / SOCKS5</h3>
-            <p>Contournez les restrictions réseau d'entreprise, de campus ou régionales via le testeur et le routeur proxy intégré.</p>
-          </article>
-
-          <article class="flat-feature">
-            <div class="feature-icon fi-lime" aria-hidden="true">↺</div>
-            <h3>Pause, reprise réelle &amp; limitation de débit</h3>
-            <p>Mettez en pause un téléchargement à tout moment (arrêt propre du processus et reprise exacte de l'offset) et plafonnez le débit si nécessaire.</p>
-          </article>
-
-          <article class="flat-feature">
-            <div class="feature-icon fi-teal" aria-hidden="true">🔔</div>
-            <h3>Abonnements automatiques aux chaînes</h3>
-            <p>Suivez vos créateurs favoris : les nouvelles vidéos publiées sont détectées et téléchargées automatiquement dans votre dossier dédié.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== 4 STEPS BANNER (capture #8) ==================== -->
-    <section class="steps-section deferred-section">
-      <div class="container">
-        <div class="steps-banner">
-          <h2>Télécharger une vidéo en 4 étapes simples</h2>
-          <ol class="steps-list">
-            <li class="step-card">
-              <span class="step-num">1</span>
-              <h3>Copiez le lien</h3>
-              <p>Copiez l'URL de la vidéo, du Short ou de la playlist dans votre presse-papiers.</p>
-            </li>
-            <li class="step-card">
-              <span class="step-num">2</span>
-              <h3>Collez dans l'app</h3>
-              <p>Cliquez sur « Coller le lien » ou activez le Mode Intelligent pour aller encore plus vite.</p>
-            </li>
-            <li class="step-card">
-              <span class="step-num">3</span>
-              <h3>Choisissez la qualité</h3>
-              <p>Sélectionnez 8K, 4K, 1080p, audio MP3 ou les sous-titres souhaités.</p>
-            </li>
-            <li class="step-card">
-              <span class="step-num">4</span>
-              <h3>Profitez hors ligne !</h3>
-              <p>Ouvrez votre fichier MKV/MP4/MP3 directement depuis la file ou votre gestionnaire de fichiers.</p>
-            </li>
-          </ol>
-          <a class="btn-white-pill" href="#telechargement">Téléchargement gratuit v0.2.0</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== MULTI-OS DOWNLOAD CENTER (capture #9) ==================== -->
-    <section id="telechargement" class="download-section deferred-section">
-      <div class="container">
-        <div class="section-heading">
-          <h2>Télécharger 4k free video dowloader (v0.2.0)</h2>
-          <p>Gratuit à vie, sans installation publicitaire, pour Windows 10/11 et toutes les distributions Linux.</p>
+        <div class="section-header">
+          <h2>Télécharger la version v0.2.0</h2>
+          <p>Tous les fichiers sont hébergés sur GitHub Releases et accompagnés de leurs empreintes dans <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/SHA256SUMS.txt">SHA256SUMS.txt</a>.</p>
         </div>
 
         <div class="os-grid">
-          <article class="os-card featured">
+          <article class="os-card highlighted">
             <div>
-              <div class="os-icon" aria-hidden="true">WIN</div>
-              <h3>Windows 10 / 11 (x64)</h3>
-              <div class="os-version-tag">4k free video dowloader.exe</div>
-              <p>Archive portable complète incluant l'interface Desktop WebView2, <code>WebView2Loader.dll</code> et le CLI Windows.</p>
+              <div class="os-head">
+                <h3>Windows 10 / 11</h3>
+                <span class="os-arch">x86_64</span>
+              </div>
+              <p>Archive portable prête à l'emploi (<code>6,0 Mo</code>) contenant <code>4k free video dowloader.exe</code> (<code>11 Mo</code>), <code>WebView2Loader.dll</code> (<code>157 Ko</code>) et <code>vidgrab-cli.exe</code> (<code>3,1 Mo</code>).</p>
             </div>
             <div>
-              <a class="os-btn" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip">
-                Télécharger (.zip • 6,0 Mo)
-              </a>
-              <div class="os-sublinks">
-                Ou direct : <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader.exe">.exe</a> •
-                <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/vidgrab-cli.exe">CLI</a>
+              <div class="os-actions">
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip">Archive .zip (6,0 Mo)</a>
+                <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader.exe">.exe seul</a>
               </div>
+              <code class="os-cmd">Garder WebView2Loader.dll dans le même dossier</code>
             </div>
           </article>
 
           <article class="os-card">
             <div>
-              <div class="os-icon" aria-hidden="true">DEB</div>
-              <h3>Ubuntu / Debian / Mint</h3>
-              <div class="os-version-tag">Paquet natif .deb</div>
-              <p>Compatible Ubuntu 24.04/26.04 LTS, Debian 13, Linux Mint, Pop!_OS, Zorin OS, Elementary, Kali et Parrot.</p>
+              <div class="os-head">
+                <h3>Ubuntu / Debian / Mint</h3>
+                <span class="os-arch">amd64 .deb</span>
+              </div>
+              <p>Paquet natif <code>.deb</code> (<code>3,9 Mo</code>) pour Ubuntu LTS, Debian 13, Linux Mint, Pop!_OS, Zorin OS, Elementary, Kali et Parrot OS.</p>
             </div>
             <div>
-              <a class="os-btn" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.deb">
-                Télécharger (.deb • 3,9 Mo)
-              </a>
-              <div class="os-sublinks"><code>sudo apt install ./4k*.deb</code></div>
+              <div class="os-actions">
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.deb">Télécharger .deb (3,9 Mo)</a>
+              </div>
+              <code class="os-cmd">sudo apt install ./4k*.deb</code>
             </div>
           </article>
 
           <article class="os-card">
             <div>
-              <div class="os-icon" aria-hidden="true">RPM</div>
-              <h3>Fedora / RHEL / openSUSE</h3>
-              <div class="os-version-tag">Paquet natif .rpm</div>
-              <p>Compatible Fedora 44, Nobara Linux, RHEL, AlmaLinux, Rocky Linux et openSUSE Leap / Tumbleweed.</p>
+              <div class="os-head">
+                <h3>Fedora / RHEL / openSUSE</h3>
+                <span class="os-arch">x86_64 .rpm</span>
+              </div>
+              <p>Paquet natif <code>.rpm</code> (<code>4,0 Mo</code>) compatible Fedora, Nobara Linux, RHEL, AlmaLinux, Rocky Linux et openSUSE.</p>
             </div>
             <div>
-              <a class="os-btn" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader-0.2.0-1.x86_64.rpm">
-                Télécharger (.rpm • 4,0 Mo)
-              </a>
-              <div class="os-sublinks"><code>sudo dnf install ./4k*.rpm</code></div>
+              <div class="os-actions">
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader-0.2.0-1.x86_64.rpm">Télécharger .rpm (4,0 Mo)</a>
+              </div>
+              <code class="os-cmd">sudo dnf install ./4k*.rpm</code>
             </div>
           </article>
 
-          <article class="os-card dark-card">
+          <article class="os-card">
             <div>
-              <div class="os-icon" aria-hidden="true">ALL</div>
-              <h3>Universel Linux &amp; Serveur</h3>
-              <div class="os-version-tag">AppImage &amp; CLI</div>
-              <p>Fonctionne sans installation sur Arch, CachyOS, Manjaro, SteamOS, Bazzite, Gentoo, NixOS, Alpine et Docker.</p>
+              <div class="os-head">
+                <h3>AppImage &amp; Serveurs CLI</h3>
+                <span class="os-arch">Linux universel</span>
+              </div>
+              <p>Exécutable portable AppImage (<code>111 Mo</code>) pour Arch, CachyOS, Manjaro, SteamOS, Bazzite, ou binaire <code>vidgrab-cli</code> (<code>3,2 Mo</code>) sans dépendance GTK.</p>
             </div>
             <div>
-              <a class="os-btn" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.AppImage">
-                Télécharger (.AppImage)
-              </a>
-              <div class="os-sublinks">
-                Serveur : <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/vidgrab-cli">vidgrab-cli</a> •
-                <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/SHA256SUMS.txt">SHA256</a>
+              <div class="os-actions">
+                <a class="btn-primary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.AppImage">AppImage (111 Mo)</a>
+                <a class="btn-secondary" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/vidgrab-cli">vidgrab-cli</a>
               </div>
+              <code class="os-cmd">chmod +x 4k*.AppImage &amp;&amp; ./4k*.AppImage</code>
             </div>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ==================== FAQ ACCORDION (conforme modern-web-guidance) ==================== -->
-    <section id="faq" class="faq-section deferred-section">
+    <!-- ==================== FAQ ==================== -->
+    <section id="faq" class="section deferred-section">
       <div class="container">
-        <div class="section-heading">
-          <h2 id="faq-heading">Questions fréquentes (FAQ)</h2>
-          <p>Tout savoir sur les formats, la sécurité open source et l'installation sur Windows ou Linux.</p>
+        <div class="section-header">
+          <h2 id="faq-heading">Questions fréquentes</h2>
+          <p>Réponses directes sur les formats, la sécurité, Windows et Linux.</p>
         </div>
 
         <section class="accordion" aria-labelledby="faq-heading">
           <details open>
-            <summary>4k free video dowloader est-il vraiment gratuit et sans limite ?</summary>
-            <div class="faq-answer">
-              <p>Oui. Le logiciel est intégralement gratuit et publié sous licence libre <strong>GNU GPL-3.0-or-later</strong>. Il n'y a aucune version payante cachée, aucune publicité et aucune limite sur la longueur des playlists ou le nombre de téléchargements quotidiens.</p>
+            <summary>Quelles sont les différences avec les téléchargeurs commerciaux ?</summary>
+            <div class="faq-body">
+              <p><strong>4k free video dowloader</strong> est un logiciel libre publié sous licence <strong>GNU GPL-3.0-or-later</strong> et écrit en Rust. Il n'impose aucune limite sur le nombre de vidéos, aucune version payante, aucune publicité ni aucun traceur : votre file et votre historique restent dans votre base SQLite locale.</p>
             </div>
           </details>
 
           <details>
-            <summary>Quelles plateformes et résolutions vidéo supporte-t-il ?</summary>
-            <div class="faq-answer">
-              <p>Grâce à <code>yt-dlp</code> et <code>FFmpeg</code>, le logiciel gère YouTube, Vimeo, TikTok, SoundCloud, Twitch, Facebook, Bilibili et plus de 1&nbsp;000 sites web. Les vidéos sont téléchargeables en 720p, 1080p, 2K, 4K UHD et 8K HDR à 60 FPS aux formats MKV, MP4 ou WebM, et l'audio en MP3, M4A, Opus ou FLAC.</p>
+            <summary>Quels formats vidéo, audio et sous-titres sont gérés ?</summary>
+            <div class="faq-body">
+              <p>Vidéo en <code>MP4</code> et <code>MKV</code> jusqu'en 8K (4320p), 4K (2160p), 2K (1440p), 1080p et 720p (60 FPS et HDR selon la source) avec choix du codec H.264, VP9 ou AV1. Extraction audio en <code>MP3</code>, <code>M4A</code>, <code>OGG</code>, <code>Opus</code>, <code>FLAC</code> ou <code>WAV</code> jusqu'à 320 kbps, et sous-titres en <code>SRT</code>, <code>VTT</code> ou <code>ASS</code>.</p>
             </div>
           </details>
 
           <details>
-            <summary>Peut-il télécharger des vidéos et des playlists privées ?</summary>
-            <div class="faq-answer">
-              <p>Oui, pour les vidéos privées auxquelles votre compte a déjà accès, vous pouvez importer vos cookies de session depuis les paramètres (stockés localement avec permissions restrictives <code>0600</code>). L'application respecte strictement les flux protégés par DRM (Widevine/PlayReady) et ne tente aucun contournement.</p>
+            <summary>Comment lancer l'application sur Windows 10 ou Windows 11 ?</summary>
+            <div class="faq-body">
+              <p>Téléchargez l'archive <code>4k.free.video.dowloader_0.2.0_windows_x64.zip</code>, extrayez son contenu et double-cliquez sur <code>4k free video dowloader.exe</code> en gardant <code>WebView2Loader.dll</code> dans le même dossier. Windows 11 et Windows 10 récents intègrent déjà Microsoft Edge WebView2 Runtime.</p>
             </div>
           </details>
 
           <details>
-            <summary>Comment installer l'application sous Windows 10/11 ?</summary>
-            <div class="faq-answer">
-              <p>Téléchargez l'archive <code>4k.free.video.dowloader_0.2.0_windows_x64.zip</code>, extrayez le dossier et double-cliquez sur <code>4k free video dowloader.exe</code>. Assurez-vous de laisser <code>WebView2Loader.dll</code> dans le même dossier. Windows 11 intègre déjà WebView2 Runtime nativement.</p>
+            <summary>Comment fonctionne le traitement audio IA et le mode CLI ?</summary>
+            <div class="faq-body">
+              <p>Le module audio IA utilise <strong>Demucs</strong> dans un environnement virtuel Python local (détection automatique CUDA/ROCm ou CPU) pour isoler la voix ou supprimer la musique, avec repli sur les filtres DSP de <code>FFmpeg</code> si Demucs n'est pas installé. Le binaire <code>vidgrab-cli</code> permet d'exécuter diagnostics, analyses, téléchargements et découpes FFmpeg sans interface graphique.</p>
             </div>
           </details>
 
           <details>
-            <summary>Comment utiliser le Mode Intelligent pour gagner du temps ?</summary>
-            <div class="faq-answer">
-              <p>Activez le bouton <strong>Mode intelligent</strong> dans la barre d'outils puis sélectionnez une fois votre qualité (par exemple 4K), votre format (MP4 ou MKV) et votre dossier de destination. À chaque clic sur « Coller le lien », le téléchargement démarre immédiatement sans fenêtre de confirmation.</p>
-            </div>
-          </details>
-
-          <details>
-            <summary>Le logiciel est-il sûr et comment vérifier son authenticité ?</summary>
-            <div class="faq-answer">
-              <p>Chaque nouvelle version est compilée depuis les sources publiques Rust sur GitHub Actions, vérifiée par Clippy et des tests unitaires Linux et Windows, protégée par une Content Security Policy (CSP) WebView stricte, et accompagnée d'un fichier <code>SHA256SUMS.txt</code> dans la Release GitHub.</p>
+            <summary>Comment vérifier l'intégrité des exécutables ?</summary>
+            <div class="faq-body">
+              <p>Comparez l'empreinte de votre fichier téléchargé avec le fichier officiel <a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/SHA256SUMS.txt">SHA256SUMS.txt</a> publié dans la Release <code>v0.2.0</code> (<code>sha256sum -c SHA256SUMS.txt</code> sous Linux ou <code>Get-FileHash</code> sous PowerShell).</p>
             </div>
           </details>
         </section>
       </div>
     </section>
 
-    <!-- ==================== RESOURCES & TECH SPECS (captures #12-#13) ==================== -->
-    <section class="deferred-section">
+    <!-- ==================== FICHE TECHNIQUE ==================== -->
+    <section class="section deferred-section" style="padding-block-start: 0;">
       <div class="container">
-        <div class="resources-grid">
-          <article class="resource-card">
-            <h3>Guides &amp; Documentation</h3>
-            <p style="margin:0; color: var(--ink-muted); font-size: 0.94rem;">
-              Installez le logiciel sur n'importe quelle distribution Linux (Desktop, Serveur, Gaming ou Conteneur Docker) ou automatisez vos scripts avec le CLI.
-            </p>
-            <div class="resource-links">
-              <div>
-                <strong><a href="guide-linux.html">Guide Linux universel</a></strong>
-                <span>Ubuntu, Debian, Fedora, Arch, Nix, Alpine, Docker</span>
-              </div>
-              <div>
-                <strong><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/blob/main/README.md" target="_blank" rel="noopener noreferrer">Documentation complète</a></strong>
-                <span>Architecture Rust &amp; compilation depuis les sources</span>
-              </div>
-              <div>
-                <strong><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.2.0" target="_blank" rel="noopener noreferrer">Notes de version v0.2.0</a></strong>
-                <span>Changelog, paquets et sommes SHA-256</span>
-              </div>
-              <div>
-                <strong><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/issues" target="_blank" rel="noopener noreferrer">Support &amp; Bugs</a></strong>
-                <span>Signaler un problème ou proposer une idée sur GitHub</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="resource-card">
-            <h3>Open Source &amp; Transparence</h3>
-            <p style="margin:0 0 1rem; color: var(--ink-muted); font-size: 0.94rem;">
-              Aucune donnée personnelle collectée, aucun traceur publicitaire. Toutes vos recherches, files d'attente et abonnements restent stockés dans votre base SQLite locale.
-            </p>
-            <div style="display:flex; flex-wrap:wrap; gap:0.65rem;">
-              <a class="nav-cta" href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">Voir le dépôt GitHub</a>
-              <a class="nav-github" href="https://github.com/Fazerdino1/4k-free-video-dowloader-/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Licence GPL-3.0</a>
-            </div>
-          </article>
-        </div>
-
-        <section class="spec-sheet" aria-label="Fiche technique du logiciel">
-          <div class="spec-header">
-            <img src="assets/icon-128.png" alt="" width="24" height="24" loading="lazy" style="border-radius: 6px;">
-            <span>4k free video dowloader — Fiche technique</span>
+        <h2 style="font-size: 1.25rem; margin-block-end: 1rem;">Fiche technique (v0.2.0)</h2>
+        <dl class="spec-grid">
+          <div class="spec-cell">
+            <dt>Version &amp; Date</dt>
+            <dd>v0.2.0 • 12 novembre 2026</dd>
           </div>
-          <dl class="spec-grid">
-            <div class="spec-item">
-              <dt>Version la plus récente</dt>
-              <dd>v0.2.0 (12 novembre 2026)</dd>
-              <dt>Auteur</dt>
-              <dd>Fazerdino1</dd>
-            </div>
-            <div class="spec-item">
-              <dt>Taille des installeurs</dt>
-              <dd>3,9 Mo (.deb/.rpm) • 6,0 Mo (Win .zip) • 111 Mo (AppImage)</dd>
-              <dt>Licence</dt>
-              <dd>GNU GPL-3.0-or-later (100 % gratuit)</dd>
-            </div>
-            <div class="spec-item">
-              <dt>Compatibilité OS</dt>
-              <dd>Windows 10/11 (x64) &amp; Linux x86_64 / ARM64</dd>
-              <dt>Moteur &amp; Stack</dt>
-              <dd>Rust + Tauri 2 + yt-dlp + FFmpeg + SQLite</dd>
-            </div>
-            <div class="spec-item">
-              <dt>Langues de l'interface</dt>
-              <dd>Français, English</dd>
-              <dt>Vérification</dt>
-              <dd>GitHub Actions CI + empreintes SHA-256</dd>
-            </div>
-          </dl>
-        </section>
+          <div class="spec-cell">
+            <dt>Licence &amp; Auteur</dt>
+            <dd>GNU GPL-3.0-or-later • Fazerdino1</dd>
+          </div>
+          <div class="spec-cell">
+            <dt>Plateformes</dt>
+            <dd>Binaires x86_64 (Win 10/11 &amp; Linux) • Sources ARM64</dd>
+          </div>
+          <div class="spec-cell">
+            <dt>Langues de l'UI</dt>
+            <dd>Français, English</dd>
+          </div>
+        </dl>
       </div>
     </section>
   </main>
@@ -763,64 +636,46 @@ Affichage    : Wayland / X11 / WebView2 / Headless CLI
   <footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
-        <div class="footer-col">
-          <h4>Logiciel</h4>
-          <ul>
-            <li><a href="./">Présentation</a></li>
-            <li><a href="#fonctionnalites">Fonctionnalités 4K / 8K</a></li>
-            <li><a href="#telechargement">Télécharger v0.2.0</a></li>
-            <li><a href="guide-linux.html">Linux &amp; CLI headless</a></li>
-          </ul>
+        <div>
+          <h4>4k free video dowloader</h4>
+          <p style="font-size: 0.88rem;">
+            Logiciel libre écrit en Rust pour télécharger des médias sans publicité ni restriction artificielle.
+          </p>
         </div>
-        <div class="footer-col">
+        <div>
           <h4>Téléchargements</h4>
           <ul>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip">Windows x64 (.zip portable)</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip">Windows x64 (.zip)</a></li>
             <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.deb">Ubuntu / Debian (.deb)</a></li>
             <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader-0.2.0-1.x86_64.rpm">Fedora / RHEL (.rpm)</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.AppImage">AppImage Universel</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_amd64.AppImage">AppImage Linux</a></li>
           </ul>
         </div>
-        <div class="footer-col">
-          <h4>Aide &amp; Sécurité</h4>
+        <div>
+          <h4>Documentation</h4>
           <ul>
-            <li><a href="#faq">Questions fréquentes (FAQ)</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/SHA256SUMS.txt">Vérifier SHA256SUMS.txt</a></li>
+            <li><a href="guide-linux.html">Guide Linux &amp; CLI</a></li>
+            <li><a href="#cli">Commandes vidgrab-cli</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/SHA256SUMS.txt">Empreintes SHA-256</a></li>
+            <li><a href="sitemap.xml">Plan du site XML</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Code source GitHub</h4>
+          <ul>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">Dépôt Fazerdino1</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.2.0" target="_blank" rel="noopener noreferrer">Release v0.2.0</a></li>
+            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/actions" target="_blank" rel="noopener noreferrer">GitHub Actions CI</a></li>
             <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/issues" target="_blank" rel="noopener noreferrer">Signaler un bug</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Licence GNU GPL-3.0</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Projet GitHub</h4>
-          <ul>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-" target="_blank" rel="noopener noreferrer">Dépôt officiel Fazerdino1</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases" target="_blank" rel="noopener noreferrer">Toutes les Releases</a></li>
-            <li><a href="https://github.com/Fazerdino1/4k-free-video-dowloader-/actions" target="_blank" rel="noopener noreferrer">Builds GitHub Actions CI</a></li>
-            <li><a href="sitemap.xml">Plan du site (Sitemap)</a></li>
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <span>© 2026 Fazerdino1 — <strong>4k free video dowloader</strong> (GNU GPL-3.0-or-later).</span>
-        <span>Respectez les droits d'auteur et ne téléchargez pas de contenus protégés par DRM.</span>
+        <span>© 2026 Fazerdino1 — Licence GNU GPL-3.0-or-later.</span>
+        <span>Respectez les droits d'auteur : aucun contournement des flux protégés par DRM.</span>
       </div>
     </div>
   </footer>
-
-  <!-- Barre flottante inférieure (capture #2 à #13) -->
-  <div id="floating-pill" class="floating-pill" hidden>
-    <div class="floating-pill-brand">
-      <img src="assets/icon-128.png" alt="" width="34" height="34">
-      <span>4k free video dowloader</span>
-    </div>
-    <a
-      id="floating-download-btn"
-      class="floating-pill-btn"
-      href="https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/download/v0.2.0/4k.free.video.dowloader_0.2.0_windows_x64.zip"
-    >
-      Téléchargement gratuit
-    </a>
-  </div>
 </body>
 </html>
