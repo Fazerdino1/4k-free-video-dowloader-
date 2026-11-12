@@ -56,6 +56,96 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
     <style>{MAIN_CSS}</style>
 </head>
 <body>
+    <!-- 0. Dedicated Mobile App Bar (4K Video Downloader Native Android Style) -->
+    <header id="mobile-top-bar" class="mobile-top-bar" aria-label="Barre d'application mobile">
+        <div class="mob-bar-main">
+            <button id="mob-btn-search-toggle" type="button" class="mob-icon-btn" aria-label="Rechercher" title="Rechercher">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <h1 class="mob-bar-title">{app_title}</h1>
+            <div class="mob-bar-actions">
+                <button id="mob-btn-sort" type="button" class="mob-icon-btn" aria-label="Trier" title="Trier" aria-haspopup="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/></svg>
+                </button>
+                <button id="mob-btn-settings" type="button" class="mob-icon-btn" aria-label="Paramètres" title="Paramètres">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <button id="mob-btn-more" type="button" class="mob-icon-btn" aria-label="Plus d'options" title="Plus" aria-haspopup="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Expandable Search Row -->
+        <div id="mob-search-row" class="mob-search-row" hidden>
+            <input id="mob-search-input" type="search" placeholder="Rechercher parmi les téléchargements..." />
+            <button id="mob-btn-search-clear" type="button" class="mob-search-clear" aria-label="Effacer">✕</button>
+        </div>
+
+        <!-- Mobile Sort Dropdown Menu (Screenshots 4 & 5) -->
+        <div id="mob-sort-dropdown" class="mob-popup-menu" hidden>
+            <button type="button" class="mob-menu-item" data-mob-sort="date">
+                <span>Date d'ajout</span>
+                <span class="mob-check check-date">✓</span>
+            </button>
+            <button type="button" class="mob-menu-item" data-mob-sort="name">
+                <span>Nom</span>
+                <span class="mob-check check-name" style="visibility:hidden;">✓</span>
+            </button>
+            <hr class="mob-menu-sep" />
+            <button type="button" class="mob-menu-item" data-mob-order="asc">
+                <span>Croissant</span>
+                <span class="mob-check check-asc" style="visibility:hidden;">✓</span>
+            </button>
+            <button type="button" class="mob-menu-item" data-mob-order="desc">
+                <span>Décroissant</span>
+                <span class="mob-check check-desc">✓</span>
+            </button>
+        </div>
+
+        <!-- Mobile Overflow More Menu (Screenshot 3) -->
+        <div id="mob-more-dropdown" class="mob-popup-menu" hidden>
+            <button type="button" class="mob-menu-item" id="mob-act-smart">
+                <span>Mode intelligent (Smart)</span>
+                <span id="mob-smart-indicator" class="mob-pill-tag">OFF</span>
+            </button>
+            <button type="button" class="mob-menu-item" id="mob-act-subs">
+                <span>Abonnements chaînes</span>
+            </button>
+            <button type="button" class="mob-menu-item" id="mob-act-media">
+                <span>Outils audio / vidéo</span>
+            </button>
+            <button type="button" class="mob-menu-item" id="mob-act-bulk">
+                <span>Importer un fichier / lot</span>
+            </button>
+            <button type="button" class="mob-menu-item" id="mob-act-logs">
+                <span>Journaux &amp; Diagnostic</span>
+            </button>
+            <button type="button" class="mob-menu-item" id="mob-act-sites">
+                <span>Sites supportés (1000+)</span>
+            </button>
+            <button type="button" class="mob-menu-item" id="mob-act-about">
+                <span>À propos &amp; Licence</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Category Filter Bar (Screenshots 1, 7, 8) -->
+    <div id="mobile-filter-bar" class="mobile-filter-bar">
+        <button id="mob-category-btn" type="button" class="mob-category-btn" aria-haspopup="true">
+            <span id="mob-category-label">Tous</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div id="mob-category-dropdown" class="mob-popup-menu" hidden>
+            <button type="button" class="mob-menu-item active" data-mob-cat="all">Tous (All)</button>
+            <button type="button" class="mob-menu-item" data-mob-cat="video">Vidéos</button>
+            <button type="button" class="mob-menu-item" data-mob-cat="audio">Audios</button>
+            <button type="button" class="mob-menu-item" data-mob-cat="subscriptions">Abonnements</button>
+            <button type="button" class="mob-menu-item" data-mob-cat="completed">Terminés</button>
+        </div>
+    </div>
+
     <!-- 1. Top Desktop Menu Bar -->
     <nav class="menubar" aria-label="Menu principal">
         <div class="menubar-items">
@@ -255,29 +345,21 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
         {cards_html}
     </main>
 
-    <!-- 4c. Mobile / Android Bottom Navigation Dock -->
-    <nav id="mobile-bottom-nav" class="mobile-bottom-nav" aria-label="Navigation mobile">
-        <button id="mob-nav-paste" type="button" class="mob-nav-btn primary">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            <span>Coller</span>
+    <!-- 4c. Mobile Bottom Floating Action Bar (4K Video Downloader Android Style) -->
+    <div id="mobile-fab-container" class="mobile-fab-container" aria-label="Actions rapides mobile">
+        <div class="mobile-fab-aux">
+            <button id="mob-fab-share" type="button" class="mob-aux-btn" aria-label="Partager" title="Partager l'application ou les liens">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
+            <button id="mob-fab-smart-quick" type="button" class="mob-aux-btn" aria-label="Mode intelligent rapide" title="Mode intelligent rapide">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+        </div>
+        <button id="mob-fab-paste" type="button" class="mob-fab-paste" aria-label="Coller le lien">
+            <span class="mob-fab-plus">+</span>
+            <span class="mob-fab-text" data-i18n="mob_paste_link">PASTE LINK</span>
         </button>
-        <button id="mob-nav-queue" type="button" class="mob-nav-btn">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span>File</span>
-        </button>
-        <button id="mob-nav-subs" type="button" class="mob-nav-btn">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span>Abos</span>
-        </button>
-        <button id="mob-nav-logs" type="button" class="mob-nav-btn">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-            <span>Logs</span>
-        </button>
-        <button id="mob-nav-settings" type="button" class="mob-nav-btn">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>Réglages</span>
-        </button>
-    </nav>
+    </div>
 
     <!-- 5. Floating Built-in Browser Button (Desktop only) -->
     <button id="btn-browser" type="button" class="fab-browser android-hide" title="Ouvrir le navigateur intégré (YouTube, Vimeo, TikTok, Cookies)" aria-label="{browser_label}">
@@ -962,6 +1044,9 @@ const CLIENT_JS: &str = r##"
         let dlSubmitDefaultText = '';
         let lastItems = [];
         let groupedMode = false;
+        let currentSort = 'date';
+        let currentOrder = 'desc';
+        let activeMobileCat = 'all';
         const collapsedGroups = new Set();
         const speeds = {};
         let expertMuxedFmt = null;
@@ -2536,10 +2621,17 @@ const CLIENT_JS: &str = r##"
         function renderCardJs(item) {
             const req = item.request, prog = item.progress;
             const cat = req.media_type === 'audio_only' ? 'audio' : (req.media_type === 'subtitles_only' ? 'subtitles' : 'video');
+            const fmt = req.media_type === 'audio_only'
+                ? (req.audio_format || 'mp3').toUpperCase()
+                : (req.media_type === 'subtitles_only' ? (req.subtitle_format || 'srt').toUpperCase() : (req.video_container || 'mkv').toUpperCase());
+            const sizeStr = prog.total_bytes ? formatBytes(prog.total_bytes) : (prog.downloaded_bytes ? formatBytes(prog.downloaded_bytes) : '');
+            const durStr = req.duration ? formatDurationShort(req.duration) : '';
+            const mobSub = [durStr, sizeStr, fmt].filter(Boolean).join(' · ');
             const thumbSrc = safeImgSrc(req.thumbnail);
+            const durBadge = durStr ? `<span class="thumb-dur-badge">${esc(durStr)}</span>` : '';
             const thumb = thumbSrc
-                ? `<img src="${esc(thumbSrc)}" alt="" referrerpolicy="no-referrer" /><span class="thumb-play-overlay">${ICO.play}</span>`
-                : `<span class="thumb-ph">${cat === 'audio' ? ICO.music : (cat === 'subtitles' ? ICO.captions : ICO.film)}</span>`;
+                ? `<img src="${esc(thumbSrc)}" alt="" referrerpolicy="no-referrer" />${durBadge}<span class="thumb-play-overlay">${ICO.play}</span>`
+                : `<span class="thumb-ph">${cat === 'audio' ? ICO.music : (cat === 'subtitles' ? ICO.captions : ICO.film)}</span>${durBadge}`;
             const pct = (prog.status === 'completed' ? 100 : (prog.percent || 0)).toFixed(1);
             const barCls = prog.status === 'failed' ? 'bar-error' : (prog.status === 'paused' ? 'bar-paused' : (prog.status === 'completed' ? 'bar-done' : ''));
             const safeId = esc(req.id);
@@ -2547,7 +2639,7 @@ const CLIENT_JS: &str = r##"
                 <div class="thumb-box" data-action="${prog.status === 'completed' ? 'play' : 'open'}" data-id="${safeId}" title="${prog.status === 'completed' ? 'Lire' : 'Ouvrir le dossier'}">${thumb}</div>
                 <div class="item-meta">
                     <div class="item-title" title="${esc(req.title)}">${esc(req.title)}</div>
-                    <div class="item-sub js-sub">${subLine(item)}</div>
+                    <div class="item-sub js-sub"><span class="mob-sub-text">${esc(mobSub || 'Prêt')}</span><span class="desk-sub-chips">${subLine(item)}</span></div>
                     <div class="progress-track ${prog.status === 'completed' ? 'hide-done' : ''}" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">
                         <div class="progress-fill ${barCls}" style="width: ${pct}%"></div>
                     </div>
@@ -2611,14 +2703,28 @@ const CLIENT_JS: &str = r##"
                 applyFilters();
                 return;
             }
+            let sortedItems = lastItems.map((item, originalIndex) => ({ item, originalIndex }));
+            sortedItems.sort((a, b) => {
+                let cmp = 0;
+                if (currentSort === 'name') {
+                    const na = (a.item.request && a.item.request.title) || '';
+                    const nb = (b.item.request && b.item.request.title) || '';
+                    cmp = na.localeCompare(nb, undefined, { sensitivity: 'base' });
+                } else {
+                    cmp = a.originalIndex - b.originalIndex;
+                }
+                return currentOrder === 'asc' ? cmp : -cmp;
+            });
+            const displayItems = sortedItems.map(x => x.item);
+
             if (!groupedMode) {
-                listEl.innerHTML = lastItems.map(renderCardJs).join('');
+                listEl.innerHTML = displayItems.map(renderCardJs).join('');
                 applyFilters();
                 return;
             }
             const groups = new Map();
             const blocks = [];
-            for (const it of lastItems) {
+            for (const it of displayItems) {
                 const gid = it.request.group_id;
                 if (!gid) {
                     blocks.push({ kind: 'single', item: it });
@@ -2646,17 +2752,31 @@ const CLIENT_JS: &str = r##"
         }
 
         function currentFilter() {
+            if (activeMobileCat && activeMobileCat !== 'all') {
+                return activeMobileCat;
+            }
             const t = document.querySelector('.nav-tab[aria-selected="true"]');
             return t ? t.getAttribute('data-filter') : 'all';
         }
 
         function applyFilters() {
             const filter = currentFilter();
-            const q = document.getElementById('search-input').value.toLowerCase();
+            const mobQ = (document.getElementById('mob-search-input')?.value || '').toLowerCase().trim();
+            const deskQ = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+            const q = mobQ || deskQ;
             let visible = 0;
             document.querySelectorAll('.download-card').forEach(card => {
                 const cat = card.getAttribute('data-category');
-                const okCat = filter === 'all' || filter === 'ytsearch' || cat === filter;
+                const st = card.getAttribute('data-status');
+                let okCat = false;
+                if (filter === 'all' || filter === 'ytsearch') okCat = true;
+                else if (filter === 'video') okCat = (cat === 'video');
+                else if (filter === 'audio') okCat = (cat === 'audio');
+                else if (filter === 'completed') okCat = (st === 'completed');
+                else if (filter === 'subscriptions') okCat = (cat === 'subscriptions');
+                else if (filter === 'playlists') okCat = !!card.closest('.group-box');
+                else okCat = (cat === filter);
+
                 const okQ = !q || card.textContent.toLowerCase().includes(q);
                 const show = okCat && okQ;
                 card.style.display = show ? 'grid' : 'none';
@@ -2667,7 +2787,8 @@ const CLIENT_JS: &str = r##"
                 gb.style.display = anyVis ? 'block' : 'none';
             });
             const suf = (I18N_DICT[currentLang] || I18N_DICT.fr).count_suffix;
-            document.getElementById('status-count').textContent = visible + ' ' + suf;
+            const sc = document.getElementById('status-count');
+            if (sc) sc.textContent = visible + ' ' + suf;
         }
 
         async function refreshList() {
@@ -3004,22 +3125,239 @@ const CLIENT_JS: &str = r##"
             } catch (_) {}
         }
 
-        function bindMobileBottomNav() {
+        function bindMobileControls() {
             const bind = (id, fn) => {
                 const el = document.getElementById(id);
                 if (el) el.addEventListener('click', fn);
             };
-            bind('mob-nav-paste', () => document.getElementById('btn-paste')?.click());
-            bind('mob-nav-queue', () => {
-                document.querySelector('.nav-tab[data-filter="all"]')?.click();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const closeAllMobPopups = () => {
+                const s = document.getElementById('mob-sort-dropdown');
+                const m = document.getElementById('mob-more-dropdown');
+                const c = document.getElementById('mob-category-dropdown');
+                if (s) s.hidden = true;
+                if (m) m.hidden = true;
+                if (c) c.hidden = true;
+            };
+
+            // Mobile search
+            bind('mob-btn-search-toggle', () => {
+                const row = document.getElementById('mob-search-row');
+                if (!row) return;
+                closeAllMobPopups();
+                row.hidden = !row.hidden;
+                if (!row.hidden) {
+                    const inp = document.getElementById('mob-search-input');
+                    if (inp) { inp.focus(); }
+                }
             });
-            bind('mob-nav-subs', () => document.getElementById('btn-subscriptions')?.click());
-            bind('mob-nav-logs', () => document.getElementById('menu-logs')?.click());
-            bind('mob-nav-settings', () => document.getElementById('btn-settings')?.click());
+            bind('mob-btn-search-clear', () => {
+                const inp = document.getElementById('mob-search-input');
+                if (inp) inp.value = '';
+                const row = document.getElementById('mob-search-row');
+                if (row) row.hidden = true;
+                applyFilters();
+            });
+            const mobSearchInp = document.getElementById('mob-search-input');
+            if (mobSearchInp) {
+                mobSearchInp.addEventListener('input', applyFilters);
+            }
+
+            // Mobile sort dropdown
+            bind('mob-btn-sort', (e) => {
+                e.stopPropagation();
+                const d = document.getElementById('mob-sort-dropdown');
+                if (!d) return;
+                const wasHidden = d.hidden;
+                closeAllMobPopups();
+                d.hidden = !wasHidden;
+            });
+
+            document.querySelectorAll('#mob-sort-dropdown [data-mob-sort]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const s = btn.getAttribute('data-mob-sort');
+                    if (s) currentSort = s;
+                    const chkDate = document.querySelector('#mob-sort-dropdown .check-date');
+                    const chkName = document.querySelector('#mob-sort-dropdown .check-name');
+                    if (chkDate) chkDate.style.visibility = currentSort === 'date' ? 'visible' : 'hidden';
+                    if (chkName) chkName.style.visibility = currentSort === 'name' ? 'visible' : 'hidden';
+                    renderQueueList();
+                    const d = document.getElementById('mob-sort-dropdown');
+                    if (d) d.hidden = true;
+                });
+            });
+
+            document.querySelectorAll('#mob-sort-dropdown [data-mob-order]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const o = btn.getAttribute('data-mob-order');
+                    if (o) currentOrder = o;
+                    const chkAsc = document.querySelector('#mob-sort-dropdown .check-asc');
+                    const chkDesc = document.querySelector('#mob-sort-dropdown .check-desc');
+                    if (chkAsc) chkAsc.style.visibility = currentOrder === 'asc' ? 'visible' : 'hidden';
+                    if (chkDesc) chkDesc.style.visibility = currentOrder === 'desc' ? 'visible' : 'hidden';
+                    renderQueueList();
+                    const d = document.getElementById('mob-sort-dropdown');
+                    if (d) d.hidden = true;
+                });
+            });
+
+            // Mobile settings button (gear in top bar)
+            bind('mob-btn-settings', () => {
+                closeAllMobPopups();
+                modalSet.hidden = false;
+            });
+
+            // Mobile more menu
+            bind('mob-btn-more', (e) => {
+                e.stopPropagation();
+                const d = document.getElementById('mob-more-dropdown');
+                if (!d) return;
+                const wasHidden = d.hidden;
+                closeAllMobPopups();
+                d.hidden = !wasHidden;
+            });
+
+            bind('mob-act-smart', () => {
+                closeAllMobPopups();
+                const btnSmart = document.getElementById('btn-smart-mode');
+                if (btnSmart) btnSmart.click();
+                const isSmart = btnSmart && btnSmart.getAttribute('aria-pressed') === 'true';
+                const ind = document.getElementById('mob-smart-indicator');
+                if (ind) {
+                    ind.textContent = isSmart ? 'ON' : 'OFF';
+                    ind.style.background = isSmart ? '#4bb300' : 'rgba(75, 179, 0, 0.15)';
+                    ind.style.color = isSmart ? '#ffffff' : '#4bb300';
+                }
+            });
+
+            bind('mob-act-subs', () => {
+                closeAllMobPopups();
+                modalSubs.hidden = false;
+            });
+
+            bind('mob-act-media', () => {
+                closeAllMobPopups();
+                openPasteDialog('', false);
+                setPillValue('sel-media-type', 'audio_only');
+            });
+
+            bind('mob-act-bulk', () => {
+                closeAllMobPopups();
+                modalBulk.hidden = false;
+            });
+
+            bind('mob-act-logs', () => {
+                closeAllMobPopups();
+                modalLogs.hidden = false;
+            });
+
+            bind('mob-act-sites', () => {
+                closeAllMobPopups();
+                showToast('Compatible YouTube, Vimeo, TikTok, X/Twitter, Twitch, Facebook, Instagram et +1000 sites.');
+            });
+
+            bind('mob-act-about', () => {
+                closeAllMobPopups();
+                showToast('VidGrab — 4K Video Downloader v0.3.0 · Libre et gratuit');
+            });
+
+            // Mobile category filter
+            bind('mob-category-btn', (e) => {
+                e.stopPropagation();
+                const d = document.getElementById('mob-category-dropdown');
+                if (!d) return;
+                const wasHidden = d.hidden;
+                closeAllMobPopups();
+                d.hidden = !wasHidden;
+            });
+
+            document.querySelectorAll('#mob-category-dropdown [data-mob-cat]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const cat = btn.getAttribute('data-mob-cat') || 'all';
+                    activeMobileCat = cat;
+                    document.querySelectorAll('#mob-category-dropdown [data-mob-cat]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const lbl = document.getElementById('mob-category-label');
+                    if (lbl) {
+                        lbl.textContent = btn.textContent.trim().split(' ')[0];
+                    }
+                    const d = document.getElementById('mob-category-dropdown');
+                    if (d) d.hidden = true;
+                    if (cat === 'subscriptions') {
+                        modalSubs.hidden = false;
+                    }
+                    applyFilters();
+                });
+            });
+
+            // Mobile FAB Actions
+            bind('mob-fab-paste', async () => {
+                let clip = '';
+                try {
+                    if (invoke) {
+                        clip = (await invoke('cmd_read_clipboard') || '').trim();
+                    }
+                    if (!clip && navigator.clipboard && navigator.clipboard.readText) {
+                        clip = (await navigator.clipboard.readText() || '').trim();
+                    }
+                } catch (_) {}
+
+                if (clip && /^https?:\/\//i.test(clip)) {
+                    const btnSmart = document.getElementById('btn-smart-mode');
+                    const isSmart = btnSmart && btnSmart.getAttribute('aria-pressed') === 'true';
+                    if (isSmart && invoke) {
+                        try {
+                            await invoke('cmd_enqueue_download', { request: buildRequestFromQuickBar(clip, clip, null) });
+                            showToast('⬇ Téléchargement démarré (Mode Smart)');
+                            await refreshList();
+                            return;
+                        } catch (err) {
+                            showToast('Erreur Smart : ' + err);
+                        }
+                    }
+                    openPasteDialog(clip, false);
+                } else {
+                    openPasteDialog('', false);
+                }
+            });
+
+            bind('mob-fab-share', () => {
+                if (navigator.share) {
+                    navigator.share({
+                        title: '4K Free Video Downloader',
+                        text: 'Téléchargeur de vidéos & audios haute qualité libre',
+                        url: 'https://github.com/fazerdino1/4kfreedowloader'
+                    }).catch(() => {});
+                } else {
+                    showToast('Partager : https://github.com/fazerdino1/4kfreedowloader');
+                }
+            });
+
+            bind('mob-fab-smart-quick', () => {
+                const btnSmart = document.getElementById('btn-smart-mode');
+                if (btnSmart) btnSmart.click();
+                const isSmart = btnSmart && btnSmart.getAttribute('aria-pressed') === 'true';
+                const ind = document.getElementById('mob-smart-indicator');
+                if (ind) {
+                    ind.textContent = isSmart ? 'ON' : 'OFF';
+                    ind.style.background = isSmart ? '#4bb300' : 'rgba(75, 179, 0, 0.15)';
+                    ind.style.color = isSmart ? '#ffffff' : '#4bb300';
+                }
+                showToast(isSmart ? '⚡ Mode Smart activé (téléchargement instantané)' : 'Mode Smart désactivé');
+            });
+
+            // Dismiss mobile popups on outside click
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#mobile-top-bar') && !e.target.closest('#mobile-filter-bar')) {
+                    closeAllMobPopups();
+                }
+            });
         }
 
-        bindMobileBottomNav();
+        bindMobileControls();
         syncInitialSettings();
         refreshPlatformInfo();
         consumePendingShareUrl();
