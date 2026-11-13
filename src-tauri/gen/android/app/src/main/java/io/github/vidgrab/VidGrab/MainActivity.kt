@@ -30,6 +30,17 @@ class MainActivity : TauriActivity() {
         }.start()
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == SafStorageHelper.REQUEST_CODE_OPEN_TREE && resultCode == RESULT_OK) {
+            data?.data?.let { treeUri ->
+                SafStorageHelper.persistTreePermission(this, treeUri)
+                Toast.makeText(this, "Dossier SAF autorisé", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun installCrashHandler() {
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->

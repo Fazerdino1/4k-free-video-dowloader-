@@ -365,3 +365,73 @@ pub fn detect_platform_info(paths: &AppPaths, settings: &Settings) -> LinuxPlatf
         }
     }
 }
+
+/// Detects available FFmpeg hardware video encoder (`"h264_nvenc"`, `"h264_vaapi"`, `"h264_qsv"`, or `"libx264"`).
+pub async fn detect_ffmpeg_hw_encoder(ffmpeg_bin: &Path) -> &'static str {
+    let mut cmd = tokio::process::Command::new(ffmpeg_bin);
+    cmd.args(["-hide_banner", "-encoders"])
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null());
+    crate::configure_background_command(&mut cmd);
+    let Ok(out) = cmd.output().await else {
+        return "libx264";
+    };
+    let text = String::from_utf8_lossy(&out.stdout);
+    select_hw_encoder_from_list(&text)
+}
+
+/// Pure helper selecting the best H.264 encoder from `ffmpeg -encoders` output.
+#[must_use]
+pub fn select_hw_encoder_from_list(encoders_output: &str) -> &'static str {
+    if encoders_output.contains("h264_nvenc") {
+        "h264_nvenc"
+    } else if encoders_output.contains("h264_vaapi") && Path::new("/dev/dri/renderD128").exists() {
+        "h264_vaapi"
+    } else if encoders_output.contains("h264_qsv") {
+        "h264_qsv"
+    } else if encoders_output.contains("h264_amf") {
+        "h264_amf"
+    } else {
+        "libx264"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_os_release_ubuntu_and_fallback() {
+        let ubuntu = r#"
+NAME="Ubuntu"
+PRETTY_NAME="Ubuntu 24.04.1 LTS"
+ID=ubuntu
+ID_LIKE="debian"
+"#;
+        let (id, name, like) = parse_os_release(ubuntu);
+        assert_eq!(id, "ubuntu");
+        assert_eq!(name, "Ubuntu 24.04.1 LTS");
+        assert_eq!(like, vec!["debian"]);
+
+        let (fb_id, fb_name, fb_like) = parse_os_release("");
+        assert_eq!(fb_id, "linux");
+        assert_eq!(fb_name, "Linux");
+        assert!(fb_like.is_empty());
+    }
+
+    #[test]
+    fn test_preferred_ytdlp_asset_names_variants() {
+        let x86_glibc = preferred_ytdlp_asset_names("x86_64", "glibc", false);
+        assert_eq!(x86_glibc.first().copied(), Some("yt-dlp_linux"));
+
+        let arm64_musl = preferred_ytdlp_asset_names("aarch64", "musl", false);
+        assert!(arm64_musl.contains(&"yt-dlp_linux_aarch64") || arm64_musl.contains(&"yt-dlp"));
+    }
+
+    #[test]
+    fn test_select_hw_encoder_from_list() {
+        assert_eq!(select_hw_encoder_from_list(" V..... h264_nvenc "), "h264_nvenc");
+        assert_eq!(select_hw_encoder_from_list(" V..... h264_qsv "), "h264_qsv");
+        assert_eq!(select_hw_encoder_from_list(" V..... libx264 "), "libx264");
+    }
+}

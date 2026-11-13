@@ -258,3 +258,136 @@ pub async fn run_ffmpeg_tool(
 
     Ok(output_path)
 }
+
+/// Verifies media container/stream integrity with `ffmpeg -v error -i <file> -f null -`.
+/// Returns `Ok(true)` if valid, `Ok(false)` if errors were detected or `ffmpeg` is unavailable.
+pub async fn verify_media_integrity(
+    paths: &AppPaths,
+    settings: &Settings,
+    file_path: &Path,
+) -> CoreResult<bool> {
+    if !file_path.exists() {
+        return Ok(false);
+    }
+    let Ok(ffmpeg_bin) = paths.effective_ffmpeg(settings) else {
+        return Ok(true);
+    };
+    let mut cmd = Command::new(&ffmpeg_bin);
+    cmd.args(["-v", "error", "-i"])
+        .arg(file_path)
+        .args(["-f", "null", "-"])
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped());
+    crate::configure_background_command(&mut cmd);
+    let output = cmd.output().await?;
+    Ok(output.status.success() && output.stderr.is_empty())
+}
+
+/// Builds FFmpeg arguments for a [`vidgrab_shared::PostProcessPipeline`].
+#[must_use]
+pub fn build_post_process_args(
+    input_path: &Path,
+    output_path: &Path,
+    pipeline: &vidgrab_shared::PostProcessPipeline,
+    hw_encoder: &str,
+) -> Option<Vec<String>> {
+    if !pipeline.normalize_loudness && !pipeline.remove_silence && !pipeline.transcode_hw_h264 {
+        return None;
+    }
+    let mut args = vec![
+        "-y".to_string(),
+        "-i".to_string(),
+        input_path.to_string_lossy().into_owned(),
+    ];
+    let mut af_filters = Vec::new();
+    if pipeline.normalize_loudness {
+        af_filters.push("loudnorm=I=-16:TP=-1.5:LRA=11");
+    }
+    if pipeline.remove_silence {
+        af_filters.push("silenceremove=start_periods=1:stop_periods=-1:stop_duration=0.5:stop_threshold=-45dB");
+    }
+    if !af_filters.is_empty() {
+        args.push("-af".to_string());
+        args.push(af_filters.join(","));
+    }
+    if pipeline.transcode_hw_h264 {
+        args.push("-c:v".to_string());
+        args.push(hw_encoder.to_string());
+    } else {
+        args.push("-c:v".to_string());
+        args.push("copy".to_string());
+    }
+    args.push(output_path.to_string_lossy().into_owned());
+    Some(args)
+}
+
+/// Executes [`vidgrab_shared::PostProcessPipeline`] on `input_path` using `ffmpeg`
+/// (with auto-detected hardware encoder when `transcode_hw_h264` is enabled).
+pub async fn run_post_process_pipeline(
+    paths: &AppPaths,
+    settings: &Settings,
+    input_path: &Path,
+) -> CoreResult<PathBuf> {
+    let pipe = &settings.post_process_pipeline;
+    if !pipe.normalize_loudness && !pipe.remove_silence && !pipe.transcode_hw_h264 {
+        return Ok(input_path.to_path_buf());
+    }
+    let ffmpeg_bin = paths.effective_ffmpeg(settings)?;
+    let hw_enc = if pipe.transcode_hw_h264 {
+        crate::platform::detect_ffmpeg_hw_encoder(&ffmpeg_bin).await
+    } else {
+        "libx264"
+    };
+    let ext = input_path
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("mp4");
+    let stem = input_path
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or("output");
+    let out_path = input_path
+        .parent()
+        .unwrap_or_else(|| Path::new("."))
+        .join(format!("{stem}_processed.{ext}"));
+
+    let Some(args) = build_post_process_args(input_path, &out_path, pipe, hw_enc) else {
+        return Ok(input_path.to_path_buf());
+    };
+    let mut cmd = Command::new(&ffmpeg_bin);
+    cmd.args(&args)
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped());
+    crate::configure_background_command(&mut cmd);
+    let out = cmd.output().await?;
+    if !out.status.success() {
+        let _ = tokio::fs::remove_file(&out_path).await;
+        return Err(CoreError::YtDlpFailed(format!(
+            "Post-process pipeline failed: {}",
+            String::from_utf8_lossy(&out.stderr)
+        )));
+    }
+    Ok(out_path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use vidgrab_shared::PostProcessPipeline;
+
+    #[test]
+    fn test_build_post_process_args() {
+        let empty = PostProcessPipeline::default();
+        assert!(build_post_process_args(Path::new("a.mp4"), Path::new("b.mp4"), &empty, "libx264").is_none());
+
+        let pipe = PostProcessPipeline {
+            normalize_loudness: true,
+            remove_silence: true,
+            transcode_hw_h264: true,
+        };
+        let args = build_post_process_args(Path::new("a.mp4"), Path::new("b.mp4"), &pipe, "h264_nvenc")
+            .expect("args");
+        assert!(args.contains(&"h264_nvenc".to_string()));
+        assert!(args.iter().any(|a| a.contains("loudnorm") && a.contains("silenceremove")));
+    }
+}

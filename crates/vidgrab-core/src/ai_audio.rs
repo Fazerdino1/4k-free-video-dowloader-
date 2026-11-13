@@ -138,18 +138,39 @@ pub fn build_ffmpeg_audio_filter(op: AiAudioOperation) -> &'static str {
 
 /// Processes an audio or video file with either Demucs (if installed and applicable) or `ffmpeg`
 /// audio filters (`afftdn`, phase cancellation, etc.), returning the newly created output path.
+/// Processes audio with Demucs/FFmpeg and reports stage progress via callback.
 pub async fn process_audio_ai(
     paths: &AppPaths,
     settings: &Settings,
     input_file: &Path,
     op: AiAudioOperation,
 ) -> CoreResult<PathBuf> {
+    process_audio_ai_with_progress(paths, settings, input_file, op, |_| {}).await
+}
+
+/// Processes audio with Demucs/FFmpeg and reports `(stage, percent, message)` updates.
+pub async fn process_audio_ai_with_progress<F>(
+    paths: &AppPaths,
+    settings: &Settings,
+    input_file: &Path,
+    op: AiAudioOperation,
+    on_progress: F,
+) -> CoreResult<PathBuf>
+where
+    F: Fn(vidgrab_shared::AiAudioProgress) + Send + Sync,
+{
     if !input_file.exists() {
         return Err(CoreError::AiProcessingFailed(format!(
             "Input file does not exist: {}",
             input_file.display()
         )));
     }
+
+    on_progress(vidgrab_shared::AiAudioProgress {
+        stage: "prepare".to_string(),
+        percent: 10.0,
+        message: "Initialisation du traitement audio IA...".to_string(),
+    });
 
     let ffmpeg = paths.effective_ffmpeg(settings)?;
     let stem = input_file
@@ -170,6 +191,11 @@ pub async fn process_audio_ai(
     if is_demucs_installed(paths) && op != AiAudioOperation::ReduceEchoReverb {
         let demucs_bin = venv_bin_path(&paths.demucs_venv_dir, "demucs");
         let device = detect_compute_device().await;
+        on_progress(vidgrab_shared::AiAudioProgress {
+            stage: "demucs".to_string(),
+            percent: 35.0,
+            message: format!("Séparation Demucs en cours ({device})..."),
+        });
         let out_root = parent.join("demucs_out");
 
         let mut demucs_cmd = Command::new(&demucs_bin);
@@ -196,6 +222,11 @@ pub async fn process_audio_ai(
                 let candidate = out_root.join("htdemucs").join(stem).join(target_stem);
                 if candidate.exists() {
                     if op == AiAudioOperation::IsolateVoiceNoise {
+                        on_progress(vidgrab_shared::AiAudioProgress {
+                            stage: "ffmpeg".to_string(),
+                            percent: 75.0,
+                            message: "Nettoyage DSP FFmpeg des voix...".to_string(),
+                        });
                         // Chain ffmpeg afftdn on top of the Demucs vocal stem
                         let final_out = parent.join(format!("{stem}_{suffix}.wav"));
                         run_ffmpeg_filter(
@@ -205,8 +236,18 @@ pub async fn process_audio_ai(
                             build_ffmpeg_audio_filter(op),
                         )
                         .await?;
+                        on_progress(vidgrab_shared::AiAudioProgress {
+                            stage: "done".to_string(),
+                            percent: 100.0,
+                            message: "Traitement audio IA terminé.".to_string(),
+                        });
                         return Ok(final_out);
                     }
+                    on_progress(vidgrab_shared::AiAudioProgress {
+                        stage: "done".to_string(),
+                        percent: 100.0,
+                        message: "Traitement Demucs terminé.".to_string(),
+                    });
                     return Ok(candidate);
                 }
             }
@@ -214,9 +255,19 @@ pub async fn process_audio_ai(
     }
 
     // Fallback or Echo/Reverb reduction via ffmpeg filters
+    on_progress(vidgrab_shared::AiAudioProgress {
+        stage: "ffmpeg".to_string(),
+        percent: 55.0,
+        message: "Application du filtre audio FFmpeg DSP...".to_string(),
+    });
     let output_file = parent.join(format!("{stem}_{suffix}.mp3"));
     let filter = build_ffmpeg_audio_filter(op);
     run_ffmpeg_filter(&ffmpeg, input_file, &output_file, filter).await?;
+    on_progress(vidgrab_shared::AiAudioProgress {
+        stage: "done".to_string(),
+        percent: 100.0,
+        message: "Traitement audio terminé.".to_string(),
+    });
     Ok(output_file)
 }
 

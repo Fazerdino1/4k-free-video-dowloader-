@@ -208,3 +208,49 @@ impl SubscriptionManager {
         });
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use vidgrab_shared::{AudioFormat, MediaType, VideoContainer};
+
+    #[tokio::test]
+    async fn test_subscription_archive_tracking() {
+        let tmp = tempfile::tempdir().expect("tempdir");
+        let paths = AppPaths::from_roots(tmp.path(), tmp.path()).expect("paths");
+        let db = Arc::new(Database::open(&paths.db_path).expect("open db"));
+        let settings = Arc::new(RwLock::new(Settings::default()));
+        let (tx, _rx) = tokio::sync::mpsc::unbounded_channel();
+        let queue = DownloadQueue::new(paths.clone(), db.clone(), settings.clone(), tx)
+            .expect("queue");
+        let mgr = SubscriptionManager::new(paths, db, queue, settings);
+
+        let sub = Subscription {
+            id: Uuid::new_v4(),
+            url: "https://example.com/@channel".to_string(),
+            title: "Test Channel".to_string(),
+            thumbnail: None,
+            check_interval_mins: 60,
+            media_type: MediaType::Video,
+            target_height: Some(1080),
+            video_container: VideoContainer::Mp4,
+            audio_format: AudioFormat::Mp3,
+            output_dir: tmp.path().to_path_buf(),
+            max_videos: 10,
+            include_shorts: true,
+            include_lives: false,
+            paused: false,
+            last_checked_at: None,
+            created_at: Utc::now(),
+        };
+        mgr.save_subscription(&sub).expect("save sub");
+        assert_eq!(mgr.list_subscriptions().expect("list").len(), 1);
+        mgr.record_archived_id(sub.id, "youtube", "vid123")
+            .expect("archive");
+        let archived = mgr.read_archived_ids(sub.id);
+        assert!(archived.contains("vid123"));
+        assert!(!archived.contains("vid999"));
+        mgr.remove_subscription(sub.id).expect("remove sub");
+        assert!(mgr.list_subscriptions().expect("list").is_empty());
+    }
+}

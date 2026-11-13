@@ -4,7 +4,7 @@ Site officiel : **[fazerdino1.github.io/4k-free-video-dowloader-](https://fazerd
 
 Application **open source**, écrite **100 % en Rust** (Tauri 2 + WebView2 / WebKitGTK / Android + CLI headless), propulsée par **yt-dlp** et **ffmpeg**, compatible avec **Windows 10/11 (x64)**, **Android 7.0+ (APK arm64-v8a)** et l'ensemble des distributions Linux **Desktop, Serveur, ARM, Gaming, Cybersécurité et Conteneurs**.
 
-## Téléchargements précompilés (`v0.3.0`)
+## Téléchargements précompilés (`v0.4.0`)
 
 Tous les binaires et paquets précompilés sont distribués exclusivement via la [**Release GitHub `v0.3.0`**](https://github.com/Fazerdino1/4k-free-video-dowloader-/releases/tag/v0.3.0) (accompagnés du fichier `SHA256SUMS.txt` ; le dépôt Git ne contient que les sources) :
 

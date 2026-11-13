@@ -1,6 +1,8 @@
 //! Page views for the main download dashboard, download options dialog,
 //! subscriptions modal, bulk import, and settings window.
 
+pub mod dashboard;
+
 use crate::components::{format_speed, html_escape};
 use crate::i18n::I18nCatalog;
 use vidgrab_shared::{DownloadItem, Settings, ThemePreference};
@@ -45,6 +47,7 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
     };
     let init_accent = sanitize_hex_accent(&settings.accent_color);
 
+    let v4_dash = dashboard::render_v4_dashboard_section();
     format!(
         r#"<!DOCTYPE html>
 <html lang="{lang}" data-theme="{init_theme}" style="--brand:{init_accent};--border-focus:{init_accent};">
@@ -320,12 +323,29 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
             </button>
         </div>
         <div class="queue-bar-right">
+            <select id="filter-status" class="queue-btn" aria-label="Filtrer par statut" title="Filtrer par statut">
+                <option value="all">Statut : Tous</option>
+                <option value="active">En cours</option>
+                <option value="completed">Terminés</option>
+                <option value="failed">Échecs</option>
+                <option value="paused">En pause</option>
+            </select>
+            <select id="toolbar-speed-limit" class="queue-btn" aria-label="Limite de vitesse" title="Limite de vitesse">
+                <option value="0">Vitesse : Illimitée</option>
+                <option value="512">512 KiB/s</option>
+                <option value="1024">1 MiB/s</option>
+                <option value="2048">2 MiB/s</option>
+                <option value="5120">5 MiB/s</option>
+                <option value="10240">10 MiB/s</option>
+            </select>
             <button id="btn-toggle-groups" type="button" class="queue-btn" aria-pressed="false">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                 <span data-i18n="q_group_pl">Grouper playlists</span>
             </button>
         </div>
     </div>
+
+    {v4_dash}
 
     <!-- 4. Built-in YouTube Search Panel (hidden until tab active) -->
     <section id="yt-search-panel" class="download-list yt-search-panel" hidden>
@@ -689,7 +709,7 @@ pub fn render_app_shell(items: &[DownloadItem], settings: &Settings) -> String {
         dl_btn = html_escape(i18n.t("dialog-download-btn")),
         count = items.len(),
         subs_modal = SUBS_MODAL_HTML,
-        settings_modal = SETTINGS_MODAL_HTML,
+        settings_modal = SETTINGS_MODAL_HTML.replace("<!--V4_SETTINGS-->", dashboard::render_v4_settings_section()),
         logs_modal = LOGS_MODAL_HTML,
         total_speed_str = total_speed_str,
         client_js = CLIENT_JS,
@@ -894,6 +914,7 @@ const SETTINGS_MODAL_HTML: &str = r##"    <!-- Modal 4: Settings Window (4 Tabs)
                         <label class="check-field"><input id="set-write-desc" type="checkbox" /><span>Écrire la description (.description)</span></label>
                         <label class="check-field"><input id="set-sponsorblock" type="checkbox" /><span>Supprimer segments SponsorBlock</span></label>
                         <label class="check-field"><input id="set-org-channel" type="checkbox" /><span>Classer par sous-dossier de chaîne</span></label>
+                        <!--V4_SETTINGS-->
                     </div>
                 </div>
 
@@ -1844,6 +1865,40 @@ const CLIENT_JS: &str = r##"
             this.setAttribute('aria-pressed', groupedMode ? 'true' : 'false');
             renderQueueList();
         });
+        document.getElementById('filter-status')?.addEventListener('change', applyFilters);
+        document.getElementById('btn-trim-preview')?.addEventListener('click', () => {
+            const inp = document.getElementById('trim-file-input');
+            const player = document.getElementById('trim-preview-player');
+            const startSec = Math.max(0, parseFloat(document.getElementById('trim-start-sec')?.value || '0') || 0);
+            if (!inp || !inp.files || !inp.files[0] || !player) {
+                showToast('Sélectionnez un fichier vidéo/audio local pour prévisualiser le trim.');
+                return;
+            }
+            player.src = URL.createObjectURL(inp.files[0]);
+            player.style.display = 'block';
+            player.currentTime = startSec;
+            player.play().catch(() => {});
+        });
+        document.getElementById('btn-whisper-transcribe')?.addEventListener('click', async () => {
+            if (!invoke) return;
+            const path = prompt('Chemin complet du fichier vidéo/audio local à transcrire en .srt :');
+            if (!path || !path.trim()) return;
+            try {
+                showToast('🎙️ Transcription Whisper en cours...');
+                const out = await invoke('cmd_run_whisper_transcribe', { inputPath: path.trim(), language: 'auto', format: 'srt' });
+                showToast('✓ Transcription créée : ' + out);
+            } catch (e) { showToast('Erreur Whisper : ' + e); }
+        });
+        document.getElementById('toolbar-speed-limit')?.addEventListener('change', async function() {
+            const kbps = Math.max(0, parseInt(this.value, 10) || 0);
+            const setInput = document.getElementById('set-speed-limit');
+            if (setInput) setInput.value = kbps;
+            if (!invoke) return;
+            try {
+                await invoke('cmd_set_speed_limit', { speedLimitKbps: kbps });
+                showToast(kbps === 0 ? '⚡ Vitesse illimitée' : '⚡ Limite : ' + kbps + ' KiB/s');
+            } catch (e) { showToast('Erreur vitesse : ' + e); }
+        });
 
         document.getElementById('btn-sched-now').addEventListener('click', async () => {
             if (!invoke) return;
@@ -2227,6 +2282,13 @@ const CLIENT_JS: &str = r##"
                 document.getElementById('set-concurrent').value = s.concurrent_downloads || 3;
                 document.getElementById('set-fragments').value = s.concurrent_fragments || 4;
                 document.getElementById('set-speed-limit').value = s.speed_limit_kbps || 0;
+                const tbSpeed = document.getElementById('toolbar-speed-limit');
+                if (tbSpeed) {
+                    const valStr = String(s.speed_limit_kbps || 0);
+                    if (Array.from(tbSpeed.options).some(o => o.value === valStr)) {
+                        tbSpeed.value = valStr;
+                    }
+                }
                 const setRetriesEl = document.getElementById('set-max-retries');
                 if (setRetriesEl) setRetriesEl.value = s.max_auto_retries != null ? s.max_auto_retries : 2;
                 setPillValue('set-duplicate', s.duplicate_policy || 'rename');
@@ -2237,6 +2299,17 @@ const CLIENT_JS: &str = r##"
                 document.getElementById('set-write-desc').checked = !!s.write_description;
                 document.getElementById('set-sponsorblock').checked = !!s.sponsorblock_enabled;
                 document.getElementById('set-org-channel').checked = !!s.auto_organize_by_channel;
+                const vMed = document.getElementById('set-verify-media');
+                if (vMed) vMed.checked = !!s.verify_downloaded_media;
+                const pPipe = s.post_process_pipeline || {};
+                const pLoud = document.getElementById('set-pipe-loudnorm');
+                if (pLoud) pLoud.checked = !!pPipe.normalize_loudness;
+                const pSil = document.getElementById('set-pipe-silence');
+                if (pSil) pSil.checked = !!pPipe.remove_silence;
+                const pHw = document.getElementById('set-pipe-hw');
+                if (pHw) pHw.checked = !!pPipe.transcode_hw_h264;
+                const dProf = document.getElementById('set-domain-profiles');
+                if (dProf) dProf.value = JSON.stringify(s.domain_profiles || []);
 
                 document.getElementById('set-proxy').value = (s.proxy && s.proxy.url) || '';
                 document.getElementById('set-proxy-domains').value = ((s.proxy && s.proxy.only_domains) || []).join(', ');
@@ -2325,6 +2398,17 @@ const CLIENT_JS: &str = r##"
                 s.write_description = !!document.getElementById('set-write-desc').checked;
                 s.sponsorblock_enabled = !!document.getElementById('set-sponsorblock').checked;
                 s.auto_organize_by_channel = !!document.getElementById('set-org-channel').checked;
+                s.verify_downloaded_media = !!(document.getElementById('set-verify-media') || {}).checked;
+                s.post_process_pipeline = {
+                    normalize_loudness: !!(document.getElementById('set-pipe-loudnorm') || {}).checked,
+                    remove_silence: !!(document.getElementById('set-pipe-silence') || {}).checked,
+                    transcode_hw_h264: !!(document.getElementById('set-pipe-hw') || {}).checked,
+                };
+                try {
+                    const rawProf = (document.getElementById('set-domain-profiles') || {}).value || '[]';
+                    const parsedProf = JSON.parse(rawProf);
+                    if (Array.isArray(parsedProf)) s.domain_profiles = parsedProf;
+                } catch (_) {}
 
                 const proxyUrl = document.getElementById('set-proxy').value.trim();
                 const domRaw = document.getElementById('set-proxy-domains').value || '';
@@ -2551,7 +2635,13 @@ const CLIENT_JS: &str = r##"
                 }
             });
         });
-        document.getElementById('search-input').addEventListener('input', applyFilters);
+        document.getElementById('search-input').addEventListener('input', () => {
+            applyFilters();
+            const q = (document.getElementById('search-input')?.value || '').trim();
+            if (invoke && q.length >= 3) {
+                invoke('cmd_search_downloads', { query: q }).catch(() => {});
+            }
+        });
 
         // Download List Rendering, Grouping, Priority & Subtitle TXT Extraction
         function actionButtons(id, status) {
@@ -2761,13 +2851,14 @@ const CLIENT_JS: &str = r##"
 
         function applyFilters() {
             const filter = currentFilter();
+            const statusFilter = document.getElementById('filter-status')?.value || 'all';
             const mobQ = (document.getElementById('mob-search-input')?.value || '').toLowerCase().trim();
             const deskQ = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
             const q = mobQ || deskQ;
             let visible = 0;
             document.querySelectorAll('.download-card').forEach(card => {
                 const cat = card.getAttribute('data-category');
-                const st = card.getAttribute('data-status');
+                const st = (card.getAttribute('data-status') || '').toLowerCase();
                 let okCat = false;
                 if (filter === 'all' || filter === 'ytsearch') okCat = true;
                 else if (filter === 'video') okCat = (cat === 'video');
@@ -2777,8 +2868,14 @@ const CLIENT_JS: &str = r##"
                 else if (filter === 'playlists') okCat = !!card.closest('.group-box');
                 else okCat = (cat === filter);
 
+                let okStatus = true;
+                if (statusFilter === 'active') okStatus = (st === 'downloading' || st === 'processing' || st === 'queued' || st === 'retrying');
+                else if (statusFilter === 'completed') okStatus = (st === 'completed');
+                else if (statusFilter === 'failed') okStatus = (st === 'failed' || st === 'cancelled');
+                else if (statusFilter === 'paused') okStatus = (st === 'paused');
+
                 const okQ = !q || card.textContent.toLowerCase().includes(q);
-                const show = okCat && okQ;
+                const show = okCat && okStatus && okQ;
                 card.style.display = show ? 'grid' : 'none';
                 if (show) visible++;
             });
@@ -2789,6 +2886,19 @@ const CLIENT_JS: &str = r##"
             const suf = (I18N_DICT[currentLang] || I18N_DICT.fr).count_suffix;
             const sc = document.getElementById('status-count');
             if (sc) sc.textContent = visible + ' ' + suf;
+            let cAct = 0, cDone = 0, cFail = 0;
+            document.querySelectorAll('.download-card').forEach(card => {
+                const st = (card.getAttribute('data-status') || '').toLowerCase();
+                if (st === 'completed') cDone++;
+                else if (st === 'failed' || st === 'cancelled') cFail++;
+                else if (st === 'downloading' || st === 'processing' || st === 'queued' || st === 'retrying') cAct++;
+            });
+            const elAct = document.getElementById('stat-active');
+            const elDone = document.getElementById('stat-done');
+            const elFail = document.getElementById('stat-failed');
+            if (elAct) elAct.textContent = 'En cours : ' + cAct;
+            if (elDone) elDone.textContent = 'Terminés : ' + cDone;
+            if (elFail) elFail.textContent = 'Échecs : ' + cFail;
         }
 
         async function refreshList() {
@@ -3392,6 +3502,13 @@ const CLIENT_JS: &str = r##"
             listen('android-share-url', (event) => {
                 if (event.payload) {
                     openPasteDialog(String(event.payload).trim(), false);
+                }
+            });
+            listen('ai-audio-progress', (event) => {
+                const p = event.payload;
+                if (p && p.message) {
+                    const pct = typeof p.percent === 'number' ? ' (' + Math.round(p.percent) + '%)' : '';
+                    showToast('🎛 ' + p.message + pct);
                 }
             });
             listen('download-progress', (event) => {

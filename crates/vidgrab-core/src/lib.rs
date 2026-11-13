@@ -19,7 +19,9 @@ pub mod updater;
 pub mod cli;
 pub mod media_tools;
 pub mod mobile_bridge;
+pub mod native_http;
 pub mod platform;
+pub mod whisper;
 
 use crate::error::{CoreError, CoreResult};
 use base64::{engine::general_purpose::STANDARD as BASE64_STD, Engine as _};
@@ -79,6 +81,39 @@ pub async fn fetch_thumbnail_data_uri(thumb_url: &str) -> Option<String> {
     let mime = header_mime.unwrap_or_else(|| sniff_image_mime(&bytes).to_string());
     let b64 = BASE64_STD.encode(&bytes);
     Some(format!("data:{mime};base64,{b64}"))
+}
+
+/// Fetches a thumbnail with a local disk cache (`cache_dir/thumbs/<sha256>.bin`)
+/// so repeated analyses do not re-download remote images.
+pub async fn fetch_thumbnail_cached(
+    cache_dir: &std::path::Path,
+    thumb_url: &str,
+) -> Option<String> {
+    use sha2::{Digest, Sha256};
+    if thumb_url.starts_with("data:image/") {
+        return Some(thumb_url.to_string());
+    }
+    let thumbs_dir = cache_dir.join("thumbs");
+    let mut hasher = Sha256::new();
+    hasher.update(thumb_url.as_bytes());
+    let key = hex::encode(hasher.finalize());
+    let cached_path = thumbs_dir.join(format!("{key}.bin"));
+
+    if let Ok(bytes) = tokio::fs::read(&cached_path).await {
+        if !bytes.is_empty() {
+            let mime = sniff_image_mime(&bytes);
+            return Some(format!("data:{mime};base64,{}", BASE64_STD.encode(&bytes)));
+        }
+    }
+
+    let data_uri = fetch_thumbnail_data_uri(thumb_url).await?;
+    if let Some((_header, b64)) = data_uri.split_once(";base64,") {
+        if let Ok(raw) = BASE64_STD.decode(b64) {
+            let _ = tokio::fs::create_dir_all(&thumbs_dir).await;
+            let _ = tokio::fs::write(&cached_path, raw).await;
+        }
+    }
+    Some(data_uri)
 }
 
 fn sniff_image_mime(bytes: &[u8]) -> &'static str {

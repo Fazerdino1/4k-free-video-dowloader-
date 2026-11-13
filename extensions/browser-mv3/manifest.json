@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "4k free video dowloader — Companion",
+  "version": "0.4.0",
+  "description": "Envoie la page vidéo ou audio courante en 1 clic vers vidgrab-cli serve.",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Envoyer vers vidgrab"
+  }
+}

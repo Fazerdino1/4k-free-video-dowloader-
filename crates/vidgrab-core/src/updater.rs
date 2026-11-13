@@ -238,3 +238,24 @@ pub async fn ensure_or_update_yt_dlp(paths: &AppPaths, force_download: bool) -> 
     );
     Ok(ver)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_sha256sums_and_verify() {
+        let sample_bytes = b"vidgrab-test-binary";
+        let digest = compute_sha256_hex(sample_bytes);
+        let sums = format!(
+            "{digest}  *yt-dlp_linux\n0000000000000000000000000000000000000000000000000000000000000000  yt-dlp.exe\n"
+        );
+        assert_eq!(parse_sha256sums(&sums, "yt-dlp_linux"), Some(digest.clone()));
+        assert_eq!(parse_sha256sums(&sums, "missing_bin"), None);
+        assert!(verify_sha256(sample_bytes, &digest).is_ok());
+        assert!(matches!(
+            verify_sha256(b"tampered", &digest),
+            Err(CoreError::ChecksumMismatch { .. })
+        ));
+    }
+}

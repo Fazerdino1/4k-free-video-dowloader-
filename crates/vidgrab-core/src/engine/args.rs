@@ -355,15 +355,60 @@ fn append_network_args(args: &mut Vec<String>, target_url: &str, settings: &Sett
     }
 }
 
+const MAX_PATH_SEGMENT_CHARS: usize = 120;
+
+/// Sanitizes a single folder or file stem segment for cross-platform safety
+/// (strips reserved/control characters, trailing dots/spaces, Windows device names,
+/// and caps length to protect against `MAX_PATH` overflows).
 pub fn sanitize_folder_name(name: &str) -> String {
-    name.chars()
+    let mut cleaned: String = name
+        .chars()
+        .filter(|c| !c.is_control())
         .map(|c| match c {
             '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|' | '\0' => '_',
             _ => c,
         })
-        .collect::<String>()
-        .trim()
-        .to_string()
+        .collect();
+
+    cleaned = cleaned.trim().trim_end_matches(['.', ' ']).to_string();
+
+    if cleaned.chars().count() > MAX_PATH_SEGMENT_CHARS {
+        cleaned = cleaned.chars().take(MAX_PATH_SEGMENT_CHARS).collect();
+        cleaned = cleaned.trim_end_matches(['.', ' ']).to_string();
+    }
+
+    let upper = cleaned.to_ascii_uppercase();
+    let base = upper.split('.').next().unwrap_or("");
+    let is_windows_reserved = matches!(
+        base,
+        "CON"
+            | "PRN"
+            | "AUX"
+            | "NUL"
+            | "COM1"
+            | "COM2"
+            | "COM3"
+            | "COM4"
+            | "COM5"
+            | "COM6"
+            | "COM7"
+            | "COM8"
+            | "COM9"
+            | "LPT1"
+            | "LPT2"
+            | "LPT3"
+            | "LPT4"
+            | "LPT5"
+            | "LPT6"
+            | "LPT7"
+            | "LPT8"
+            | "LPT9"
+    );
+    if is_windows_reserved {
+        format!("_{cleaned}")
+    } else {
+        cleaned
+    }
 }
 
 fn is_safe_custom_arg(arg: &str) -> bool {
@@ -378,4 +423,18 @@ fn is_safe_custom_arg(arg: &str) -> bool {
         }
     }
     true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sanitize_folder_name_cross_platform() {
+        assert_eq!(sanitize_folder_name("  My:Video*Name? . "), "My_Video_Name_");
+        assert_eq!(sanitize_folder_name("CON"), "_CON");
+        assert_eq!(sanitize_folder_name("nul.txt"), "_nul.txt");
+        let long = "a".repeat(200);
+        assert_eq!(sanitize_folder_name(&long).chars().count(), MAX_PATH_SEGMENT_CHARS);
+    }
 }

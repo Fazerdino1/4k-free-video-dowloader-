@@ -629,19 +629,69 @@ impl DownloadQueue {
         });
 
         let pids_ref = self.pids.clone();
-        let result = engine::run_download(
-            &self.paths,
-            req,
-            current_settings,
-            extra_args,
-            inner_tx,
-            move |pid| {
-                if let Ok(mut p) = pids_ref.write() {
-                    p.insert(id, pid);
-                }
-            },
-        )
-        .await;
+        let result = if crate::native_http::is_direct_media_url(&req.url)
+            && req.explicit_format_id.is_none()
+            && req.clip_start.is_none()
+            && req.clip_end.is_none()
+        {
+            let file_name = req
+                .url
+                .split('/')
+                .next_back()
+                .and_then(|s| s.split('?').next())
+                .filter(|s| !s.is_empty())
+                .unwrap_or("download.bin");
+            let dest_path = req.output_dir.join(file_name);
+            let dest_clone = dest_path.clone();
+            let tx_clone = inner_tx.clone();
+            match crate::native_http::download_direct_http(
+                &req.url,
+                &dest_path,
+                current_settings.concurrent_fragments.max(1) as usize,
+                move |downloaded, total| {
+                    let pct = total
+                        .filter(|&t| t > 0)
+                        .map(|t| (downloaded as f32 / t as f32) * 100.0)
+                        .unwrap_or(0.0);
+                    let _ = tx_clone.send(DownloadProgress {
+                        id,
+                        status: DownloadStatus::Downloading,
+                        percent: pct,
+                        downloaded_bytes: downloaded,
+                        total_bytes: total,
+                        output_path: Some(dest_clone.clone()),
+                        ..Default::default()
+                    });
+                },
+            )
+            .await
+            {
+                Ok(total) => Ok(DownloadProgress {
+                    id,
+                    status: DownloadStatus::Completed,
+                    percent: 100.0,
+                    downloaded_bytes: total,
+                    total_bytes: Some(total),
+                    output_path: Some(dest_path),
+                    ..Default::default()
+                }),
+                Err(e) => Err(e),
+            }
+        } else {
+            engine::run_download(
+                &self.paths,
+                req,
+                current_settings,
+                extra_args,
+                inner_tx,
+                move |pid| {
+                    if let Ok(mut p) = pids_ref.write() {
+                        p.insert(id, pid);
+                    }
+                },
+            )
+            .await
+        };
 
         if let Ok(mut p) = self.pids.write() {
             p.remove(&id);
@@ -713,7 +763,53 @@ impl DownloadQueue {
                 }
 
                 match result {
-                    Ok(final_prog) => {
+                    Ok(mut final_prog) => {
+                        if let Some(ref out_path) = final_prog.output_path {
+                            match crate::media_tools::run_post_process_pipeline(
+                                &queue.paths,
+                                &current_settings,
+                                out_path,
+                            )
+                            .await
+                            {
+                                Ok(new_path) if new_path != *out_path => {
+                                    final_prog.output_path = Some(new_path);
+                                }
+                                Err(e) => {
+                                    warn!("Post-process pipeline notice: {e}");
+                                }
+                                _ => {}
+                            }
+                        }
+                        if current_settings.verify_downloaded_media {
+                            if let Some(ref out_path) = final_prog.output_path {
+                                match crate::media_tools::verify_media_integrity(
+                                    &queue.paths,
+                                    &current_settings,
+                                    out_path,
+                                )
+                                .await
+                                {
+                                    Ok(false) => {
+                                        let msg = format!(
+                                            "Vérification d'intégrité échouée pour {}",
+                                            out_path.display()
+                                        );
+                                        warn!("{msg}");
+                                        let _ = queue.update_status(
+                                            id,
+                                            DownloadStatus::Failed,
+                                            Some(msg),
+                                        );
+                                        return;
+                                    }
+                                    Err(e) => {
+                                        warn!("Impossible de vérifier l'intégrité : {e}");
+                                    }
+                                    Ok(true) => {}
+                                }
+                            }
+                        }
                         queue.finish_completed(id, &req, final_prog);
                         return;
                     }
@@ -741,5 +837,28 @@ impl DownloadQueue {
                 }
             }
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_queue_concurrency_and_snapshot() {
+        let tmp = tempfile::tempdir().expect("tempdir");
+        let paths = AppPaths::from_roots(tmp.path(), tmp.path()).expect("paths");
+        let db = Arc::new(Database::open(&paths.db_path).expect("open db"));
+        let settings = Arc::new(RwLock::new(Settings::default()));
+        let (tx, _rx) = mpsc::unbounded_channel();
+        let queue = DownloadQueue::new(paths, db, settings, tx).expect("queue");
+
+        queue.update_concurrency(6);
+        assert_eq!(queue.concurrency_limit.load(Ordering::Acquire), 6);
+        queue.update_concurrency(0);
+        assert_eq!(queue.concurrency_limit.load(Ordering::Acquire), 1);
+
+        let items = queue.list_items();
+        assert!(items.is_empty());
     }
 }

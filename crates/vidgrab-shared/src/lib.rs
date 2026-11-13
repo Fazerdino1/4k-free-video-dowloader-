@@ -754,6 +754,54 @@ pub struct Settings {
 
     // Smart Mode
     pub smart_mode: SmartModeSettings,
+
+    // Profiles & Integrity
+    #[serde(default)]
+    pub verify_downloaded_media: bool,
+    #[serde(default)]
+    pub domain_profiles: Vec<DomainProfile>,
+    #[serde(default)]
+    pub post_process_pipeline: PostProcessPipeline,
+}
+
+/// Automated post-download media processing pipeline.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(default)]
+pub struct PostProcessPipeline {
+    pub normalize_loudness: bool,
+    pub remove_silence: bool,
+    pub transcode_hw_h264: bool,
+}
+
+/// Per-domain quality/format override profile used by Smart Mode.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(default)]
+pub struct DomainProfile {
+    pub domain: String,
+    pub media_type: MediaType,
+    pub target_height: Option<u32>,
+    pub video_container: VideoContainer,
+    pub audio_format: AudioFormat,
+}
+
+impl Default for DomainProfile {
+    fn default() -> Self {
+        Self {
+            domain: String::new(),
+            media_type: MediaType::Video,
+            target_height: Some(1080),
+            video_container: VideoContainer::Mp4,
+            audio_format: AudioFormat::Mp3,
+        }
+    }
+}
+
+/// Real-time stage/progress event emitted during AI audio processing.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AiAudioProgress {
+    pub stage: String,
+    pub percent: f32,
+    pub message: String,
 }
 
 impl Default for Settings {
@@ -807,6 +855,9 @@ impl Default for Settings {
             sponsorblock_enabled: false,
 
             smart_mode: SmartModeSettings::default(),
+            verify_downloaded_media: false,
+            domain_profiles: Vec::new(),
+            post_process_pipeline: PostProcessPipeline::default(),
         }
     }
 }

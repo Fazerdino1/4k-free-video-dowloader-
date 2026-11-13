@@ -44,8 +44,6 @@ mod tests {
         assert!(shell.contains("Coller le lien"));
 
         let empty_shell = render_app_shell(&[], &Settings::default());
-        let dist_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("dist");
-        let _ = std::fs::create_dir_all(&dist_dir);
-        let _ = std::fs::write(dist_dir.join("index.html"), empty_shell);
+        assert!(empty_shell.contains("4k free video dowloader"));
     }
 }

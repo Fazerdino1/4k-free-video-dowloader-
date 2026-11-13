@@ -6,7 +6,22 @@
 //! equal to the target height (or the lowest available if all are higher).
 
 use uuid::Uuid;
-use vidgrab_shared::{DownloadRequest, DubbedTrackMode, LiveRecordMode, Settings, VideoInfo};
+use vidgrab_shared::{
+    DomainProfile, DownloadRequest, DubbedTrackMode, LiveRecordMode, Settings, VideoInfo,
+};
+
+/// Finds the first [`DomainProfile`] whose `domain` matches the URL host.
+pub fn match_domain_profile<'a>(
+    url_str: &str,
+    profiles: &'a [DomainProfile],
+) -> Option<&'a DomainProfile> {
+    let parsed = url::Url::parse(url_str).ok()?;
+    let host = parsed.host_str()?.to_ascii_lowercase();
+    profiles.iter().find(|p| {
+        let d = p.domain.trim().to_ascii_lowercase();
+        !d.is_empty() && (host == d || host.ends_with(&format!(".{d}")))
+    })
+}
 
 /// Resolves the best available video height matching `requested_height` from `available_heights`.
 ///
@@ -37,8 +52,25 @@ pub fn resolve_smart_height(
 /// using the user's Smart Mode preferences.
 pub fn build_smart_download_request(info: &VideoInfo, settings: &Settings) -> DownloadRequest {
     let sm = &settings.smart_mode;
+    let url = info
+        .webpage_url
+        .clone()
+        .unwrap_or_else(|| format!("https://www.youtube.com/watch?v={}", info.id));
+    let matched_profile = match_domain_profile(&url, &settings.domain_profiles);
+
+    let effective_media_type = matched_profile.map(|p| p.media_type).unwrap_or(sm.media_type);
+    let requested_height = matched_profile
+        .map(|p| p.target_height)
+        .unwrap_or(sm.target_height);
+    let effective_container = matched_profile
+        .map(|p| p.video_container)
+        .unwrap_or(sm.video_container);
+    let effective_audio_fmt = matched_profile
+        .map(|p| p.audio_format)
+        .unwrap_or(sm.audio_format);
+
     let avail_heights = info.available_heights();
-    let resolved_height = resolve_smart_height(sm.target_height, &avail_heights);
+    let resolved_height = resolve_smart_height(requested_height, &avail_heights);
 
     let mut audio_languages = Vec::new();
     if let Some(pref_audio) = &sm.preferred_audio_language {
@@ -66,11 +98,6 @@ pub fn build_smart_download_request(info: &VideoInfo, settings: &Settings) -> Do
         }
     }
 
-    let url = info
-        .webpage_url
-        .clone()
-        .unwrap_or_else(|| format!("https://www.youtube.com/watch?v={}", info.id));
-
     DownloadRequest {
         id: Uuid::new_v4(),
         url,
@@ -83,16 +110,16 @@ pub fn build_smart_download_request(info: &VideoInfo, settings: &Settings) -> Do
         group_id: None,
         group_title: None,
         playlist_index: None,
-        media_type: sm.media_type,
+        media_type: effective_media_type,
         target_height: resolved_height,
         explicit_format_id: None,
         priority: 0,
         prefer_60fps: true,
         prefer_hdr: false,
         preserve_vr_projection: false,
-        video_container: sm.video_container,
+        video_container: effective_container,
         video_codec: sm.video_codec,
-        audio_format: sm.audio_format,
+        audio_format: effective_audio_fmt,
         audio_bitrate: sm.audio_bitrate,
         audio_languages,
         dubbed_track_mode: DubbedTrackMode::SingleTrack,
@@ -109,5 +136,32 @@ pub fn build_smart_download_request(info: &VideoInfo, settings: &Settings) -> Do
         sponsorblock_remove: settings.sponsorblock_enabled,
         clip_start: None,
         clip_end: None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use vidgrab_shared::{AudioFormat, MediaType, VideoContainer};
+
+    #[test]
+    fn test_domain_profile_matching() {
+        let mut settings = Settings::default();
+        settings.domain_profiles.push(DomainProfile {
+            domain: "soundcloud.com".to_string(),
+            media_type: MediaType::AudioOnly,
+            target_height: None,
+            video_container: VideoContainer::Mp4,
+            audio_format: AudioFormat::Flac,
+        });
+        let info = VideoInfo {
+            id: "123".to_string(),
+            title: "Track".to_string(),
+            webpage_url: Some("https://soundcloud.com/artist/track".to_string()),
+            ..Default::default()
+        };
+        let req = build_smart_download_request(&info, &settings);
+        assert_eq!(req.media_type, MediaType::AudioOnly);
+        assert_eq!(req.audio_format, AudioFormat::Flac);
     }
 }
